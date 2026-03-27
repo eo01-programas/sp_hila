@@ -94,10 +94,11 @@
                 <form id="form-ingreso" onsubmit="guardarIngreso(event)">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                         <div><label class="block text-sm font-semibold text-gray-600 mb-1">Fecha Movimiento *</label><input type="date" id="ing-fecha" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
-                        <div>
+                        <div class="relative">
                             <label class="block text-sm font-semibold text-gray-600 mb-1">Código *</label>
-                            <input type="text" id="ing-codigo" list="datalist-codigos" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white" placeholder="Escriba o seleccione..." autocomplete="off">
-                            <datalist id="datalist-codigos"></datalist>
+                            <input type="text" id="ing-codigo" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white" placeholder="Escriba o seleccione..." autocomplete="off">
+                            <!-- Lista desplegable personalizada -->
+                            <div id="dropdown-ing-codigo" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden"></div>
                         </div>
                         <div><label class="block text-sm font-semibold text-gray-600 mb-1">Lote *</label><input type="text" id="ing-lote" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
                         
@@ -141,20 +142,26 @@
                 <form id="form-salida" onsubmit="guardarSalida(event)">
                     <div class="max-w-md mx-auto bg-rose-50 p-6 rounded-xl border border-rose-100">
                         <div class="space-y-5">
-                            <div>
+                            <div class="relative">
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Código *</label>
-                                <input type="text" id="sal-codigo" list="datalist-codigos" required class="w-full p-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none bg-white" placeholder="Escriba o seleccione..." autocomplete="off">
+                                <input type="text" id="sal-codigo" required class="w-full p-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none bg-white" placeholder="Escriba o seleccione..." autocomplete="off">
+                                <!-- Lista desplegable personalizada -->
+                                <div id="dropdown-sal-codigo" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden"></div>
                             </div>
                             
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Lote *</label>
-                                <input type="text" id="sal-lote" list="datalist-lotes" required placeholder="Ej: L-2023-A o seleccione..." class="w-full p-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none bg-white" autocomplete="off">
-                                <datalist id="datalist-lotes"></datalist>
+                                <!-- Cambiado de input a select -->
+                                <select id="sal-lote" required class="w-full p-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none bg-white">
+                                    <option value="">Primero seleccione un código...</option>
+                                </select>
                             </div>
                             
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">PESO (KG) a retirar *</label>
                                 <input type="number" step="0.01" id="sal-cantidad" required placeholder="0.00" class="w-full p-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-rose-600 font-bold text-lg">
+                                <!-- Mensaje dinámico de stock -->
+                                <p id="sal-stock-disponible" class="text-sm font-semibold mt-2 text-blue-600 hidden">Stock disponible: <span>0</span> KG</p>
                             </div>
                         </div>
 
@@ -265,8 +272,13 @@
     </div>
 
     <script>
+        // --- FUNCIÓN DE FORMATO DE NÚMEROS (SEPARADOR DE MILES) ---
+        function formatearNumero(num) {
+            return Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
         // --- 1. CONFIGURACIÓN DEL BACKEND ---
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyWLBN7CfIQc1I5sJfRervT16niNT6OfaQSYacnX5efOblKuCdnOsyf2q-w2LSPku7b/exec";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwbObDTZ36mkBXSR-ay3AGRi07deg_Lomh-t6CSV8S2c7qQyghQ1tBVSs3E7OY5tF6O/exec";
         
         // Variables globales
         let registrosKardex = [];
@@ -299,8 +311,8 @@
 
                 // Actualizar las interfaces
                 actualizarTabla();
-                actualizarTablaSaldos(); // Novedad: Generar tabla de saldos
-                poblarSelectoresCodigo();
+                actualizarTablaSaldos();
+                configurarDropdownsCodigo(); // Usamos la nueva función visual
                 poblarSelectoresLote();
                 
                 // Indicador visual
@@ -318,16 +330,60 @@
             }
         }
 
-        // Funciones de Listas Desplegables
-        function poblarSelectoresCodigo() {
-            const datalist = document.getElementById('datalist-codigos');
-            let opcionesHTML = ``;
-            catalogoCodigos.forEach(item => {
-                opcionesHTML += `<option value="${item.codigo}">${item.articulo}</option>`;
-            });
-            if(datalist) datalist.innerHTML = opcionesHTML;
+        // --- NUEVO SISTEMA DE AUTOCOMPLETADO VISUAL ---
+        function configurarDropdownsCodigo() {
+            const ingInput = document.getElementById('ing-codigo');
+            const ingDropdown = document.getElementById('dropdown-ing-codigo');
+            const salInput = document.getElementById('sal-codigo');
+            const salDropdown = document.getElementById('dropdown-sal-codigo');
+
+            function renderLista(input, dropdown) {
+                const query = input.value.toLowerCase();
+                dropdown.innerHTML = '';
+                
+                const filtrados = catalogoCodigos.filter(item => 
+                    String(item.codigo).toLowerCase().includes(query) || 
+                    String(item.articulo).toLowerCase().includes(query)
+                );
+
+                if (filtrados.length === 0) {
+                    dropdown.innerHTML = '<div class="p-4 text-sm text-gray-500 italic text-center">No se encontraron coincidencias</div>';
+                } else {
+                    filtrados.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = "px-4 py-2 border-b border-gray-100 last:border-0 hover:bg-slate-100 cursor-pointer flex flex-col transition-colors";
+                        div.innerHTML = `<span class="font-bold text-slate-800 text-sm">${item.codigo}</span><span class="text-xs text-slate-500 truncate">${item.articulo}</span>`;
+                        
+                        // onmousedown se ejecuta antes que el blur del input
+                        div.onmousedown = (e) => {
+                            e.preventDefault(); 
+                            input.value = item.codigo;
+                            dropdown.classList.add('hidden');
+                            input.dispatchEvent(new Event('input')); // Disparar llenado automático de Artículo / Lote
+                        };
+                        dropdown.appendChild(div);
+                    });
+                }
+                dropdown.classList.remove('hidden');
+            }
+
+            // Listeners Ingreso
+            if(ingInput) {
+                ingInput.addEventListener('focus', () => renderLista(ingInput, ingDropdown));
+                ingInput.addEventListener('input', () => renderLista(ingInput, ingDropdown));
+                // Timeout sutil para permitir clics en la barra de scroll si fuera necesario
+                ingInput.addEventListener('blur', () => setTimeout(() => ingDropdown.classList.add('hidden'), 150));
+            }
+
+            // Listeners Salida
+            if(salInput) {
+                salInput.addEventListener('focus', () => renderLista(salInput, salDropdown));
+                salInput.addEventListener('input', () => renderLista(salInput, salDropdown));
+                salInput.addEventListener('blur', () => setTimeout(() => salDropdown.classList.add('hidden'), 150));
+            }
         }
 
+        // Función de Lista Desplegable Lotes (Se elimina poblarSelectoresCodigo)
         function poblarSelectoresLote() {
             const datalist = document.getElementById('datalist-lotes');
             if (!datalist) return;
@@ -346,6 +402,93 @@
             inputArticulo.value = itemEncontrado ? itemEncontrado.articulo : "";
         });
 
+        // --- FUNCIÓN PARA CALCULAR STOCK ESPECÍFICO ---
+        function calcularSaldoStock(codigo, lote) {
+            let saldo = 0;
+            registrosKardex.forEach(reg => {
+                if (String(reg.codigo) === String(codigo) && String(reg.lote) === String(lote)) {
+                    const valorPeso = reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad);
+                    const cant = parseFloat(valorPeso) || 0;
+                    if (String(reg.tipo).toUpperCase() === 'INGRESO') {
+                        saldo += cant;
+                    } else {
+                        saldo -= Math.abs(cant);
+                    }
+                }
+            });
+            return saldo;
+        }
+
+        // --- DINÁMICA DE LOTES PARA SALIDA ---
+        document.getElementById('sal-codigo').addEventListener('input', function(e) {
+            const codigoSeleccionado = e.target.value.trim();
+            const selectLoteSalida = document.getElementById('sal-lote');
+            const inputCantidad = document.getElementById('sal-cantidad');
+            const lblStock = document.getElementById('sal-stock-disponible');
+            
+            if (!selectLoteSalida) return;
+
+            // Resetear visuales
+            selectLoteSalida.innerHTML = '<option value="">Seleccione un lote...</option>'; 
+            lblStock.classList.add('hidden');
+            inputCantidad.max = ""; 
+            inputCantidad.value = "";
+
+            if (!codigoSeleccionado) {
+                selectLoteSalida.innerHTML = '<option value="">Primero seleccione un código...</option>';
+                return;
+            }
+
+            // Filtrar lotes que pertenezcan SOLO al código seleccionado
+            const lotesDelCodigo = registrosKardex
+                .filter(reg => String(reg.codigo) === codigoSeleccionado && reg.lote && String(reg.lote).trim() !== "-" && String(reg.lote).trim() !== "")
+                .map(reg => reg.lote);
+
+            const lotesUnicos = [...new Set(lotesDelCodigo)];
+
+            let opcionesHTML = `<option value="">Seleccione el lote a retirar...</option>`;
+            let lotesConStock = 0;
+
+            lotesUnicos.forEach(lote => { 
+                const saldoActual = calcularSaldoStock(codigoSeleccionado, lote);
+                // SOLO AGREGAR A LA LISTA SI TIENE STOCK POSITIVO
+                if (saldoActual > 0) {
+                    opcionesHTML += `<option value="${lote}">${lote} (Disp: ${formatearNumero(saldoActual)} KG)</option>`; 
+                    lotesConStock++;
+                }
+            });
+
+            if (lotesConStock === 0) {
+                opcionesHTML = `<option value="">Sin lotes con stock para este código</option>`;
+            }
+
+            selectLoteSalida.innerHTML = opcionesHTML;
+        });
+
+        // --- MOSTRAR STOCK AL SELECCIONAR LOTE ---
+        document.getElementById('sal-lote').addEventListener('change', function(e) {
+            const codigoSeleccionado = document.getElementById('sal-codigo').value.trim();
+            const loteSeleccionado = e.target.value.trim();
+            const lblStock = document.getElementById('sal-stock-disponible');
+            const inputCantidad = document.getElementById('sal-cantidad');
+
+            if (codigoSeleccionado && loteSeleccionado) {
+                const saldo = calcularSaldoStock(codigoSeleccionado, loteSeleccionado);
+                if (saldo > 0) {
+                    lblStock.innerHTML = `Stock disponible: <span>${formatearNumero(saldo)}</span> KG`;
+                    lblStock.className = "text-sm font-semibold mt-2 text-blue-600"; // Azul si hay stock
+                    inputCantidad.max = saldo; // Bloquear por HTML
+                } else {
+                    lblStock.innerHTML = `⚠️ Sin stock disponible (0 KG)`;
+                    lblStock.className = "text-sm font-semibold mt-2 text-rose-600"; // Rojo si no hay
+                    inputCantidad.max = 0;
+                }
+            } else {
+                lblStock.classList.add('hidden');
+                inputCantidad.max = "";
+            }
+        });
+
         // --- 3. ESCRITURA DE INGRESO (POST) ---
         async function guardarIngreso(e) {
             e.preventDefault(); 
@@ -354,6 +497,8 @@
             btn.innerHTML = `<div class="loader mr-2"></div> ENVIANDO...`;
             btn.disabled = true;
             
+            const cantIngresada = parseFloat(document.getElementById('ing-cantidad').value);
+
             const nuevoRegistro = {
                 fechaMovimiento: document.getElementById('ing-fecha').value,
                 codigo: document.getElementById('ing-codigo').value,
@@ -361,7 +506,8 @@
                 caracteristicas: document.getElementById('ing-caracteristicas').value || "-",
                 articulo: document.getElementById('ing-articulo').value || "-", 
                 tipo: 'INGRESO',
-                cantidad: parseFloat(document.getElementById('ing-cantidad').value),
+                peso: cantIngresada,      // Ahora enviamos el campo 'peso' para que Sheets lo detecte
+                cantidad: cantIngresada,  // Lo mantenemos por si tu script antiguo lo usa de respaldo
                 proveedor: document.getElementById('ing-proveedor').value || "-",
                 origen: document.getElementById('ing-origen').value || "-",
                 fLlegada: document.getElementById('ing-fllegada').value || "-",
@@ -394,15 +540,39 @@
             btn.innerHTML = `<div class="loader mr-2"></div> REGISTRANDO...`;
             btn.disabled = true;
             
+            const codigoSalida = document.getElementById('sal-codigo').value.trim();
+            const loteSalida = document.getElementById('sal-lote').value.trim();
+            const cantRequerida = Math.abs(parseFloat(document.getElementById('sal-cantidad').value));
+
+            // VALIDACIÓN DE STOCK: Comprobar el stock actual del lote seleccionado
+            const saldoActual = calcularSaldoStock(codigoSalida, loteSalida);
+
+            if (saldoActual <= 0) {
+                alert(`⚠️ Error: La combinación de Código "${codigoSalida}" y Lote "${loteSalida}" NO tiene stock disponible para retirar.`);
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+                return; // Detiene la ejecución
+            }
+
+            if (cantRequerida > saldoActual) {
+                alert(`⚠️ Error de Stock:\nEstás intentando retirar ${formatearNumero(cantRequerida)} KG, pero el stock disponible para este Lote es de solo ${formatearNumero(saldoActual)} KG.`);
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+                return; // Detiene la ejecución
+            }
+
             const hoy = new Date().toISOString().split('T')[0];
+            const cantSalida = -cantRequerida; // Guardamos en negativo
+
             const nuevoRegistro = {
                 fechaMovimiento: hoy,
-                codigo: document.getElementById('sal-codigo').value,
-                lote: document.getElementById('sal-lote').value,
+                codigo: codigoSalida,
+                lote: loteSalida,
                 caracteristicas: "-",
                 articulo: "", 
                 tipo: 'SALIDA',
-                cantidad: -Math.abs(parseFloat(document.getElementById('sal-cantidad').value)),
+                peso: cantSalida,     // Ahora enviamos el campo 'peso'
+                cantidad: cantSalida, // Lo mantenemos de respaldo
                 proveedor: "-", origen: "-", fLlegada: "-", andamio: "-", nCaja: "-", presentacion: "-", certificado: "-"
             };
 
@@ -443,7 +613,10 @@
                     };
                 }
 
-                const cant = parseFloat(reg.cantidad) || 0;
+                // Detectamos la variable 'peso' si el backend ya usa la nueva columna, sino usamos 'cantidad'
+                const valorPeso = reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad);
+                const cant = parseFloat(valorPeso) || 0;
+                
                 if (String(reg.tipo).toUpperCase() === 'INGRESO') {
                     saldos[key].ingresos += cant;
                 } else {
@@ -451,8 +624,7 @@
                     saldos[key].salidas += Math.abs(cant);
                 }
                 
-                // El saldo general (Suma directa porque la salida ya es negativa en BD, 
-                // pero por precaución sumamos Ingresos - Abs(Salidas))
+                // El saldo general
                 saldos[key].saldo = saldos[key].ingresos - saldos[key].salidas;
             });
 
@@ -474,9 +646,9 @@
                     <td class="px-4 py-3 font-semibold text-slate-800 whitespace-nowrap celda-codigo">${item.codigo}</td>
                     <td class="px-4 py-3 font-medium text-slate-700 whitespace-nowrap celda-articulo">${item.articulo}</td>
                     <td class="px-4 py-3 text-slate-600 whitespace-nowrap">${item.lote}</td>
-                    <td class="px-4 py-3 text-right text-emerald-600 whitespace-nowrap">${item.ingresos.toFixed(2)}</td>
-                    <td class="px-4 py-3 text-right text-rose-600 whitespace-nowrap">${item.salidas.toFixed(2)}</td>
-                    <td class="px-4 py-3 text-right font-bold text-lg ${colorSaldo} whitespace-nowrap">${item.saldo.toFixed(2)}</td>
+                    <td class="px-4 py-3 text-right text-emerald-600 whitespace-nowrap">${formatearNumero(item.ingresos)}</td>
+                    <td class="px-4 py-3 text-right text-rose-600 whitespace-nowrap">${formatearNumero(item.salidas)}</td>
+                    <td class="px-4 py-3 text-right font-bold text-lg ${colorSaldo} whitespace-nowrap">${formatearNumero(item.saldo)}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -520,6 +692,10 @@
                 
                 const colorCantidad = isIngreso ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold';
 
+                // Usamos la variable 'peso' o 'PESO' si existe, si no recaemos en 'cantidad'
+                const valorPeso = reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad);
+                const valorPesoFormateado = valorPeso !== undefined ? formatearNumero(valorPeso) : formatearNumero(0);
+
                 const tr = document.createElement('tr');
                 tr.classList.add('hover:bg-slate-50', 'transition-colors', 'fila-historico'); // Añadimos clase para el filtro
                 tr.innerHTML = `
@@ -529,7 +705,7 @@
                     <td class="px-4 py-3 text-slate-600 whitespace-nowrap">${reg.caracteristicas || '-'}</td>
                     <td class="px-4 py-3 font-medium text-slate-700 whitespace-nowrap">${reg.articulo}</td>
                     <td class="px-4 py-3 text-center whitespace-nowrap">${colorTipo}</td>
-                    <td class="px-4 py-3 text-right ${colorCantidad} whitespace-nowrap">${reg.cantidad}</td>
+                    <td class="px-4 py-3 text-right ${colorCantidad} whitespace-nowrap">${valorPesoFormateado}</td>
                     <td class="px-4 py-3 whitespace-nowrap">${reg.proveedor}</td>
                     <td class="px-4 py-3 whitespace-nowrap">${reg.origen}</td>
                     <td class="px-4 py-3 whitespace-nowrap">${reg.fLlegada}</td>
