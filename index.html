@@ -34,8 +34,9 @@
 
         /* --- ESTILOS PARA IMPRESIÓN --- */
         @media print {
+            @page { size: landscape; margin: 1cm; } /* Forzar orientación horizontal */
             body { background-color: white !important; padding: 0 !important; color: black !important; }
-            .max-w-7xl { max-width: 100% !important; box-shadow: none !important; margin: 0 !important; }
+            .max-w-[98%] { max-width: 100% !important; box-shadow: none !important; margin: 0 !important; }
             .no-print { display: none !important; }
             .bg-slate-800 { background-color: transparent !important; color: black !important; padding: 10px 0 !important; border-bottom: 2px solid #333; }
             .bg-slate-800 p { color: #555 !important; }
@@ -49,9 +50,10 @@
         }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans min-h-screen p-4 md:p-8">
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen p-2 md:p-4">
 
-    <div class="max-w-7xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+    <!-- CAMBIO: w-full max-w-[98%] para aprovechar toda la pantalla y evitar scroll horizontal -->
+    <div class="w-full max-w-[98%] mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
         
         <div class="bg-slate-800 text-white p-6 text-center relative">
             <h1 class="text-3xl font-bold tracking-tight">Kardex de Control</h1>
@@ -61,7 +63,7 @@
             </div>
         </div>
 
-        <div class="p-6 md:p-8">
+        <div class="p-4 md:p-6">
 
             <!-- ==========================================
                  VISTA 1: MENÚ PRINCIPAL
@@ -81,7 +83,7 @@
                     </button>
                 </div>
 
-                <!-- Botón de STOCK (NUEVO REPORTE) -->
+                <!-- Botón de STOCK -->
                 <button onclick="cambiarVista('vista-saldos')" 
                         class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xl py-6 rounded-xl transition-colors flex items-center justify-center gap-3 mb-4 shadow-md transform hover:-translate-y-1">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -99,7 +101,7 @@
             <!-- ==========================================
                  VISTA 2: FORMULARIO DE INGRESO
                  ========================================== -->
-            <div id="vista-ingreso" class="vista fade-in">
+            <div id="vista-ingreso" class="vista fade-in max-w-5xl mx-auto">
                 <div class="flex items-center mb-6 border-b pb-4">
                     <button onclick="cambiarVista('vista-menu')" class="text-slate-500 hover:text-slate-800 mr-4">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
@@ -109,30 +111,29 @@
 
                 <form id="form-ingreso" onsubmit="guardarIngreso(event)">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Fecha Movimiento *</label><input type="date" id="ing-fecha" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Fecha Movimiento *</label><input type="date" id="ing-fecha" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
                         <div class="relative">
                             <label class="block text-sm font-semibold text-gray-600 mb-1">Código *</label>
-                            <input type="text" id="ing-codigo" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white" placeholder="Escriba o seleccione..." autocomplete="off">
-                            <!-- Lista desplegable personalizada -->
+                            <input type="text" id="ing-codigo" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white" placeholder="Escriba o seleccione..." autocomplete="off">
                             <div id="dropdown-ing-codigo" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden"></div>
                         </div>
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Lote *</label><input type="text" id="ing-lote" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Lote *</label><input type="text" id="ing-lote" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
                         
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Características</label><input type="text" id="ing-caracteristicas" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Características</label><input type="text" id="ing-caracteristicas" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
                         
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Artículo (Automático)</label><input type="text" id="ing-articulo" placeholder="Esperando código..." readonly class="w-full p-2.5 border rounded-lg bg-gray-100 text-gray-800 font-medium outline-none"></div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Artículo (Automático)</label><input type="text" id="ing-articulo" placeholder="Esperando código..." readonly class="w-full p-2 border rounded-lg bg-gray-100 text-gray-800 font-medium outline-none"></div>
                         
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">PESO (KG) *</label><input type="number" step="0.01" id="ing-cantidad" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">PESO (KG) *</label><input type="number" step="0.01" id="ing-cantidad" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
                         
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Proveedor</label><input type="text" id="ing-proveedor" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Origen</label><input type="text" id="ing-origen" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">F. Llegada Fibra</label><input type="date" id="ing-fllegada" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Proveedor</label><input type="text" id="ing-proveedor" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Origen</label><input type="text" id="ing-origen" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">F. Llegada Fibra</label><input type="date" id="ing-fllegada" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
                         
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Andamio</label><input type="text" id="ing-andamio" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">N° de Caja</label><input type="text" id="ing-ncaja" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Presentación</label><input type="text" id="ing-presentacion" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Andamio</label><input type="text" id="ing-andamio" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">N° de Caja</label><input type="text" id="ing-ncaja" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Presentación</label><input type="text" id="ing-presentacion" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
                         
-                        <div class="md:col-span-2 lg:col-span-3"><label class="block text-sm font-semibold text-gray-600 mb-1">Certificado</label><input type="text" id="ing-certificado" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        <div class="md:col-span-2 lg:col-span-3"><label class="block text-sm font-semibold text-gray-600 mb-1">Certificado</label><input type="text" id="ing-certificado" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
                     </div>
                     
                     <div class="mt-8 flex justify-end gap-4">
@@ -161,13 +162,11 @@
                             <div class="relative">
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Código *</label>
                                 <input type="text" id="sal-codigo" required class="w-full p-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none bg-white" placeholder="Escriba o seleccione..." autocomplete="off">
-                                <!-- Lista desplegable personalizada -->
                                 <div id="dropdown-sal-codigo" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden"></div>
                             </div>
                             
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Lote *</label>
-                                <!-- Cambiado de input a select -->
                                 <select id="sal-lote" required class="w-full p-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none bg-white">
                                     <option value="">Primero seleccione un código...</option>
                                 </select>
@@ -176,7 +175,6 @@
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">PESO (KG) a retirar *</label>
                                 <input type="number" step="0.01" id="sal-cantidad" required placeholder="0.00" class="w-full p-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-rose-600 font-bold text-lg">
-                                <!-- Mensaje dinámico de stock -->
                                 <p id="sal-stock-disponible" class="text-sm font-semibold mt-2 text-blue-600 hidden">Stock disponible: <span>0</span> KG</p>
                             </div>
                         </div>
@@ -192,7 +190,7 @@
             </div>
 
             <!-- ==========================================
-                 VISTA 4: REPORTE DE SALDOS (NUEVO)
+                 VISTA 4: REPORTE DE SALDOS
                  ========================================== -->
             <div id="vista-saldos" class="vista fade-in">
                 <div class="flex flex-wrap items-center justify-between mb-6 border-b pb-4 gap-4">
@@ -214,7 +212,6 @@
                     </div>
                 </div>
 
-                <!-- Buscador para saldos -->
                 <div class="mb-4 flex gap-4 bg-blue-50 p-4 rounded-lg border border-blue-100 no-print">
                     <div class="flex-1">
                         <label class="block text-xs font-bold text-blue-800 uppercase mb-1">Buscar por Código o Artículo:</label>
@@ -245,7 +242,7 @@
                  VISTA 5: HISTÓRICO GENERAL
                  ========================================== -->
             <div id="vista-historico" class="vista fade-in">
-                <div class="flex flex-wrap items-center justify-between mb-6 border-b pb-4 gap-4">
+                <div class="flex flex-wrap items-center justify-between mb-4 border-b pb-4 gap-4">
                     <div class="flex items-center">
                         <button onclick="cambiarVista('vista-menu')" class="text-slate-500 hover:text-slate-800 mr-4 no-print">
                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
@@ -253,10 +250,9 @@
                         <h2 class="text-2xl font-bold text-slate-800">Histórico General (Auditoría)</h2>
                     </div>
                     
-                    <!-- BOTONES DE EXPORTACIÓN E INFO -->
                     <div class="flex items-center gap-4">
                         <div class="text-sm bg-slate-100 px-4 py-2 rounded-full font-semibold text-slate-600 shadow-inner border border-slate-200 no-print">
-                            Total Registros: <span id="contador-registros" class="text-emerald-600 font-bold ml-1">0</span>
+                            Registros: <span id="contador-registros" class="text-emerald-600 font-bold ml-1">0</span>
                         </div>
                         <div class="flex gap-2 no-print">
                             <button onclick="window.print()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-bold text-sm transition-colors flex items-center gap-2">
@@ -269,39 +265,49 @@
                     </div>
                 </div>
 
-                <div class="overflow-x-auto border rounded-xl shadow-sm">
-                    <table class="min-w-full divide-y divide-gray-200 text-sm" id="tabla-historico">
+                <!-- CAMBIO: Espaciado ajustado para evitar scroll horizontal -->
+                <div class="overflow-x-auto border rounded-xl shadow-sm pb-10">
+                    <table class="min-w-full divide-y divide-gray-200 text-xs" id="tabla-historico">
                         <thead class="bg-slate-800 text-white">
                             <tr>
-                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Fecha Mov.</th>
-                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Código</th>
-                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Lote</th>
-                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap text-amber-300">Características</th>
-                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Artículo</th>
-                                <th class="px-4 py-3 text-center font-semibold uppercase tracking-wider whitespace-nowrap">Tipo</th>
-                                <th class="px-4 py-3 text-right font-semibold uppercase tracking-wider whitespace-nowrap">PESO (KG)</th>
-                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Proveedor</th>
-                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Origen</th>
-                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">F. Llegada</th>
-                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Andamio</th>
-                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">N° Caja</th>
-                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Presentación</th>
-                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Certificado</th>
+                                <!-- Reducimos padding (px-2 py-1.5) y usamos texto pequeño para meter 15 columnas -->
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Fecha Mov.</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Código</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Lote</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap text-amber-300">Características</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Artículo</th>
+                                <th class="px-2 py-1.5 text-center font-semibold uppercase tracking-wider whitespace-nowrap">Tipo</th>
+                                <th class="px-2 py-1.5 text-right font-semibold uppercase tracking-wider whitespace-nowrap">PESO (KG)</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Proveedor</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Origen</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">F. Llegada</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Andamio</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">N° Caja</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Presentación</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Certificado</th>
+                                <th class="px-2 py-1.5 text-center font-semibold uppercase tracking-wider whitespace-nowrap no-print">Acciones</th>
                             </tr>
-                            <!-- FILA DE FILTROS TIPO EXCEL -->
                             <tr class="bg-slate-700 no-print">
-                                <td class="p-1"><input type="text" id="fh-fecha" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-xs text-black px-2 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400"></td>
-                                <td class="p-1"><input type="text" id="fh-codigo" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-xs text-black px-2 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400"></td>
-                                <td class="p-1"><input type="text" id="fh-lote" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-xs text-black px-2 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400"></td>
-                                <td class="p-1"><input type="text" id="fh-caracteristicas" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-xs text-black px-2 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400"></td>
-                                <td class="p-1"><input type="text" id="fh-articulo" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-xs text-black px-2 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400"></td>
-                                <td class="p-1"><select id="fh-tipo" onchange="filtrarHistorico()" class="w-full text-xs text-black px-1 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400"><option value="">Todos</option><option value="INGRESO">INGRESO</option><option value="SALIDA">SALIDA</option></select></td>
-                                <td colspan="8" class="p-1 text-center text-xs text-slate-300 italic">Otras columnas no filtrables</td>
+                                <td class="p-1"><input type="text" id="fh-fecha" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-[10px] text-black px-1 py-1 rounded outline-none"></td>
+                                <td class="p-1"><input type="text" id="fh-codigo" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-[10px] text-black px-1 py-1 rounded outline-none"></td>
+                                <td class="p-1"><input type="text" id="fh-lote" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-[10px] text-black px-1 py-1 rounded outline-none"></td>
+                                <td class="p-1"><input type="text" id="fh-caracteristicas" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-[10px] text-black px-1 py-1 rounded outline-none"></td>
+                                <td class="p-1"><input type="text" id="fh-articulo" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-[10px] text-black px-1 py-1 rounded outline-none"></td>
+                                <td class="p-1"><select id="fh-tipo" onchange="filtrarHistorico()" class="w-full text-[10px] text-black px-1 py-1 rounded outline-none"><option value="">Todos</option><option value="INGRESO">IN</option><option value="SALIDA">OUT</option></select></td>
+                                <td colspan="9" class="p-1 text-center text-[10px] text-slate-300 italic">Otras columnas sin filtro</td>
                             </tr>
                         </thead>
                         <tbody id="cuerpo-tabla" class="bg-white divide-y divide-gray-200">
-                            <tr><td colspan="14" class="px-6 py-8 text-center text-gray-500 italic">Cargando información desde la base de datos... <div class="loader ml-2 mb-[-6px]"></div></td></tr>
+                            <tr><td colspan="15" class="px-6 py-8 text-center text-gray-500 italic">Cargando información desde la base de datos... <div class="loader ml-2 mb-[-6px]"></div></td></tr>
                         </tbody>
+                        <!-- NUEVO: Pie de tabla para el subtotal dinámico -->
+                        <tfoot id="pie-tabla-historico" class="bg-slate-200 font-bold text-slate-800 border-t-2 border-slate-400 hidden">
+                            <tr>
+                                <td colspan="6" class="px-2 py-2 text-right uppercase tracking-wider text-xs">Subtotal Filtrado (NETO):</td>
+                                <td class="px-2 py-2 text-right text-xs" id="subtotal-peso-historico">0.00</td>
+                                <td colspan="8" class="px-2 py-2"></td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -309,36 +315,82 @@
         </div>
     </div>
 
+    <!-- ==========================================
+         MODAL DE EDICIÓN
+         ========================================== -->
+    <div id="modal-editar" class="fixed inset-0 bg-black bg-opacity-60 z-[100] hidden flex items-center justify-center p-4 fade-in no-print">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+            <div class="bg-blue-700 text-white px-6 py-4 flex justify-between items-center">
+                <h3 class="text-xl font-bold">Editar Registro</h3>
+                <button onclick="cerrarModalEditar()" class="text-white hover:text-gray-200 text-2xl font-bold">&times;</button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto flex-1">
+                <form id="form-editar" onsubmit="guardarEdicionLocal(event)">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Fecha Movimiento *</label><input type="date" id="ed-fecha" required class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Código *</label><input type="text" id="ed-codigo" required class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Lote *</label><input type="text" id="ed-lote" required class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                        
+                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Características</label><input type="text" id="ed-caracteristicas" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                        
+                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Tipo *</label>
+                            <select id="ed-tipo" required class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                                <option value="INGRESO">INGRESO</option>
+                                <option value="SALIDA">SALIDA</option>
+                            </select>
+                        </div>
+                        
+                        <div><label class="block text-xs font-bold text-gray-600 mb-1">PESO (KG) *</label><input type="number" step="0.01" id="ed-cantidad" required class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none font-bold"></div>
+                        
+                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Proveedor</label><input type="text" id="ed-proveedor" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Origen</label><input type="text" id="ed-origen" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                        <div><label class="block text-xs font-bold text-gray-600 mb-1">F. Llegada Fibra</label><input type="date" id="ed-fllegada" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                        
+                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Andamio</label><input type="text" id="ed-andamio" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                        <div><label class="block text-xs font-bold text-gray-600 mb-1">N° de Caja</label><input type="text" id="ed-ncaja" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Presentación</label><input type="text" id="ed-presentacion" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                        
+                        <div class="md:col-span-3"><label class="block text-xs font-bold text-gray-600 mb-1">Certificado</label><input type="text" id="ed-certificado" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="bg-gray-50 px-6 py-4 border-t flex justify-end gap-3">
+                <button type="button" onclick="cerrarModalEditar()" class="px-4 py-2 rounded font-bold text-gray-600 bg-gray-200 hover:bg-gray-300">Cancelar</button>
+                <button type="submit" form="form-editar" class="px-6 py-2 rounded font-bold text-white bg-blue-600 hover:bg-blue-700">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         // --- FUNCIÓN PARA EXPORTAR TABLA A EXCEL ---
         function exportarExcel(tablaId, nombreArchivo) {
             let tabla = document.getElementById(tablaId);
-            // Clonamos la tabla para no modificar la visual original
             let tablaClon = tabla.cloneNode(true);
             
-            // Eliminar fila de filtros y columnas ocultas del clon
             let elementosNoPrint = tablaClon.querySelectorAll('.no-print');
             elementosNoPrint.forEach(el => el.remove());
-            
             let inputs = tablaClon.querySelectorAll('input, select');
             inputs.forEach(input => input.remove());
-            
             let filasOcultas = tablaClon.querySelectorAll('tr[style*="display: none"]');
             filasOcultas.forEach(fila => fila.remove());
 
-            // Agregar un estilo en línea básico para Excel
             let html = `
                 <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-                <head><meta charset="UTF-8"></head>
-                <body>
-                    ${tablaClon.outerHTML}
-                </body>
+                <head>
+                    <meta charset="UTF-8">
+                    <style>
+                        table { border-collapse: collapse; width: 100%; }
+                        th, td { border: 1px solid black !important; padding: 5px; text-align: left; }
+                        th { background-color: #f1f5f9; font-weight: bold; }
+                    </style>
+                </head>
+                <body>${tablaClon.outerHTML}</body>
                 </html>`;
 
-            // Crear Blob para descargar
             let blob = new Blob(['\ufeff', html], { type: 'application/vnd.ms-excel' });
             let url = URL.createObjectURL(blob);
-            
             let a = document.createElement('a');
             a.href = url;
             a.download = nombreArchivo + '_' + new Date().toISOString().split('T')[0] + '.xls';
@@ -347,28 +399,36 @@
             document.body.removeChild(a);
         }
 
-        // --- FUNCIÓN DE FORMATO DE NÚMEROS (SEPARADOR DE MILES) ---
+        // --- FORMATO DE NÚMEROS (SEPARADOR DE MILES) ---
         function formatearNumero(num) {
             return Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // --- FORMATO DE FECHA PARA TABLA Y MODAL (Convierte ISO larga a YYYY-MM-DD) ---
+        function formatearFechaCorto(fechaIso) {
+            if (!fechaIso || fechaIso === "-") return "";
+            if (String(fechaIso).length === 10 && String(fechaIso).includes("-")) return fechaIso;
+            try {
+                const d = new Date(fechaIso);
+                if (isNaN(d.getTime())) return fechaIso;
+                return d.toISOString().split('T')[0];
+            } catch(e) {
+                return fechaIso;
+            }
         }
 
         // --- 1. CONFIGURACIÓN DEL BACKEND ---
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwbObDTZ36mkBXSR-ay3AGRi07deg_Lomh-t6CSV8S2c7qQyghQ1tBVSs3E7OY5tF6O/exec";
         
-        // Variables globales
         let registrosKardex = [];
         let catalogoCodigos = [];
+        let indiceEdicionActual = -1; // Para el modal
 
-        // Inicializar al cargar la página
         document.addEventListener("DOMContentLoaded", () => {
-            const hoy = new Date().toISOString().split('T')[0];
-            document.getElementById('ing-fecha').value = hoy;
-            
-            // Iniciar la descarga de datos
+            document.getElementById('ing-fecha').value = new Date().toISOString().split('T')[0];
             cargarDashboard();
         });
 
-        // Función para cambiar entre pantallas
         function cambiarVista(idVista) {
             document.querySelectorAll('.vista').forEach(el => el.classList.remove('activa'));
             document.getElementById(idVista).classList.add('activa');
@@ -380,28 +440,22 @@
                 const response = await fetch(WEB_APP_URL);
                 const data = await response.json();
                 
-                // Extraemos ambas tablas
                 registrosKardex = data.historico || [];
                 catalogoCodigos = data.catalogo || [];
 
-                // Actualizar las interfaces
                 actualizarTabla();
                 actualizarTablaSaldos();
-                configurarDropdownsCodigo(); // Usamos la nueva función visual
-                poblarSelectoresLote();
+                configurarDropdownsCodigo(); 
                 
-                // Indicador visual
                 const indicador = document.getElementById('estado-conexion');
                 indicador.classList.replace('bg-slate-700', 'bg-emerald-600');
                 indicador.innerHTML = '¡Conectado! ✅';
 
             } catch (error) {
-                console.error("Error al cargar datos:", error);
-                document.getElementById('cuerpo-tabla').innerHTML = `<tr><td colspan="14" class="px-6 py-8 text-center text-rose-500 font-bold">Error de conexión con la Base de Datos.</td></tr>`;
-                
-                const indicador = document.getElementById('estado-conexion');
-                indicador.classList.replace('bg-slate-700', 'bg-rose-600');
-                indicador.innerHTML = 'Error de Conexión ❌';
+                console.error("Error al cargar:", error);
+                document.getElementById('cuerpo-tabla').innerHTML = `<tr><td colspan="15" class="px-6 py-8 text-center text-rose-500 font-bold">Error de conexión con la Base de Datos.</td></tr>`;
+                document.getElementById('estado-conexion').classList.replace('bg-slate-700', 'bg-rose-600');
+                document.getElementById('estado-conexion').innerHTML = 'Error de Conexión ❌';
             }
         }
 
@@ -417,24 +471,21 @@
                 dropdown.innerHTML = '';
                 
                 const filtrados = catalogoCodigos.filter(item => 
-                    String(item.codigo).toLowerCase().includes(query) || 
-                    String(item.articulo).toLowerCase().includes(query)
+                    String(item.codigo).toLowerCase().includes(query) || String(item.articulo).toLowerCase().includes(query)
                 );
 
                 if (filtrados.length === 0) {
-                    dropdown.innerHTML = '<div class="p-4 text-sm text-gray-500 italic text-center">No se encontraron coincidencias</div>';
+                    dropdown.innerHTML = '<div class="p-4 text-sm text-gray-500 italic text-center">Sin coincidencias</div>';
                 } else {
                     filtrados.forEach(item => {
                         const div = document.createElement('div');
-                        div.className = "px-4 py-2 border-b border-gray-100 last:border-0 hover:bg-slate-100 cursor-pointer flex flex-col transition-colors";
+                        div.className = "px-4 py-2 border-b border-gray-100 hover:bg-slate-100 cursor-pointer flex flex-col";
                         div.innerHTML = `<span class="font-bold text-slate-800 text-sm">${item.codigo}</span><span class="text-xs text-slate-500 truncate">${item.articulo}</span>`;
-                        
-                        // onmousedown se ejecuta antes que el blur del input
                         div.onmousedown = (e) => {
                             e.preventDefault(); 
                             input.value = item.codigo;
                             dropdown.classList.add('hidden');
-                            input.dispatchEvent(new Event('input')); // Disparar llenado automático de Artículo / Lote
+                            input.dispatchEvent(new Event('input'));
                         };
                         dropdown.appendChild(div);
                     });
@@ -442,15 +493,12 @@
                 dropdown.classList.remove('hidden');
             }
 
-            // Listeners Ingreso
             if(ingInput) {
                 ingInput.addEventListener('focus', () => renderLista(ingInput, ingDropdown));
                 ingInput.addEventListener('input', () => renderLista(ingInput, ingDropdown));
-                // Timeout sutil para permitir clics en la barra de scroll si fuera necesario
                 ingInput.addEventListener('blur', () => setTimeout(() => ingDropdown.classList.add('hidden'), 150));
             }
 
-            // Listeners Salida
             if(salInput) {
                 salInput.addEventListener('focus', () => renderLista(salInput, salDropdown));
                 salInput.addEventListener('input', () => renderLista(salInput, salDropdown));
@@ -458,89 +506,60 @@
             }
         }
 
-        // Función de Lista Desplegable Lotes (Se elimina poblarSelectoresCodigo)
-        function poblarSelectoresLote() {
-            const datalist = document.getElementById('datalist-lotes');
-            if (!datalist) return;
-            const lotes = registrosKardex.map(item => item.lote).filter(lote => lote && String(lote).trim() !== "-" && String(lote).trim() !== "");
-            const lotesUnicos = [...new Set(lotes)];
-            let opcionesHTML = ``;
-            lotesUnicos.forEach(lote => { opcionesHTML += `<option value="${lote}"></option>`; });
-            datalist.innerHTML = opcionesHTML;
-        }
-
-        // --- LÓGICA PARA AUTOCOMPLETAR EL ARTÍCULO ---
         document.getElementById('ing-codigo').addEventListener('input', function(e) {
             const codigoIngresado = e.target.value.trim();
-            const inputArticulo = document.getElementById('ing-articulo');
             const itemEncontrado = catalogoCodigos.find(c => String(c.codigo) === String(codigoIngresado));
-            inputArticulo.value = itemEncontrado ? itemEncontrado.articulo : "";
+            document.getElementById('ing-articulo').value = itemEncontrado ? itemEncontrado.articulo : "";
         });
 
-        // --- FUNCIÓN PARA CALCULAR STOCK ESPECÍFICO ---
         function calcularSaldoStock(codigo, lote) {
             let saldo = 0;
             registrosKardex.forEach(reg => {
                 if (String(reg.codigo) === String(codigo) && String(reg.lote) === String(lote)) {
-                    const valorPeso = reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad);
-                    const cant = parseFloat(valorPeso) || 0;
-                    if (String(reg.tipo).toUpperCase() === 'INGRESO') {
-                        saldo += cant;
-                    } else {
-                        saldo -= Math.abs(cant);
-                    }
+                    const cant = parseFloat(reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad)) || 0;
+                    if (String(reg.tipo).toUpperCase() === 'INGRESO') saldo += cant;
+                    else saldo -= Math.abs(cant);
                 }
             });
             return saldo;
         }
 
-        // --- DINÁMICA DE LOTES PARA SALIDA ---
         document.getElementById('sal-codigo').addEventListener('input', function(e) {
             const codigoSeleccionado = e.target.value.trim();
             const selectLoteSalida = document.getElementById('sal-lote');
-            const inputCantidad = document.getElementById('sal-cantidad');
             const lblStock = document.getElementById('sal-stock-disponible');
             
             if (!selectLoteSalida) return;
-
-            // Resetear visuales
             selectLoteSalida.innerHTML = '<option value="">Seleccione un lote...</option>'; 
             lblStock.classList.add('hidden');
-            inputCantidad.max = ""; 
-            inputCantidad.value = "";
+            document.getElementById('sal-cantidad').max = ""; 
+            document.getElementById('sal-cantidad').value = "";
 
             if (!codigoSeleccionado) {
                 selectLoteSalida.innerHTML = '<option value="">Primero seleccione un código...</option>';
                 return;
             }
 
-            // Filtrar lotes que pertenezcan SOLO al código seleccionado
             const lotesDelCodigo = registrosKardex
                 .filter(reg => String(reg.codigo) === codigoSeleccionado && reg.lote && String(reg.lote).trim() !== "-" && String(reg.lote).trim() !== "")
                 .map(reg => reg.lote);
 
             const lotesUnicos = [...new Set(lotesDelCodigo)];
-
             let opcionesHTML = `<option value="">Seleccione el lote a retirar...</option>`;
             let lotesConStock = 0;
 
             lotesUnicos.forEach(lote => { 
                 const saldoActual = calcularSaldoStock(codigoSeleccionado, lote);
-                // SOLO AGREGAR A LA LISTA SI TIENE STOCK POSITIVO
                 if (saldoActual > 0) {
                     opcionesHTML += `<option value="${lote}">${lote} (Disp: ${formatearNumero(saldoActual)} KG)</option>`; 
                     lotesConStock++;
                 }
             });
 
-            if (lotesConStock === 0) {
-                opcionesHTML = `<option value="">Sin lotes con stock para este código</option>`;
-            }
-
+            if (lotesConStock === 0) opcionesHTML = `<option value="">Sin lotes con stock para este código</option>`;
             selectLoteSalida.innerHTML = opcionesHTML;
         });
 
-        // --- MOSTRAR STOCK AL SELECCIONAR LOTE ---
         document.getElementById('sal-lote').addEventListener('change', function(e) {
             const codigoSeleccionado = document.getElementById('sal-codigo').value.trim();
             const loteSeleccionado = e.target.value.trim();
@@ -551,11 +570,11 @@
                 const saldo = calcularSaldoStock(codigoSeleccionado, loteSeleccionado);
                 if (saldo > 0) {
                     lblStock.innerHTML = `Stock disponible: <span>${formatearNumero(saldo)}</span> KG`;
-                    lblStock.className = "text-sm font-semibold mt-2 text-blue-600"; // Azul si hay stock
-                    inputCantidad.max = saldo; // Bloquear por HTML
+                    lblStock.className = "text-sm font-semibold mt-2 text-blue-600"; 
+                    inputCantidad.max = saldo; 
                 } else {
                     lblStock.innerHTML = `⚠️ Sin stock disponible (0 KG)`;
-                    lblStock.className = "text-sm font-semibold mt-2 text-rose-600"; // Rojo si no hay
+                    lblStock.className = "text-sm font-semibold mt-2 text-rose-600";
                     inputCantidad.max = 0;
                 }
             } else {
@@ -564,7 +583,7 @@
             }
         });
 
-        // --- 3. ESCRITURA DE INGRESO (POST) ---
+        // --- 3. ESCRITURA INGRESO ---
         async function guardarIngreso(e) {
             e.preventDefault(); 
             const btn = document.getElementById('btn-submit-ingreso');
@@ -572,17 +591,14 @@
             btn.innerHTML = `<div class="loader mr-2"></div> ENVIANDO...`;
             btn.disabled = true;
             
-            const cantIngresada = parseFloat(document.getElementById('ing-cantidad').value);
-
+            const cant = parseFloat(document.getElementById('ing-cantidad').value);
             const nuevoRegistro = {
                 fechaMovimiento: document.getElementById('ing-fecha').value,
                 codigo: document.getElementById('ing-codigo').value,
                 lote: document.getElementById('ing-lote').value,
                 caracteristicas: document.getElementById('ing-caracteristicas').value || "-",
                 articulo: document.getElementById('ing-articulo').value || "-", 
-                tipo: 'INGRESO',
-                peso: cantIngresada,      // Ahora enviamos el campo 'peso' para que Sheets lo detecte
-                cantidad: cantIngresada,  // Lo mantenemos por si tu script antiguo lo usa de respaldo
+                tipo: 'INGRESO', peso: cant, cantidad: cant,
                 proveedor: document.getElementById('ing-proveedor').value || "-",
                 origen: document.getElementById('ing-origen').value || "-",
                 fLlegada: document.getElementById('ing-fllegada').value || "-",
@@ -607,47 +623,31 @@
             }
         }
 
-        // --- 4. ESCRITURA DE SALIDA (POST) ---
+        // --- 4. ESCRITURA SALIDA ---
         async function guardarSalida(e) {
             e.preventDefault(); 
             const btn = document.getElementById('btn-submit-salida');
-            const textoOriginal = btn.innerHTML;
+            const btnOriginal = btn.innerHTML;
             btn.innerHTML = `<div class="loader mr-2"></div> REGISTRANDO...`;
             btn.disabled = true;
             
-            const codigoSalida = document.getElementById('sal-codigo').value.trim();
-            const loteSalida = document.getElementById('sal-lote').value.trim();
+            const codigo = document.getElementById('sal-codigo').value.trim();
+            const lote = document.getElementById('sal-lote').value.trim();
             const cantRequerida = Math.abs(parseFloat(document.getElementById('sal-cantidad').value));
+            const saldoActual = calcularSaldoStock(codigo, lote);
 
-            // VALIDACIÓN DE STOCK: Comprobar el stock actual del lote seleccionado
-            const saldoActual = calcularSaldoStock(codigoSalida, loteSalida);
-
-            if (saldoActual <= 0) {
-                alert(`⚠️ Error: La combinación de Código "${codigoSalida}" y Lote "${loteSalida}" NO tiene stock disponible para retirar.`);
-                btn.innerHTML = textoOriginal;
+            if (saldoActual <= 0 || cantRequerida > saldoActual) {
+                alert(`⚠️ Error de Stock:\nEstás intentando retirar ${formatearNumero(cantRequerida)} KG, pero el stock es de ${formatearNumero(saldoActual)} KG.`);
+                btn.innerHTML = btnOriginal;
                 btn.disabled = false;
-                return; // Detiene la ejecución
+                return;
             }
 
-            if (cantRequerida > saldoActual) {
-                alert(`⚠️ Error de Stock:\nEstás intentando retirar ${formatearNumero(cantRequerida)} KG, pero el stock disponible para este Lote es de solo ${formatearNumero(saldoActual)} KG.`);
-                btn.innerHTML = textoOriginal;
-                btn.disabled = false;
-                return; // Detiene la ejecución
-            }
-
-            const hoy = new Date().toISOString().split('T')[0];
-            const cantSalida = -cantRequerida; // Guardamos en negativo
-
+            const cantSalida = -cantRequerida;
             const nuevoRegistro = {
-                fechaMovimiento: hoy,
-                codigo: codigoSalida,
-                lote: loteSalida,
-                caracteristicas: "-",
-                articulo: "", 
-                tipo: 'SALIDA',
-                peso: cantSalida,     // Ahora enviamos el campo 'peso'
-                cantidad: cantSalida, // Lo mantenemos de respaldo
+                fechaMovimiento: new Date().toISOString().split('T')[0],
+                codigo: codigo, lote: lote, caracteristicas: "-", articulo: "", tipo: 'SALIDA',
+                peso: cantSalida, cantidad: cantSalida,
                 proveedor: "-", origen: "-", fLlegada: "-", andamio: "-", nCaja: "-", presentacion: "-", certificado: "-"
             };
 
@@ -660,56 +660,102 @@
             } catch(error) {
                 alert('Error al procesar la salida: ' + error.message);
             } finally {
-                btn.innerHTML = textoOriginal;
+                btn.innerHTML = btnOriginal;
                 btn.disabled = false;
             }
         }
 
-        // --- 5A. ACTUALIZAR TABLA DE SALDOS (NUEVO REPORTE) ---
+        // --- EDICIÓN Y ELIMINACIÓN LOCAL (UI) ---
+        function abrirModalEditar(indexReal) {
+            indiceEdicionActual = indexReal;
+            const reg = registrosKardex[indexReal];
+            
+            document.getElementById('ed-fecha').value = formatearFechaCorto(reg.fechaMovimiento);
+            document.getElementById('ed-codigo').value = reg.codigo;
+            document.getElementById('ed-lote').value = reg.lote;
+            document.getElementById('ed-caracteristicas').value = reg.caracteristicas || "";
+            document.getElementById('ed-tipo').value = String(reg.tipo).toUpperCase() === 'INGRESO' ? 'INGRESO' : 'SALIDA';
+            
+            const valorPeso = reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad);
+            document.getElementById('ed-cantidad').value = Math.abs(parseFloat(valorPeso) || 0); // Mostrar en positivo para facilitar edición
+
+            document.getElementById('ed-proveedor').value = reg.proveedor || "";
+            document.getElementById('ed-origen').value = reg.origen || "";
+            document.getElementById('ed-fllegada').value = formatearFechaCorto(reg.fLlegada);
+            document.getElementById('ed-andamio').value = reg.andamio || "";
+            document.getElementById('ed-ncaja').value = reg.nCaja || "";
+            document.getElementById('ed-presentacion').value = reg.presentacion || "";
+            document.getElementById('ed-certificado').value = reg.certificado || "";
+
+            document.getElementById('modal-editar').classList.remove('hidden');
+        }
+
+        function cerrarModalEditar() {
+            document.getElementById('modal-editar').classList.add('hidden');
+            indiceEdicionActual = -1;
+        }
+
+        function guardarEdicionLocal(e) {
+            e.preventDefault();
+            if (indiceEdicionActual === -1) return;
+
+            let cant = parseFloat(document.getElementById('ed-cantidad').value);
+            const tipo = document.getElementById('ed-tipo').value;
+            if(tipo === 'SALIDA') cant = -Math.abs(cant); // Salidas siempre en negativo
+
+            registrosKardex[indiceEdicionActual] = {
+                ...registrosKardex[indiceEdicionActual], // Mantiene otras props ocultas si existen
+                fechaMovimiento: document.getElementById('ed-fecha').value,
+                codigo: document.getElementById('ed-codigo').value,
+                lote: document.getElementById('ed-lote').value,
+                caracteristicas: document.getElementById('ed-caracteristicas').value || "-",
+                tipo: tipo,
+                peso: cant,
+                cantidad: cant,
+                proveedor: document.getElementById('ed-proveedor').value || "-",
+                origen: document.getElementById('ed-origen').value || "-",
+                fLlegada: document.getElementById('ed-fllegada').value || "-",
+                andamio: document.getElementById('ed-andamio').value || "-",
+                nCaja: document.getElementById('ed-ncaja').value || "-",
+                presentacion: document.getElementById('ed-presentacion').value || "-",
+                certificado: document.getElementById('ed-certificado').value || "-"
+            };
+
+            alert("Edición aplicada en la vista local.\n\nNOTA: Para que este cambio se guarde en Google Sheets permanentemente, debes agregar el método de edición a tu código backend (Código.gs).");
+            cerrarModalEditar();
+            actualizarTabla();
+            actualizarTablaSaldos();
+        }
+
+        function eliminarRegistro(indexReal) {
+            if (confirm("¿Estás seguro de eliminar este registro?\n\nNOTA: Esto solo lo eliminará de la vista actual. Para que se borre de tu base de datos en Google Sheets, tu backend (Código.gs) debe soportar la función de eliminar.")) {
+                registrosKardex.splice(indexReal, 1);
+                actualizarTabla();
+                actualizarTablaSaldos();
+            }
+        }
+
+        // --- ACTUALIZACIÓN DE TABLAS ---
         function actualizarTablaSaldos() {
             const tbody = document.getElementById('cuerpo-tabla-saldos');
-            const saldos = {}; // Diccionario para agrupar
-
-            // Agrupar y sumar
+            const saldos = {}; 
             registrosKardex.forEach(reg => {
-                // Evitar filas vacías corruptas
                 if(!reg.codigo) return; 
-
                 const key = `${reg.codigo}__|__${reg.lote}`;
                 if (!saldos[key]) {
-                    // Buscar en el catálogo para asegurar que tengamos el nombre
                     const itemCat = catalogoCodigos.find(c => String(c.codigo) === String(reg.codigo));
                     const nombreArt = itemCat ? itemCat.articulo : (reg.articulo && String(reg.articulo).trim() !== "-" && String(reg.articulo).trim() !== "" ? reg.articulo : "-");
-
-                    // Si no existe, crear la base
-                    saldos[key] = {
-                        codigo: reg.codigo,
-                        articulo: nombreArt,
-                        lote: reg.lote,
-                        ingresos: 0,
-                        salidas: 0,
-                        saldo: 0
-                    };
+                    saldos[key] = { codigo: reg.codigo, articulo: nombreArt, lote: reg.lote, ingresos: 0, salidas: 0, saldo: 0 };
                 }
-
-                // Detectamos la variable 'peso' si el backend ya usa la nueva columna, sino usamos 'cantidad'
                 const valorPeso = reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad);
                 const cant = parseFloat(valorPeso) || 0;
+                if (String(reg.tipo).toUpperCase() === 'INGRESO') saldos[key].ingresos += cant;
+                else saldos[key].salidas += Math.abs(cant);
                 
-                if (String(reg.tipo).toUpperCase() === 'INGRESO') {
-                    saldos[key].ingresos += cant;
-                } else {
-                    // Las salidas vienen en negativo desde la BD, sacamos el valor absoluto para mostrar
-                    saldos[key].salidas += Math.abs(cant);
-                }
-                
-                // El saldo general
                 saldos[key].saldo = saldos[key].ingresos - saldos[key].salidas;
             });
 
-            // Dibujar la tabla
             tbody.innerHTML = '';
-            
             const saldosArray = Object.values(saldos);
             if(saldosArray.length === 0){
                 tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500 italic">No hay stock registrado.</td></tr>`;
@@ -718,9 +764,8 @@
 
             saldosArray.forEach(item => {
                 const colorSaldo = item.saldo > 0 ? 'text-blue-700 bg-blue-50' : (item.saldo < 0 ? 'text-rose-600' : 'text-gray-500');
-                
                 const tr = document.createElement('tr');
-                tr.classList.add('hover:bg-blue-50', 'transition-colors', 'fila-saldo'); // 'fila-saldo' para el buscador
+                tr.classList.add('hover:bg-blue-50', 'transition-colors', 'fila-saldo'); 
                 tr.innerHTML = `
                     <td class="px-4 py-3 font-semibold text-slate-800 whitespace-nowrap celda-codigo">${item.codigo}</td>
                     <td class="px-4 py-3 font-medium text-slate-700 whitespace-nowrap celda-articulo">${item.articulo}</td>
@@ -733,107 +778,126 @@
             });
         }
 
-        // Buscador interno para la tabla de Saldos
         function filtrarSaldos() {
             const input = document.getElementById('filtro-saldo-general').value.toLowerCase();
             const filas = document.getElementsByClassName('fila-saldo');
-            
             for (let i = 0; i < filas.length; i++) {
-                const txtCodigo = filas[i].querySelector('.celda-codigo').textContent.toLowerCase();
-                const txtArticulo = filas[i].querySelector('.celda-articulo').textContent.toLowerCase();
-                
-                if (txtCodigo.includes(input) || txtArticulo.includes(input)) {
-                    filas[i].style.display = "";
-                } else {
-                    filas[i].style.display = "none";
-                }
+                const txtC = filas[i].querySelector('.celda-codigo').textContent.toLowerCase();
+                const txtA = filas[i].querySelector('.celda-articulo').textContent.toLowerCase();
+                filas[i].style.display = (txtC.includes(input) || txtA.includes(input)) ? "" : "none";
             }
         }
 
-        // --- 5B. ACTUALIZAR TABLA HISTÓRICA ---
         function actualizarTabla() {
             const tbody = document.getElementById('cuerpo-tabla');
             document.getElementById('contador-registros').innerText = registrosKardex.length;
             
             if (registrosKardex.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="14" class="px-6 py-8 text-center text-gray-500 italic">No hay movimientos registrados todavía.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="15" class="px-6 py-8 text-center text-gray-500 italic">No hay movimientos registrados.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = '';
-            const registrosInvertidos = [...registrosKardex].reverse();
             
-            registrosInvertidos.forEach(reg => {
-                const isIngreso = reg.tipo.toUpperCase() === 'INGRESO';
-                const colorTipo = isIngreso 
-                    ? '<span class="bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full text-xs font-bold shadow-sm">INGRESO</span>' 
-                    : '<span class="bg-rose-100 text-rose-800 px-2 py-1 rounded-full text-xs font-bold shadow-sm">SALIDA</span>';
-                
+            // Recorremos de atrás para adelante (los más recientes primero)
+            for(let i = registrosKardex.length - 1; i >= 0; i--) {
+                const reg = registrosKardex[i];
+                const isIngreso = String(reg.tipo).toUpperCase() === 'INGRESO';
+                const colorTipo = isIngreso ? '<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold">IN</span>' : '<span class="bg-rose-100 text-rose-800 px-2 py-0.5 rounded text-[10px] font-bold">OUT</span>';
                 const colorCantidad = isIngreso ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold';
-
-                // Usamos la variable 'peso' o 'PESO' si existe, si no recaemos en 'cantidad'
+                
                 const valorPeso = reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad);
-                const valorPesoFormateado = valorPeso !== undefined ? formatearNumero(valorPeso) : formatearNumero(0);
-
-                // Recuperar el artículo real del catálogo si está vacío o es un guión (muy común en Salidas)
                 const itemCat = catalogoCodigos.find(c => String(c.codigo) === String(reg.codigo));
                 const nombreArticulo = itemCat ? itemCat.articulo : (reg.articulo && String(reg.articulo).trim() !== "-" && String(reg.articulo).trim() !== "" ? reg.articulo : "-");
 
                 const tr = document.createElement('tr');
-                tr.classList.add('hover:bg-slate-50', 'transition-colors', 'fila-historico'); // Añadimos clase para el filtro
+                tr.classList.add('hover:bg-slate-50', 'transition-colors', 'fila-historico');
+                
+                // Aplicamos estilos muy comprimidos (px-2, py-1.5, texto muy pequeño, y envolver texto largo)
                 tr.innerHTML = `
-                    <td class="px-4 py-3 whitespace-nowrap">${reg.fechaMovimiento}</td>
-                    <td class="px-4 py-3 font-semibold text-slate-800 whitespace-nowrap">${reg.codigo}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">${reg.lote}</td>
-                    <td class="px-4 py-3 text-slate-600 whitespace-nowrap">${reg.caracteristicas || '-'}</td>
-                    <td class="px-4 py-3 font-medium text-slate-700 whitespace-nowrap">${nombreArticulo}</td>
-                    <td class="px-4 py-3 text-center whitespace-nowrap">${colorTipo}</td>
-                    <td class="px-4 py-3 text-right ${colorCantidad} whitespace-nowrap">${valorPesoFormateado}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">${reg.proveedor}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">${reg.origen}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">${reg.fLlegada}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">${reg.andamio}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">${reg.nCaja}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">${reg.presentacion}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">${reg.certificado}</td>
+                    <td class="px-2 py-1.5 text-xs whitespace-nowrap">${formatearFechaCorto(reg.fechaMovimiento)}</td>
+                    <td class="px-2 py-1.5 text-xs font-semibold text-slate-800 whitespace-nowrap">${reg.codigo}</td>
+                    <td class="px-2 py-1.5 text-xs whitespace-nowrap">${reg.lote}</td>
+                    <td class="px-2 py-1.5 text-xs min-w-[100px] whitespace-normal break-words">${reg.caracteristicas || '-'}</td>
+                    <td class="px-2 py-1.5 text-xs font-medium text-slate-700 min-w-[120px] whitespace-normal break-words">${nombreArticulo}</td>
+                    <td class="px-2 py-1.5 text-center whitespace-nowrap">${colorTipo}</td>
+                    <td class="px-2 py-1.5 text-xs text-right ${colorCantidad} whitespace-nowrap">${formatearNumero(valorPeso || 0)}</td>
+                    <td class="px-2 py-1.5 text-xs whitespace-nowrap truncate max-w-[80px]">${reg.proveedor || '-'}</td>
+                    <td class="px-2 py-1.5 text-xs whitespace-nowrap">${reg.origen || '-'}</td>
+                    <td class="px-2 py-1.5 text-xs whitespace-nowrap">${formatearFechaCorto(reg.fLlegada)}</td>
+                    <td class="px-2 py-1.5 text-xs whitespace-nowrap">${reg.andamio || '-'}</td>
+                    <td class="px-2 py-1.5 text-xs whitespace-nowrap">${reg.nCaja || '-'}</td>
+                    <td class="px-2 py-1.5 text-xs whitespace-nowrap">${reg.presentacion || '-'}</td>
+                    <td class="px-2 py-1.5 text-xs whitespace-nowrap">${reg.certificado || '-'}</td>
+                    <td class="px-2 py-1.5 text-center whitespace-nowrap no-print">
+                        <button onclick="abrirModalEditar(${i})" class="text-blue-500 hover:text-blue-700 p-1 rounded hover:bg-blue-50 transition" title="Editar este registro">✏️</button>
+                        <button onclick="eliminarRegistro(${i})" class="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition ml-1" title="Eliminar este registro">🗑️</button>
+                    </td>
                 `;
                 tbody.appendChild(tr);
-            });
+            }
+
+            // Mostrar el pie de tabla y calcular subtotal
+            document.getElementById('pie-tabla-historico').classList.remove('hidden');
+            calcularSubtotalHistorico();
         }
 
-        // --- FILTROS TIPO EXCEL PARA EL HISTÓRICO ---
         function filtrarHistorico() {
-            // Recoger los valores escritos en las cajas de la cabecera
             const fFecha = document.getElementById('fh-fecha').value.toLowerCase();
             const fCodigo = document.getElementById('fh-codigo').value.toLowerCase();
             const fLote = document.getElementById('fh-lote').value.toLowerCase();
-            const fCaracteristicas = document.getElementById('fh-caracteristicas').value.toLowerCase();
+            const fCarac = document.getElementById('fh-caracteristicas').value.toLowerCase();
             const fArticulo = document.getElementById('fh-articulo').value.toLowerCase();
-            const fTipo = document.getElementById('fh-tipo').value.toLowerCase(); // Select dropdown
+            const fTipo = document.getElementById('fh-tipo').value.toLowerCase();
 
             const filas = document.getElementsByClassName('fila-historico');
 
             for (let i = 0; i < filas.length; i++) {
-                // Celdas de la fila actual correspondientes a cada columna
                 const txtFecha = filas[i].cells[0].textContent.toLowerCase();
                 const txtCodigo = filas[i].cells[1].textContent.toLowerCase();
                 const txtLote = filas[i].cells[2].textContent.toLowerCase();
                 const txtCarac = filas[i].cells[3].textContent.toLowerCase();
                 const txtArticulo = filas[i].cells[4].textContent.toLowerCase();
-                const txtTipo = filas[i].cells[5].textContent.toLowerCase(); // El span interno del tipo
+                const txtTipo = filas[i].cells[5].textContent.toLowerCase();
 
-                // Lógica de coincidencia (tiene que coincidir con TODOS los filtros escritos)
-                const matchFecha = txtFecha.includes(fFecha);
-                const matchCodigo = txtCodigo.includes(fCodigo);
-                const matchLote = txtLote.includes(fLote);
-                const matchCarac = txtCarac.includes(fCaracteristicas);
-                const matchArticulo = txtArticulo.includes(fArticulo);
-                const matchTipo = fTipo === "" || txtTipo.includes(fTipo);
+                const match = txtFecha.includes(fFecha) && txtCodigo.includes(fCodigo) && 
+                              txtLote.includes(fLote) && txtCarac.includes(fCarac) && 
+                              txtArticulo.includes(fArticulo) && (fTipo === "" || txtTipo.includes(fTipo));
 
-                if (matchFecha && matchCodigo && matchLote && matchCarac && matchArticulo && matchTipo) {
-                    filas[i].style.display = ""; // Mostrar
+                filas[i].style.display = match ? "" : "none";
+            }
+            
+            // Recalcular subtotal al filtrar
+            calcularSubtotalHistorico();
+        }
+
+        // --- NUEVA FUNCIÓN: CALCULAR SUBTOTAL DINÁMICO ---
+        function calcularSubtotalHistorico() {
+            const filas = document.getElementsByClassName('fila-historico');
+            let subtotal = 0;
+            
+            for (let i = 0; i < filas.length; i++) {
+                // Solo sumar si la fila NO está oculta
+                if (filas[i].style.display !== "none") {
+                    // La columna 6 (índice 6) corresponde a PESO (KG)
+                    // Eliminamos las comas de miles para poder sumar correctamente
+                    const textoPeso = filas[i].cells[6].textContent.replace(/,/g, ''); 
+                    const peso = parseFloat(textoPeso) || 0;
+                    subtotal += peso;
+                }
+            }
+
+            const elSubtotal = document.getElementById('subtotal-peso-historico');
+            if (elSubtotal) {
+                elSubtotal.textContent = formatearNumero(subtotal);
+                
+                // Darle color dependiendo de si es positivo, negativo o cero
+                if (subtotal > 0) {
+                    elSubtotal.className = "px-2 py-2 text-right text-xs text-emerald-700";
+                } else if (subtotal < 0) {
+                    elSubtotal.className = "px-2 py-2 text-right text-xs text-rose-700";
                 } else {
-                    filas[i].style.display = "none"; // Ocultar
+                    elSubtotal.className = "px-2 py-2 text-right text-xs text-slate-800";
                 }
             }
         }
