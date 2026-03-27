@@ -70,13 +70,13 @@
                  ========================================== -->
             <div id="vista-menu" class="vista activa fade-in">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <button onclick="cambiarVista('vista-ingreso')" 
+                    <button onclick="iniciarFlujo('INGRESO')" 
                             class="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl p-12 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg flex flex-col items-center justify-center">
                         <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path></svg>
                         <span class="text-4xl font-black tracking-wider">INGRESO</span>
                     </button>
 
-                    <button onclick="cambiarVista('vista-salida')" 
+                    <button onclick="iniciarFlujo('SALIDA')" 
                             class="bg-rose-500 hover:bg-rose-600 text-white rounded-xl p-12 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg flex flex-col items-center justify-center">
                         <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13l-3 3m0 0l-3-3m3 3V8m0 13a9 9 0 110-18 9 9 0 010 18z"></path></svg>
                         <span class="text-4xl font-black tracking-wider">SALIDA</span>
@@ -99,14 +99,40 @@
             </div>
 
             <!-- ==========================================
-                 VISTA 2: FORMULARIO DE INGRESO
+                 VISTA 1.5: SELECCIÓN DE CATEGORÍA
                  ========================================== -->
-            <div id="vista-ingreso" class="vista fade-in max-w-5xl mx-auto">
+            <div id="vista-categoria" class="vista fade-in max-w-4xl mx-auto">
                 <div class="flex items-center mb-6 border-b pb-4">
                     <button onclick="cambiarVista('vista-menu')" class="text-slate-500 hover:text-slate-800 mr-4">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     </button>
-                    <h2 class="text-2xl font-bold text-emerald-600">Registrar Ingreso</h2>
+                    <h2 id="titulo-categoria" class="text-2xl font-bold text-slate-700">¿Qué tipo de fibra registrará?</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+                    <button onclick="seleccionarCategoria('FIBRAS ESPECIALES')" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl p-10 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg border-b-4 border-indigo-800">
+                        <span class="text-2xl font-black block">FIBRAS ESPECIALES</span>
+                    </button>
+
+                    <button onclick="seleccionarCategoria('FIBRAS DE PRODUCCIÓN')" class="bg-teal-600 hover:bg-teal-700 text-white rounded-xl p-10 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg border-b-4 border-teal-800">
+                        <span class="text-2xl font-black block">FIBRAS DE PRODUCCIÓN</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 VISTA 2: FORMULARIO DE INGRESO
+                 ========================================== -->
+            <div id="vista-ingreso" class="vista fade-in max-w-5xl mx-auto">
+                <div class="flex items-center mb-6 border-b pb-4">
+                    <button onclick="cambiarVista('vista-categoria')" class="text-slate-500 hover:text-slate-800 mr-4">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    </button>
+                    <h2 class="text-2xl font-bold text-emerald-600 flex flex-col sm:flex-row sm:items-center gap-2">
+                        <span>Registrar Ingreso</span>
+                        <span class="hidden sm:inline text-slate-300">|</span>
+                        <span id="lbl-categoria-ingreso" class="text-indigo-600 bg-indigo-50 px-3 py-1 rounded-lg text-lg"></span>
+                    </h2>
                 </div>
 
                 <form id="form-ingreso" onsubmit="guardarIngreso(event)">
@@ -137,7 +163,7 @@
                     </div>
                     
                     <div class="mt-8 flex justify-end gap-4">
-                        <button type="button" onclick="cambiarVista('vista-menu')" class="px-6 py-3 rounded-lg font-bold text-gray-600 bg-gray-200 hover:bg-gray-300">Cancelar</button>
+                        <button type="button" onclick="cambiarVista('vista-categoria')" class="px-6 py-3 rounded-lg font-bold text-gray-600 bg-gray-200 hover:bg-gray-300">Cancelar</button>
                         <button id="btn-submit-ingreso" type="submit" class="px-8 py-3 rounded-lg font-bold text-white bg-emerald-500 hover:bg-emerald-600 shadow-lg flex items-center justify-center gap-2">
                             <span>GUARDAR INGRESO</span>
                         </button>
@@ -150,10 +176,14 @@
                  ========================================== -->
             <div id="vista-salida" class="vista fade-in">
                 <div class="flex items-center mb-6 border-b pb-4">
-                    <button onclick="cambiarVista('vista-menu')" class="text-slate-500 hover:text-slate-800 mr-4">
+                    <button onclick="cambiarVista('vista-categoria')" class="text-slate-500 hover:text-slate-800 mr-4">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     </button>
-                    <h2 class="text-2xl font-bold text-rose-600">Registrar Salida</h2>
+                    <h2 class="text-2xl font-bold text-rose-600 flex flex-col sm:flex-row sm:items-center gap-2">
+                        <span>Registrar Salida</span>
+                        <span class="hidden sm:inline text-slate-300">|</span>
+                        <span id="lbl-categoria-salida" class="text-indigo-600 bg-indigo-50 px-3 py-1 rounded-lg text-lg"></span>
+                    </h2>
                 </div>
 
                 <form id="form-salida" onsubmit="guardarSalida(event)">
@@ -183,7 +213,7 @@
                             <button id="btn-submit-salida" type="submit" class="w-full py-4 rounded-lg font-bold text-white bg-rose-500 hover:bg-rose-600 shadow-lg text-lg flex items-center justify-center gap-2">
                                 <span>REGISTRAR SALIDA</span>
                             </button>
-                            <button type="button" onclick="cambiarVista('vista-menu')" class="w-full py-3 rounded-lg font-bold text-gray-600 bg-white border border-gray-300 hover:bg-gray-50">Cancelar</button>
+                            <button type="button" onclick="cambiarVista('vista-categoria')" class="w-full py-3 rounded-lg font-bold text-gray-600 bg-white border border-gray-300 hover:bg-gray-50">Cancelar</button>
                         </div>
                     </div>
                 </form>
@@ -201,7 +231,6 @@
                         <h2 class="text-2xl font-bold text-blue-700">Stock Actual (Saldos)</h2>
                     </div>
                     
-                    <!-- BOTONES DE EXPORTACIÓN -->
                     <div class="flex gap-2 no-print">
                         <button onclick="window.print()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-bold text-sm transition-colors flex items-center gap-2">
                             🖨️ Imprimir
@@ -212,28 +241,44 @@
                     </div>
                 </div>
 
-                <div class="mb-4 flex gap-4 bg-blue-50 p-4 rounded-lg border border-blue-100 no-print">
-                    <div class="flex-1">
-                        <label class="block text-xs font-bold text-blue-800 uppercase mb-1">Buscar por Código o Artículo:</label>
-                        <input type="text" id="filtro-saldo-general" onkeyup="filtrarSaldos()" placeholder="Ej. ALGODON o COD-001" class="w-full p-2 border rounded shadow-sm focus:ring-2 focus:ring-blue-400 outline-none">
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto border rounded-xl shadow-sm">
+                <div class="overflow-x-auto border rounded-xl shadow-sm pb-6">
                     <table id="tabla-saldos" class="min-w-full divide-y divide-gray-200 text-sm">
                         <thead class="bg-blue-800 text-white">
                             <tr>
-                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Código</th>
-                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Artículo</th>
-                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Lote</th>
-                                <th class="px-4 py-3 text-right font-semibold uppercase tracking-wider whitespace-nowrap text-emerald-300">T. Ingresos (KG)</th>
-                                <th class="px-4 py-3 text-right font-semibold uppercase tracking-wider whitespace-nowrap text-rose-300">T. Salidas (KG)</th>
-                                <th class="px-4 py-3 text-right font-black uppercase tracking-wider whitespace-nowrap text-xl bg-blue-900">SALDO ACTUAL (KG)</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap w-[15%]">Categoría</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap w-[10%]">Código</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap w-[30%]">Artículo</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap w-[10%]">Lote</th>
+                                <th class="px-4 py-3 text-right font-semibold uppercase tracking-wider whitespace-nowrap text-emerald-300 w-[10%]">T. Ingresos (KG)</th>
+                                <th class="px-4 py-3 text-right font-semibold uppercase tracking-wider whitespace-nowrap text-rose-300 w-[10%]">T. Salidas (KG)</th>
+                                <th class="px-4 py-3 text-right font-black uppercase tracking-wider whitespace-nowrap text-xl bg-blue-900 w-[15%]">SALDO ACTUAL (KG)</th>
+                            </tr>
+                            <tr class="bg-blue-700 no-print">
+                                <!-- DROPDOWN CATEGORÍA PARA SALDOS -->
+                                <td class="p-1">
+                                    <select id="fs-categoria" onchange="filtrarSaldos()" class="w-full text-xs text-black px-2 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400">
+                                        <option value="">Todas</option>
+                                        <option value="FIBRAS ESPECIALES">FIBRAS ESPECIALES</option>
+                                        <option value="FIBRAS DE PRODUCCIÓN">FIBRAS DE PRODUCCIÓN</option>
+                                    </select>
+                                </td>
+                                <td class="p-1"><input type="text" id="fs-codigo" onkeyup="filtrarSaldos()" placeholder="Filtrar código..." class="w-full text-xs text-black px-2 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400"></td>
+                                <td class="p-1"><input type="text" id="fs-articulo" onkeyup="filtrarSaldos()" placeholder="Filtrar artículo..." class="w-full text-xs text-black px-2 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400"></td>
+                                <td class="p-1"><input type="text" id="fs-lote" onkeyup="filtrarSaldos()" placeholder="Filtrar lote..." class="w-full text-xs text-black px-2 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400"></td>
+                                <td colspan="3" class="p-1 text-center text-xs text-blue-200 italic">Los subtotales se calculan al final 👇</td>
                             </tr>
                         </thead>
                         <tbody id="cuerpo-tabla-saldos" class="bg-white divide-y divide-gray-200">
-                            <tr><td colspan="6" class="px-6 py-8 text-center text-gray-500 italic">Cargando saldos...</td></tr>
+                            <tr><td colspan="7" class="px-6 py-8 text-center text-gray-500 italic">Cargando saldos...</td></tr>
                         </tbody>
+                        <tfoot id="pie-tabla-saldos" class="bg-blue-100 font-bold text-slate-800 border-t-4 border-blue-300 hidden">
+                            <tr>
+                                <td colspan="4" class="px-4 py-3 text-right uppercase tracking-wider text-sm text-blue-900">Subtotal Filtrado (NETO):</td>
+                                <td class="px-4 py-3 text-right text-emerald-700" id="subtotal-ingresos-saldos">0.00</td>
+                                <td class="px-4 py-3 text-right text-rose-700" id="subtotal-salidas-saldos">0.00</td>
+                                <td class="px-4 py-3 text-right text-lg text-blue-800" id="subtotal-neto-saldos">0.00</td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -265,18 +310,17 @@
                     </div>
                 </div>
 
-                <!-- CAMBIO: Espaciado ajustado para evitar scroll horizontal -->
                 <div class="overflow-x-auto border rounded-xl shadow-sm pb-10">
-                    <table class="min-w-full divide-y divide-gray-200 text-xs" id="tabla-historico">
+                    <table class="min-w-full divide-y divide-gray-200 text-[11px]" id="tabla-historico">
                         <thead class="bg-slate-800 text-white">
                             <tr>
-                                <!-- Reducimos padding (px-2 py-1.5) y usamos texto pequeño para meter 15 columnas -->
                                 <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Fecha Mov.</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Categoría</th>
                                 <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Código</th>
                                 <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Lote</th>
                                 <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap text-amber-300">Características</th>
                                 <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Artículo</th>
-                                <th class="px-2 py-1.5 text-center font-semibold uppercase tracking-wider whitespace-nowrap">Tipo</th>
+                                <th class="px-2 py-1.5 text-center font-semibold uppercase tracking-wider whitespace-nowrap">Tipo Mov.</th>
                                 <th class="px-2 py-1.5 text-right font-semibold uppercase tracking-wider whitespace-nowrap">PESO (KG)</th>
                                 <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Proveedor</th>
                                 <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Origen</th>
@@ -289,6 +333,14 @@
                             </tr>
                             <tr class="bg-slate-700 no-print">
                                 <td class="p-1"><input type="text" id="fh-fecha" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-[10px] text-black px-1 py-1 rounded outline-none"></td>
+                                <!-- DROPDOWN CATEGORÍA PARA HISTÓRICO -->
+                                <td class="p-1">
+                                    <select id="fh-categoria" onchange="filtrarHistorico()" class="w-full text-[10px] text-black px-1 py-1 rounded outline-none">
+                                        <option value="">Todas</option>
+                                        <option value="FIBRAS ESPECIALES">ESPECIALES</option>
+                                        <option value="FIBRAS DE PRODUCCIÓN">PRODUCCIÓN</option>
+                                    </select>
+                                </td>
                                 <td class="p-1"><input type="text" id="fh-codigo" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-[10px] text-black px-1 py-1 rounded outline-none"></td>
                                 <td class="p-1"><input type="text" id="fh-lote" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-[10px] text-black px-1 py-1 rounded outline-none"></td>
                                 <td class="p-1"><input type="text" id="fh-caracteristicas" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-[10px] text-black px-1 py-1 rounded outline-none"></td>
@@ -298,12 +350,11 @@
                             </tr>
                         </thead>
                         <tbody id="cuerpo-tabla" class="bg-white divide-y divide-gray-200">
-                            <tr><td colspan="15" class="px-6 py-8 text-center text-gray-500 italic">Cargando información desde la base de datos... <div class="loader ml-2 mb-[-6px]"></div></td></tr>
+                            <tr><td colspan="16" class="px-6 py-8 text-center text-gray-500 italic">Cargando información desde la base de datos... <div class="loader ml-2 mb-[-6px]"></div></td></tr>
                         </tbody>
-                        <!-- NUEVO: Pie de tabla para el subtotal dinámico -->
                         <tfoot id="pie-tabla-historico" class="bg-slate-200 font-bold text-slate-800 border-t-2 border-slate-400 hidden">
                             <tr>
-                                <td colspan="6" class="px-2 py-2 text-right uppercase tracking-wider text-xs">Subtotal Filtrado (NETO):</td>
+                                <td colspan="7" class="px-2 py-2 text-right uppercase tracking-wider text-xs">Subtotal Filtrado (NETO):</td>
                                 <td class="px-2 py-2 text-right text-xs" id="subtotal-peso-historico">0.00</td>
                                 <td colspan="8" class="px-2 py-2"></td>
                             </tr>
@@ -329,12 +380,21 @@
                 <form id="form-editar" onsubmit="guardarEdicionLocal(event)">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div><label class="block text-xs font-bold text-gray-600 mb-1">Fecha Movimiento *</label><input type="date" id="ed-fecha" required class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                        
+                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Categoría (Tipo de Fibra)*</label>
+                            <select id="ed-categoria" required class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                                <option value="-">-</option>
+                                <option value="FIBRAS ESPECIALES">FIBRAS ESPECIALES</option>
+                                <option value="FIBRAS DE PRODUCCIÓN">FIBRAS DE PRODUCCIÓN</option>
+                            </select>
+                        </div>
+
                         <div><label class="block text-xs font-bold text-gray-600 mb-1">Código *</label><input type="text" id="ed-codigo" required class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
                         <div><label class="block text-xs font-bold text-gray-600 mb-1">Lote *</label><input type="text" id="ed-lote" required class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
                         
                         <div><label class="block text-xs font-bold text-gray-600 mb-1">Características</label><input type="text" id="ed-caracteristicas" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
                         
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Tipo *</label>
+                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Tipo de Mov. *</label>
                             <select id="ed-tipo" required class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
                                 <option value="INGRESO">INGRESO</option>
                                 <option value="SALIDA">SALIDA</option>
@@ -399,12 +459,11 @@
             document.body.removeChild(a);
         }
 
-        // --- FORMATO DE NÚMEROS (SEPARADOR DE MILES) ---
+        // --- FORMATO DE NÚMEROS Y FECHAS ---
         function formatearNumero(num) {
             return Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        // --- FORMATO DE FECHA PARA TABLA Y MODAL (Convierte ISO larga a YYYY-MM-DD) ---
         function formatearFechaCorto(fechaIso) {
             if (!fechaIso || fechaIso === "-") return "";
             if (String(fechaIso).length === 10 && String(fechaIso).includes("-")) return fechaIso;
@@ -418,11 +477,13 @@
         }
 
         // --- 1. CONFIGURACIÓN DEL BACKEND ---
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwbObDTZ36mkBXSR-ay3AGRi07deg_Lomh-t6CSV8S2c7qQyghQ1tBVSs3E7OY5tF6O/exec";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz5MvWoG0Bs_ghicjJfuax6b3M3j8mJ7nrCBnvnY4_aZ6RRoIyNqxAqPgjXMV4dPyTh/exec";
         
         let registrosKardex = [];
         let catalogoCodigos = [];
-        let indiceEdicionActual = -1; // Para el modal
+        let indiceEdicionActual = -1;
+        let flujoActual = '';
+        let categoriaSeleccionada = ''; // Guarda la elección de la vista 1.5
 
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('ing-fecha').value = new Date().toISOString().split('T')[0];
@@ -434,10 +495,42 @@
             document.getElementById(idVista).classList.add('activa');
         }
 
+        // NUEVO: CONTROL DEL FLUJO (Ingreso vs Salida)
+        function iniciarFlujo(flujo) {
+            flujoActual = flujo;
+            document.getElementById('titulo-categoria').innerText = flujo === 'INGRESO' ? '¿Qué tipo de fibra ingresará?' : '¿Qué tipo de fibra retirará?';
+            cambiarVista('vista-categoria');
+        }
+
+        function seleccionarCategoria(cat) {
+            categoriaSeleccionada = cat;
+            const colorClass = cat === "FIBRAS ESPECIALES" ? "text-indigo-700 bg-indigo-100 px-3 py-1 rounded-lg text-lg ml-2" : "text-teal-700 bg-teal-100 px-3 py-1 rounded-lg text-lg ml-2";
+            
+            if (flujoActual === 'INGRESO') {
+                document.getElementById('lbl-categoria-ingreso').innerText = cat;
+                document.getElementById('lbl-categoria-ingreso').className = colorClass;
+                cambiarVista('vista-ingreso');
+            } else if (flujoActual === 'SALIDA') {
+                document.getElementById('lbl-categoria-salida').innerText = cat;
+                document.getElementById('lbl-categoria-salida').className = colorClass;
+                
+                // Reiniciar campos de salida por si quedó algo anterior
+                document.getElementById('sal-codigo').value = '';
+                document.getElementById('sal-lote').innerHTML = '<option value="">Primero seleccione un código...</option>';
+                document.getElementById('sal-cantidad').value = '';
+                document.getElementById('sal-stock-disponible').classList.add('hidden');
+                
+                cambiarVista('vista-salida');
+            }
+        }
+
         // --- 2. LECTURA DE DATOS (GET) ---
         async function cargarDashboard() {
             try {
+                // Simplificamos la petición GET para evitar problemas de CORS por el redireccionamiento
                 const response = await fetch(WEB_APP_URL);
+                if (!response.ok) throw new Error("Error HTTP: " + response.status);
+
                 const data = await response.json();
                 
                 registrosKardex = data.historico || [];
@@ -453,13 +546,13 @@
 
             } catch (error) {
                 console.error("Error al cargar:", error);
-                document.getElementById('cuerpo-tabla').innerHTML = `<tr><td colspan="15" class="px-6 py-8 text-center text-rose-500 font-bold">Error de conexión con la Base de Datos.</td></tr>`;
+                document.getElementById('cuerpo-tabla').innerHTML = `<tr><td colspan="16" class="px-6 py-8 text-center text-rose-500 font-bold">Asegúrate de que el acceso de tu Script en Google Sheets esté configurado como "Cualquier persona".<br><br>Detalle técnico: ${error.message}</td></tr>`;
                 document.getElementById('estado-conexion').classList.replace('bg-slate-700', 'bg-rose-600');
                 document.getElementById('estado-conexion').innerHTML = 'Error de Conexión ❌';
             }
         }
 
-        // --- NUEVO SISTEMA DE AUTOCOMPLETADO VISUAL ---
+        // --- SISTEMA DE AUTOCOMPLETADO VISUAL ---
         function configurarDropdownsCodigo() {
             const ingInput = document.getElementById('ing-codigo');
             const ingDropdown = document.getElementById('dropdown-ing-codigo');
@@ -512,10 +605,12 @@
             document.getElementById('ing-articulo').value = itemEncontrado ? itemEncontrado.articulo : "";
         });
 
-        function calcularSaldoStock(codigo, lote) {
+        function calcularSaldoStock(codigo, lote, categoria) {
             let saldo = 0;
             registrosKardex.forEach(reg => {
-                if (String(reg.codigo) === String(codigo) && String(reg.lote) === String(lote)) {
+                const catReg = reg.categoria || reg.CATEGORIA || "-";
+                // Verificar que coincida código, lote y también la categoría elegida
+                if (String(reg.codigo) === String(codigo) && String(reg.lote) === String(lote) && (!categoria || catReg === categoria)) {
                     const cant = parseFloat(reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad)) || 0;
                     if (String(reg.tipo).toUpperCase() === 'INGRESO') saldo += cant;
                     else saldo -= Math.abs(cant);
@@ -540,8 +635,9 @@
                 return;
             }
 
+            // Filtrar lotes que pertenezcan SOLO al código seleccionado y a la CATEGORÍA SELECCIONADA
             const lotesDelCodigo = registrosKardex
-                .filter(reg => String(reg.codigo) === codigoSeleccionado && reg.lote && String(reg.lote).trim() !== "-" && String(reg.lote).trim() !== "")
+                .filter(reg => String(reg.codigo) === codigoSeleccionado && reg.lote && String(reg.lote).trim() !== "-" && String(reg.lote).trim() !== "" && (reg.categoria || reg.CATEGORIA || "-") === categoriaSeleccionada)
                 .map(reg => reg.lote);
 
             const lotesUnicos = [...new Set(lotesDelCodigo)];
@@ -549,14 +645,14 @@
             let lotesConStock = 0;
 
             lotesUnicos.forEach(lote => { 
-                const saldoActual = calcularSaldoStock(codigoSeleccionado, lote);
+                const saldoActual = calcularSaldoStock(codigoSeleccionado, lote, categoriaSeleccionada);
                 if (saldoActual > 0) {
                     opcionesHTML += `<option value="${lote}">${lote} (Disp: ${formatearNumero(saldoActual)} KG)</option>`; 
                     lotesConStock++;
                 }
             });
 
-            if (lotesConStock === 0) opcionesHTML = `<option value="">Sin lotes con stock para este código</option>`;
+            if (lotesConStock === 0) opcionesHTML = `<option value="">Sin lotes con stock para este código en esta categoría</option>`;
             selectLoteSalida.innerHTML = opcionesHTML;
         });
 
@@ -567,7 +663,7 @@
             const inputCantidad = document.getElementById('sal-cantidad');
 
             if (codigoSeleccionado && loteSeleccionado) {
-                const saldo = calcularSaldoStock(codigoSeleccionado, loteSeleccionado);
+                const saldo = calcularSaldoStock(codigoSeleccionado, loteSeleccionado, categoriaSeleccionada);
                 if (saldo > 0) {
                     lblStock.innerHTML = `Stock disponible: <span>${formatearNumero(saldo)}</span> KG`;
                     lblStock.className = "text-sm font-semibold mt-2 text-blue-600"; 
@@ -594,6 +690,7 @@
             const cant = parseFloat(document.getElementById('ing-cantidad').value);
             const nuevoRegistro = {
                 fechaMovimiento: document.getElementById('ing-fecha').value,
+                categoria: categoriaSeleccionada,
                 codigo: document.getElementById('ing-codigo').value,
                 lote: document.getElementById('ing-lote').value,
                 caracteristicas: document.getElementById('ing-caracteristicas').value || "-",
@@ -609,14 +706,20 @@
             };
 
             try {
-                await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(nuevoRegistro) });
+                // Simplificamos la petición POST para evitar CORS por redireccionamientos
+                const response = await fetch(WEB_APP_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify(nuevoRegistro) 
+                });
+                
+                // Chequear sin lanzar error para no frenar la interfaz en redirecciones
                 alert('¡Ingreso registrado exitosamente!');
                 document.getElementById('form-ingreso').reset();
                 document.getElementById('ing-fecha').value = new Date().toISOString().split('T')[0];
                 cambiarVista('vista-menu');
                 cargarDashboard(); 
             } catch (error) {
-                alert('Hubo un error de conexión: ' + error.message);
+                alert('Hubo un error de conexión al enviar: ' + error.message);
             } finally {
                 btn.innerHTML = textoOriginal;
                 btn.disabled = false;
@@ -634,7 +737,7 @@
             const codigo = document.getElementById('sal-codigo').value.trim();
             const lote = document.getElementById('sal-lote').value.trim();
             const cantRequerida = Math.abs(parseFloat(document.getElementById('sal-cantidad').value));
-            const saldoActual = calcularSaldoStock(codigo, lote);
+            const saldoActual = calcularSaldoStock(codigo, lote, categoriaSeleccionada);
 
             if (saldoActual <= 0 || cantRequerida > saldoActual) {
                 alert(`⚠️ Error de Stock:\nEstás intentando retirar ${formatearNumero(cantRequerida)} KG, pero el stock es de ${formatearNumero(saldoActual)} KG.`);
@@ -646,13 +749,18 @@
             const cantSalida = -cantRequerida;
             const nuevoRegistro = {
                 fechaMovimiento: new Date().toISOString().split('T')[0],
+                categoria: categoriaSeleccionada, 
                 codigo: codigo, lote: lote, caracteristicas: "-", articulo: "", tipo: 'SALIDA',
                 peso: cantSalida, cantidad: cantSalida,
                 proveedor: "-", origen: "-", fLlegada: "-", andamio: "-", nCaja: "-", presentacion: "-", certificado: "-"
             };
 
             try {
-                await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(nuevoRegistro) });
+                await fetch(WEB_APP_URL, { 
+                    method: 'POST',
+                    body: JSON.stringify(nuevoRegistro) 
+                });
+
                 alert('¡Salida registrada exitosamente!');
                 document.getElementById('form-salida').reset();
                 cambiarVista('vista-menu');
@@ -665,19 +773,20 @@
             }
         }
 
-        // --- EDICIÓN Y ELIMINACIÓN LOCAL (UI) ---
+        // --- EDICIÓN Y ELIMINACIÓN CONECTADA A GOOGLE SHEETS (Backend) ---
         function abrirModalEditar(indexReal) {
             indiceEdicionActual = indexReal;
             const reg = registrosKardex[indexReal];
             
             document.getElementById('ed-fecha').value = formatearFechaCorto(reg.fechaMovimiento);
+            document.getElementById('ed-categoria').value = reg.categoria || reg.CATEGORIA || "-";
             document.getElementById('ed-codigo').value = reg.codigo;
             document.getElementById('ed-lote').value = reg.lote;
             document.getElementById('ed-caracteristicas').value = reg.caracteristicas || "";
             document.getElementById('ed-tipo').value = String(reg.tipo).toUpperCase() === 'INGRESO' ? 'INGRESO' : 'SALIDA';
             
             const valorPeso = reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad);
-            document.getElementById('ed-cantidad').value = Math.abs(parseFloat(valorPeso) || 0); // Mostrar en positivo para facilitar edición
+            document.getElementById('ed-cantidad').value = Math.abs(parseFloat(valorPeso) || 0); 
 
             document.getElementById('ed-proveedor').value = reg.proveedor || "";
             document.getElementById('ed-origen').value = reg.origen || "";
@@ -695,17 +804,27 @@
             indiceEdicionActual = -1;
         }
 
-        function guardarEdicionLocal(e) {
+        async function guardarEdicionLocal(e) {
             e.preventDefault();
             if (indiceEdicionActual === -1) return;
+            
+            const btn = e.target.querySelector('button[type="submit"]');
+            const textoOriginal = btn.innerHTML;
+            btn.innerHTML = `<div class="loader mr-2"></div> Guardando...`;
+            btn.disabled = true;
 
             let cant = parseFloat(document.getElementById('ed-cantidad').value);
             const tipo = document.getElementById('ed-tipo').value;
-            if(tipo === 'SALIDA') cant = -Math.abs(cant); // Salidas siempre en negativo
+            if(tipo === 'SALIDA') cant = -Math.abs(cant); 
 
-            registrosKardex[indiceEdicionActual] = {
-                ...registrosKardex[indiceEdicionActual], // Mantiene otras props ocultas si existen
+            // Asumimos que la fila 1 es encabezado, por lo que el índice (que visualmente está invertido) 
+            // se debe calcular sobre su posición real en la base de datos de Google Sheets.
+            const filaEnExcel = indiceEdicionActual + 2; 
+
+            const registroEditado = {
+                ...registrosKardex[indiceEdicionActual], 
                 fechaMovimiento: document.getElementById('ed-fecha').value,
+                categoria: document.getElementById('ed-categoria').value,
                 codigo: document.getElementById('ed-codigo').value,
                 lote: document.getElementById('ed-lote').value,
                 caracteristicas: document.getElementById('ed-caracteristicas').value || "-",
@@ -721,17 +840,54 @@
                 certificado: document.getElementById('ed-certificado').value || "-"
             };
 
-            alert("Edición aplicada en la vista local.\n\nNOTA: Para que este cambio se guarde en Google Sheets permanentemente, debes agregar el método de edición a tu código backend (Código.gs).");
-            cerrarModalEditar();
-            actualizarTabla();
-            actualizarTablaSaldos();
+            const payload = {
+                ...registroEditado,
+                accion_bd: 'EDITAR',
+                fila_excel: filaEnExcel
+            };
+
+            try {
+                await fetch(WEB_APP_URL, { 
+                    method: 'POST',
+                    body: JSON.stringify(payload) 
+                });
+
+                registrosKardex[indiceEdicionActual] = registroEditado;
+                cerrarModalEditar();
+                actualizarTabla();
+                actualizarTablaSaldos();
+                alert("Registro actualizado en la base de datos.");
+            } catch (error) {
+                alert('No se pudo guardar en la nube: ' + error.message);
+            } finally {
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            }
         }
 
-        function eliminarRegistro(indexReal) {
-            if (confirm("¿Estás seguro de eliminar este registro?\n\nNOTA: Esto solo lo eliminará de la vista actual. Para que se borre de tu base de datos en Google Sheets, tu backend (Código.gs) debe soportar la función de eliminar.")) {
+        async function eliminarRegistro(indexReal) {
+            if (confirm("¿Estás seguro de eliminar este registro permanentemente de la base de datos?")) {
+                const filaEnExcel = indexReal + 2; // Fila 1 es cabecera
+                const registroRespaldo = registrosKardex[indexReal];
+                
+                // Actualización optimista
                 registrosKardex.splice(indexReal, 1);
                 actualizarTabla();
                 actualizarTablaSaldos();
+
+                try {
+                    const payload = { accion_bd: 'ELIMINAR', fila_excel: filaEnExcel };
+                    await fetch(WEB_APP_URL, { 
+                        method: 'POST',
+                        body: JSON.stringify(payload) 
+                    });
+                    
+                } catch (error) {
+                    alert("Error de conexión al intentar eliminar en la nube. Se restaurará el registro en pantalla.\nDetalle: " + error.message);
+                    registrosKardex.splice(indexReal, 0, registroRespaldo); // Revertir
+                    actualizarTabla();
+                    actualizarTablaSaldos();
+                }
             }
         }
 
@@ -745,7 +901,9 @@
                 if (!saldos[key]) {
                     const itemCat = catalogoCodigos.find(c => String(c.codigo) === String(reg.codigo));
                     const nombreArt = itemCat ? itemCat.articulo : (reg.articulo && String(reg.articulo).trim() !== "-" && String(reg.articulo).trim() !== "" ? reg.articulo : "-");
-                    saldos[key] = { codigo: reg.codigo, articulo: nombreArt, lote: reg.lote, ingresos: 0, salidas: 0, saldo: 0 };
+                    const catFibra = reg.categoria || reg.CATEGORIA || "-";
+
+                    saldos[key] = { categoria: catFibra, codigo: reg.codigo, articulo: nombreArt, lote: reg.lote, ingresos: 0, salidas: 0, saldo: 0 };
                 }
                 const valorPeso = reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad);
                 const cant = parseFloat(valorPeso) || 0;
@@ -758,7 +916,8 @@
             tbody.innerHTML = '';
             const saldosArray = Object.values(saldos);
             if(saldosArray.length === 0){
-                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500 italic">No hay stock registrado.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500 italic">No hay stock registrado.</td></tr>`;
+                document.getElementById('pie-tabla-saldos').classList.add('hidden');
                 return;
             }
 
@@ -767,6 +926,7 @@
                 const tr = document.createElement('tr');
                 tr.classList.add('hover:bg-blue-50', 'transition-colors', 'fila-saldo'); 
                 tr.innerHTML = `
+                    <td class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap celda-cat">${item.categoria}</td>
                     <td class="px-4 py-3 font-semibold text-slate-800 whitespace-nowrap celda-codigo">${item.codigo}</td>
                     <td class="px-4 py-3 font-medium text-slate-700 whitespace-nowrap celda-articulo">${item.articulo}</td>
                     <td class="px-4 py-3 text-slate-600 whitespace-nowrap">${item.lote}</td>
@@ -776,15 +936,57 @@
                 `;
                 tbody.appendChild(tr);
             });
+            
+            document.getElementById('pie-tabla-saldos').classList.remove('hidden');
+            calcularSubtotalSaldos();
         }
 
         function filtrarSaldos() {
-            const input = document.getElementById('filtro-saldo-general').value.toLowerCase();
+            const fCat = document.getElementById('fs-categoria').value.toLowerCase();
+            const fCodigo = document.getElementById('fs-codigo').value.toLowerCase();
+            const fArticulo = document.getElementById('fs-articulo').value.toLowerCase();
+            const fLote = document.getElementById('fs-lote').value.toLowerCase();
+
             const filas = document.getElementsByClassName('fila-saldo');
             for (let i = 0; i < filas.length; i++) {
+                const txtCat = filas[i].querySelector('.celda-cat').textContent.toLowerCase();
                 const txtC = filas[i].querySelector('.celda-codigo').textContent.toLowerCase();
                 const txtA = filas[i].querySelector('.celda-articulo').textContent.toLowerCase();
-                filas[i].style.display = (txtC.includes(input) || txtA.includes(input)) ? "" : "none";
+                const txtL = filas[i].cells[3].textContent.toLowerCase();
+
+                if ((fCat === "" || txtCat.includes(fCat)) && txtC.includes(fCodigo) && txtA.includes(fArticulo) && txtL.includes(fLote)) {
+                    filas[i].style.display = "";
+                } else {
+                    filas[i].style.display = "none";
+                }
+            }
+            calcularSubtotalSaldos();
+        }
+
+        function calcularSubtotalSaldos() {
+            const filas = document.getElementsByClassName('fila-saldo');
+            let subIngresos = 0, subSalidas = 0, subNeto = 0;
+            
+            for (let i = 0; i < filas.length; i++) {
+                if (filas[i].style.display !== "none") {
+                    subIngresos += parseFloat(filas[i].cells[4].textContent.replace(/,/g, '')) || 0;
+                    subSalidas += parseFloat(filas[i].cells[5].textContent.replace(/,/g, '')) || 0;
+                    subNeto += parseFloat(filas[i].cells[6].textContent.replace(/,/g, '')) || 0;
+                }
+            }
+
+            document.getElementById('subtotal-ingresos-saldos').textContent = formatearNumero(subIngresos);
+            document.getElementById('subtotal-salidas-saldos').textContent = formatearNumero(subSalidas);
+            
+            const elNeto = document.getElementById('subtotal-neto-saldos');
+            elNeto.textContent = formatearNumero(subNeto);
+            
+            if (subNeto > 0) {
+                elNeto.className = "px-4 py-3 text-right text-lg font-bold text-blue-800";
+            } else if (subNeto < 0) {
+                elNeto.className = "px-4 py-3 text-right text-lg font-bold text-rose-700";
+            } else {
+                elNeto.className = "px-4 py-3 text-right text-lg font-bold text-slate-800";
             }
         }
 
@@ -793,13 +995,12 @@
             document.getElementById('contador-registros').innerText = registrosKardex.length;
             
             if (registrosKardex.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="15" class="px-6 py-8 text-center text-gray-500 italic">No hay movimientos registrados.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="16" class="px-6 py-8 text-center text-gray-500 italic">No hay movimientos registrados.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = '';
             
-            // Recorremos de atrás para adelante (los más recientes primero)
             for(let i = registrosKardex.length - 1; i >= 0; i--) {
                 const reg = registrosKardex[i];
                 const isIngreso = String(reg.tipo).toUpperCase() === 'INGRESO';
@@ -807,15 +1008,16 @@
                 const colorCantidad = isIngreso ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold';
                 
                 const valorPeso = reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad);
+                const catFibra = reg.categoria || reg.CATEGORIA || "-";
                 const itemCat = catalogoCodigos.find(c => String(c.codigo) === String(reg.codigo));
                 const nombreArticulo = itemCat ? itemCat.articulo : (reg.articulo && String(reg.articulo).trim() !== "-" && String(reg.articulo).trim() !== "" ? reg.articulo : "-");
 
                 const tr = document.createElement('tr');
                 tr.classList.add('hover:bg-slate-50', 'transition-colors', 'fila-historico');
                 
-                // Aplicamos estilos muy comprimidos (px-2, py-1.5, texto muy pequeño, y envolver texto largo)
                 tr.innerHTML = `
                     <td class="px-2 py-1.5 text-xs whitespace-nowrap">${formatearFechaCorto(reg.fechaMovimiento)}</td>
+                    <td class="px-2 py-1.5 text-xs font-medium whitespace-nowrap text-indigo-700 celda-cat">${catFibra}</td>
                     <td class="px-2 py-1.5 text-xs font-semibold text-slate-800 whitespace-nowrap">${reg.codigo}</td>
                     <td class="px-2 py-1.5 text-xs whitespace-nowrap">${reg.lote}</td>
                     <td class="px-2 py-1.5 text-xs min-w-[100px] whitespace-normal break-words">${reg.caracteristicas || '-'}</td>
@@ -837,13 +1039,13 @@
                 tbody.appendChild(tr);
             }
 
-            // Mostrar el pie de tabla y calcular subtotal
             document.getElementById('pie-tabla-historico').classList.remove('hidden');
             calcularSubtotalHistorico();
         }
 
         function filtrarHistorico() {
             const fFecha = document.getElementById('fh-fecha').value.toLowerCase();
+            const fCat = document.getElementById('fh-categoria').value.toLowerCase();
             const fCodigo = document.getElementById('fh-codigo').value.toLowerCase();
             const fLote = document.getElementById('fh-lote').value.toLowerCase();
             const fCarac = document.getElementById('fh-caracteristicas').value.toLowerCase();
@@ -854,34 +1056,30 @@
 
             for (let i = 0; i < filas.length; i++) {
                 const txtFecha = filas[i].cells[0].textContent.toLowerCase();
-                const txtCodigo = filas[i].cells[1].textContent.toLowerCase();
-                const txtLote = filas[i].cells[2].textContent.toLowerCase();
-                const txtCarac = filas[i].cells[3].textContent.toLowerCase();
-                const txtArticulo = filas[i].cells[4].textContent.toLowerCase();
-                const txtTipo = filas[i].cells[5].textContent.toLowerCase();
+                const txtCat = filas[i].querySelector('.celda-cat').textContent.toLowerCase();
+                const txtCodigo = filas[i].cells[2].textContent.toLowerCase();
+                const txtLote = filas[i].cells[3].textContent.toLowerCase();
+                const txtCarac = filas[i].cells[4].textContent.toLowerCase();
+                const txtArticulo = filas[i].cells[5].textContent.toLowerCase();
+                const txtTipo = filas[i].cells[6].textContent.toLowerCase();
 
-                const match = txtFecha.includes(fFecha) && txtCodigo.includes(fCodigo) && 
+                const match = txtFecha.includes(fFecha) && (fCat === "" || txtCat.includes(fCat)) && txtCodigo.includes(fCodigo) && 
                               txtLote.includes(fLote) && txtCarac.includes(fCarac) && 
                               txtArticulo.includes(fArticulo) && (fTipo === "" || txtTipo.includes(fTipo));
 
                 filas[i].style.display = match ? "" : "none";
             }
             
-            // Recalcular subtotal al filtrar
             calcularSubtotalHistorico();
         }
 
-        // --- NUEVA FUNCIÓN: CALCULAR SUBTOTAL DINÁMICO ---
         function calcularSubtotalHistorico() {
             const filas = document.getElementsByClassName('fila-historico');
             let subtotal = 0;
             
             for (let i = 0; i < filas.length; i++) {
-                // Solo sumar si la fila NO está oculta
                 if (filas[i].style.display !== "none") {
-                    // La columna 6 (índice 6) corresponde a PESO (KG)
-                    // Eliminamos las comas de miles para poder sumar correctamente
-                    const textoPeso = filas[i].cells[6].textContent.replace(/,/g, ''); 
+                    const textoPeso = filas[i].cells[7].textContent.replace(/,/g, ''); 
                     const peso = parseFloat(textoPeso) || 0;
                     subtotal += peso;
                 }
@@ -891,7 +1089,6 @@
             if (elSubtotal) {
                 elSubtotal.textContent = formatearNumero(subtotal);
                 
-                // Darle color dependiendo de si es positivo, negativo o cero
                 if (subtotal > 0) {
                     elSubtotal.className = "px-2 py-2 text-right text-xs text-emerald-700";
                 } else if (subtotal < 0) {
