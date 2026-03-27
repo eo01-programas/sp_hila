@@ -6,6 +6,8 @@
     <title>Kardex de Inventario</title>
     <!-- Usamos Tailwind CSS para un diseño rápido y moderno -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- NUEVO: Librería Chart.js para los gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Ocultar vistas que no están activas */
         .vista { display: none; }
@@ -52,7 +54,6 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen p-2 md:p-4">
 
-    <!-- CAMBIO: w-full max-w-[98%] para aprovechar toda la pantalla y evitar scroll horizontal -->
     <div class="w-full max-w-[98%] mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
         
         <div class="bg-slate-800 text-white p-6 text-center relative">
@@ -220,7 +221,7 @@
             </div>
 
             <!-- ==========================================
-                 VISTA 4: REPORTE DE SALDOS
+                 VISTA 4: REPORTE DE SALDOS Y GRÁFICOS
                  ========================================== -->
             <div id="vista-saldos" class="vista fade-in">
                 <div class="flex flex-wrap items-center justify-between mb-6 border-b pb-4 gap-4">
@@ -238,6 +239,22 @@
                         <button onclick="exportarExcel('tabla-saldos', 'Reporte_Stock_Actual')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold text-sm transition-colors flex items-center gap-2">
                             📊 Exportar Excel
                         </button>
+                    </div>
+                </div>
+
+                <!-- NUEVO: Contenedor de Gráficos Dinámicos -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 no-print" id="contenedor-graficos" style="display: none;">
+                    <div class="bg-white p-4 rounded-xl border border-blue-100 shadow-sm flex flex-col items-center">
+                        <h3 class="text-sm font-bold text-blue-800 mb-2 uppercase">Stock por Artículo (KG)</h3>
+                        <div class="w-full relative h-64">
+                            <canvas id="chartArticulos"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-blue-100 shadow-sm flex flex-col items-center">
+                        <h3 class="text-sm font-bold text-blue-800 mb-2 uppercase">Stock por Lote (KG)</h3>
+                        <div class="w-full relative h-64">
+                            <canvas id="chartLotes"></canvas>
+                        </div>
                     </div>
                 </div>
 
@@ -424,6 +441,10 @@
 
 
     <script>
+        // --- VARIABLES PARA GRÁFICOS ---
+        let chartArticulosInstance = null;
+        let chartLotesInstance = null;
+
         // --- FUNCIÓN PARA EXPORTAR TABLA A EXCEL ---
         function exportarExcel(tablaId, nombreArchivo) {
             let tabla = document.getElementById(tablaId);
@@ -483,7 +504,7 @@
         let catalogoCodigos = [];
         let indiceEdicionActual = -1;
         let flujoActual = '';
-        let categoriaSeleccionada = ''; // Guarda la elección de la vista 1.5
+        let categoriaSeleccionada = ''; 
 
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('ing-fecha').value = new Date().toISOString().split('T')[0];
@@ -495,7 +516,7 @@
             document.getElementById(idVista).classList.add('activa');
         }
 
-        // NUEVO: CONTROL DEL FLUJO (Ingreso vs Salida)
+        // CONTROL DEL FLUJO (Ingreso vs Salida)
         function iniciarFlujo(flujo) {
             flujoActual = flujo;
             document.getElementById('titulo-categoria').innerText = flujo === 'INGRESO' ? '¿Qué tipo de fibra ingresará?' : '¿Qué tipo de fibra retirará?';
@@ -514,7 +535,6 @@
                 document.getElementById('lbl-categoria-salida').innerText = cat;
                 document.getElementById('lbl-categoria-salida').className = colorClass;
                 
-                // Reiniciar campos de salida por si quedó algo anterior
                 document.getElementById('sal-codigo').value = '';
                 document.getElementById('sal-lote').innerHTML = '<option value="">Primero seleccione un código...</option>';
                 document.getElementById('sal-cantidad').value = '';
@@ -527,7 +547,6 @@
         // --- 2. LECTURA DE DATOS (GET) ---
         async function cargarDashboard() {
             try {
-                // Simplificamos la petición GET para evitar problemas de CORS por el redireccionamiento
                 const response = await fetch(WEB_APP_URL);
                 if (!response.ok) throw new Error("Error HTTP: " + response.status);
 
@@ -609,7 +628,6 @@
             let saldo = 0;
             registrosKardex.forEach(reg => {
                 const catReg = reg.categoria || reg.CATEGORIA || "-";
-                // Verificar que coincida código, lote y también la categoría elegida
                 if (String(reg.codigo) === String(codigo) && String(reg.lote) === String(lote) && (!categoria || catReg === categoria)) {
                     const cant = parseFloat(reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad)) || 0;
                     if (String(reg.tipo).toUpperCase() === 'INGRESO') saldo += cant;
@@ -635,7 +653,6 @@
                 return;
             }
 
-            // Filtrar lotes que pertenezcan SOLO al código seleccionado y a la CATEGORÍA SELECCIONADA
             const lotesDelCodigo = registrosKardex
                 .filter(reg => String(reg.codigo) === codigoSeleccionado && reg.lote && String(reg.lote).trim() !== "-" && String(reg.lote).trim() !== "" && (reg.categoria || reg.CATEGORIA || "-") === categoriaSeleccionada)
                 .map(reg => reg.lote);
@@ -706,13 +723,14 @@
             };
 
             try {
-                // Simplificamos la petición POST para evitar CORS por redireccionamientos
                 const response = await fetch(WEB_APP_URL, { 
                     method: 'POST', 
+                    redirect: 'follow',
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify(nuevoRegistro) 
                 });
-                
-                // Chequear sin lanzar error para no frenar la interfaz en redirecciones
+                if(!response.ok) throw new Error("Error HTTP: " + response.status);
+
                 alert('¡Ingreso registrado exitosamente!');
                 document.getElementById('form-ingreso').reset();
                 document.getElementById('ing-fecha').value = new Date().toISOString().split('T')[0];
@@ -756,10 +774,13 @@
             };
 
             try {
-                await fetch(WEB_APP_URL, { 
+                const response = await fetch(WEB_APP_URL, { 
                     method: 'POST',
+                    redirect: 'follow',
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify(nuevoRegistro) 
                 });
+                if(!response.ok) throw new Error("Error HTTP: " + response.status);
 
                 alert('¡Salida registrada exitosamente!');
                 document.getElementById('form-salida').reset();
@@ -817,8 +838,6 @@
             const tipo = document.getElementById('ed-tipo').value;
             if(tipo === 'SALIDA') cant = -Math.abs(cant); 
 
-            // Asumimos que la fila 1 es encabezado, por lo que el índice (que visualmente está invertido) 
-            // se debe calcular sobre su posición real en la base de datos de Google Sheets.
             const filaEnExcel = indiceEdicionActual + 2; 
 
             const registroEditado = {
@@ -847,10 +866,13 @@
             };
 
             try {
-                await fetch(WEB_APP_URL, { 
+                const response = await fetch(WEB_APP_URL, { 
                     method: 'POST',
+                    redirect: 'follow',
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify(payload) 
                 });
+                if(!response.ok) throw new Error("Error HTTP: " + response.status);
 
                 registrosKardex[indiceEdicionActual] = registroEditado;
                 cerrarModalEditar();
@@ -867,31 +889,115 @@
 
         async function eliminarRegistro(indexReal) {
             if (confirm("¿Estás seguro de eliminar este registro permanentemente de la base de datos?")) {
-                const filaEnExcel = indexReal + 2; // Fila 1 es cabecera
+                const filaEnExcel = indexReal + 2; 
                 const registroRespaldo = registrosKardex[indexReal];
                 
-                // Actualización optimista
                 registrosKardex.splice(indexReal, 1);
                 actualizarTabla();
                 actualizarTablaSaldos();
 
                 try {
                     const payload = { accion_bd: 'ELIMINAR', fila_excel: filaEnExcel };
-                    await fetch(WEB_APP_URL, { 
+                    const response = await fetch(WEB_APP_URL, { 
                         method: 'POST',
+                        redirect: 'follow',
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
                         body: JSON.stringify(payload) 
                     });
+                    if(!response.ok) throw new Error("Error HTTP: " + response.status);
                     
                 } catch (error) {
                     alert("Error de conexión al intentar eliminar en la nube. Se restaurará el registro en pantalla.\nDetalle: " + error.message);
-                    registrosKardex.splice(indexReal, 0, registroRespaldo); // Revertir
+                    registrosKardex.splice(indexReal, 0, registroRespaldo); 
                     actualizarTabla();
                     actualizarTablaSaldos();
                 }
             }
         }
 
-        // --- ACTUALIZACIÓN DE TABLAS ---
+        // --- ACTUALIZACIÓN DE TABLAS Y GRÁFICOS ---
+        function actualizarGraficosSaldos() {
+            const filas = document.getElementsByClassName('fila-saldo');
+            const dataArticulos = {};
+            const dataLotes = {};
+            let hasData = false;
+
+            for (let i = 0; i < filas.length; i++) {
+                if (filas[i].style.display !== "none") {
+                    const articulo = filas[i].querySelector('.celda-articulo').textContent.trim() || "Sin Artículo";
+                    const lote = filas[i].cells[3].textContent.trim();
+                    const saldo = parseFloat(filas[i].cells[6].textContent.replace(/,/g, '')) || 0;
+
+                    if (saldo > 0) { // Solo consideramos saldos positivos para las gráficas
+                        // Acumular por Artículo para gráfico de barras
+                        dataArticulos[articulo] = (dataArticulos[articulo] || 0) + saldo;
+                        
+                        // Acumular por Lote para gráfico de donas
+                        // Se agrega una versión corta del artículo para el tooltip/leyenda
+                        const articuloCorto = articulo !== "Sin Artículo" ? articulo.substring(0, 12) + "..." : "";
+                        const labelLote = `${lote} (${articuloCorto})`;
+                        dataLotes[labelLote] = (dataLotes[labelLote] || 0) + saldo;
+                        
+                        hasData = true;
+                    }
+                }
+            }
+
+            const contenedorGraficos = document.getElementById('contenedor-graficos');
+            if (!hasData) {
+                contenedorGraficos.style.display = 'none';
+                return;
+            }
+            contenedorGraficos.style.display = 'grid'; // Mostrar grid lg:grid-cols-2
+
+            // Paleta de colores extensa y moderna
+            const bgColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#84cc16'];
+
+            // 1. Gráfico de Barras (Stock por Artículo)
+            const ctxArt = document.getElementById('chartArticulos').getContext('2d');
+            if (chartArticulosInstance) chartArticulosInstance.destroy();
+            chartArticulosInstance = new Chart(ctxArt, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(dataArticulos),
+                    datasets: [{
+                        label: 'Stock Actual (KG)',
+                        data: Object.values(dataArticulos),
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            // 2. Gráfico de Donas (Stock por Lote)
+            const ctxLotes = document.getElementById('chartLotes').getContext('2d');
+            if (chartLotesInstance) chartLotesInstance.destroy();
+            chartLotesInstance = new Chart(ctxLotes, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(dataLotes),
+                    datasets: [{
+                        data: Object.values(dataLotes),
+                        backgroundColor: bgColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { position: 'right', labels: { boxWidth: 12, font: {size: 10} } } 
+                    }
+                }
+            });
+        }
+
         function actualizarTablaSaldos() {
             const tbody = document.getElementById('cuerpo-tabla-saldos');
             const saldos = {}; 
@@ -918,6 +1024,7 @@
             if(saldosArray.length === 0){
                 tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500 italic">No hay stock registrado.</td></tr>`;
                 document.getElementById('pie-tabla-saldos').classList.add('hidden');
+                document.getElementById('contenedor-graficos').style.display = 'none';
                 return;
             }
 
@@ -988,6 +1095,9 @@
             } else {
                 elNeto.className = "px-4 py-3 text-right text-lg font-bold text-slate-800";
             }
+
+            // Actualizar Gráficos cada vez que se calcula un subtotal (incluso en filtros)
+            actualizarGraficosSaldos();
         }
 
         function actualizarTabla() {
