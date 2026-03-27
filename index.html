@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kardex de Inventario</title>
+    <!-- Usamos Tailwind CSS para un diseño rápido y moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Ocultar vistas que no están activas */
+        .vista { display: none; }
+        .vista.activa { display: block; }
+        
+        /* Animación suave al cambiar de vista */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Loader de espera */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #10b981;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+        
+        <div class="bg-slate-800 text-white p-6 text-center relative">
+            <h1 class="text-3xl font-bold tracking-tight">Kardex de Control</h1>
+            <p class="text-slate-300 mt-2">Gestión de Ingresos y Salidas</p>
+            <div id="estado-conexion" class="absolute top-4 right-4 text-xs font-bold px-3 py-1 rounded-full bg-slate-700 text-slate-300 flex items-center gap-2">
+                Conectando... <div class="loader" style="width: 12px; height: 12px; border-width: 2px;"></div>
+            </div>
+        </div>
+
+        <div class="p-6 md:p-8">
+
+            <!-- ==========================================
+                 VISTA 1: MENÚ PRINCIPAL
+                 ========================================== -->
+            <div id="vista-menu" class="vista activa fade-in">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <button onclick="cambiarVista('vista-ingreso')" 
+                            class="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl p-12 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg flex flex-col items-center justify-center">
+                        <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path></svg>
+                        <span class="text-4xl font-black tracking-wider">INGRESO</span>
+                    </button>
+
+                    <button onclick="cambiarVista('vista-salida')" 
+                            class="bg-rose-500 hover:bg-rose-600 text-white rounded-xl p-12 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg flex flex-col items-center justify-center">
+                        <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13l-3 3m0 0l-3-3m3 3V8m0 13a9 9 0 110-18 9 9 0 010 18z"></path></svg>
+                        <span class="text-4xl font-black tracking-wider">SALIDA</span>
+                    </button>
+                </div>
+
+                <!-- Botón de STOCK (NUEVO REPORTE) -->
+                <button onclick="cambiarVista('vista-saldos')" 
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xl py-6 rounded-xl transition-colors flex items-center justify-center gap-3 mb-4 shadow-md transform hover:-translate-y-1">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    VER STOCK ACTUAL (SALDOS)
+                </button>
+
+                <!-- Botón Histórico General -->
+                <button onclick="cambiarVista('vista-historico')" 
+                        class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xl py-4 rounded-xl transition-colors flex items-center justify-center gap-3">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                    Auditoría / Histórico Completo
+                </button>
+            </div>
+
+            <!-- ==========================================
+                 VISTA 2: FORMULARIO DE INGRESO
+                 ========================================== -->
+            <div id="vista-ingreso" class="vista fade-in">
+                <div class="flex items-center mb-6 border-b pb-4">
+                    <button onclick="cambiarVista('vista-menu')" class="text-slate-500 hover:text-slate-800 mr-4">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    </button>
+                    <h2 class="text-2xl font-bold text-emerald-600">Registrar Ingreso</h2>
+                </div>
+
+                <form id="form-ingreso" onsubmit="guardarIngreso(event)">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Fecha Movimiento *</label><input type="date" id="ing-fecha" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-600 mb-1">Código *</label>
+                            <input type="text" id="ing-codigo" list="datalist-codigos" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white" placeholder="Escriba o seleccione..." autocomplete="off">
+                            <datalist id="datalist-codigos"></datalist>
+                        </div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Lote *</label><input type="text" id="ing-lote" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Características</label><input type="text" id="ing-caracteristicas" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Artículo (Automático)</label><input type="text" id="ing-articulo" placeholder="Esperando código..." readonly class="w-full p-2.5 border rounded-lg bg-gray-100 text-gray-800 font-medium outline-none"></div>
+                        
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Cantidad *</label><input type="number" step="0.01" id="ing-cantidad" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Proveedor</label><input type="text" id="ing-proveedor" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Origen</label><input type="text" id="ing-origen" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">F. Llegada Fibra</label><input type="date" id="ing-fllegada" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Andamio</label><input type="text" id="ing-andamio" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">N° de Caja</label><input type="text" id="ing-ncaja" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Presentación</label><input type="text" id="ing-presentacion" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        
+                        <div class="md:col-span-2 lg:col-span-3"><label class="block text-sm font-semibold text-gray-600 mb-1">Certificado</label><input type="text" id="ing-certificado" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                    </div>
+                    
+                    <div class="mt-8 flex justify-end gap-4">
+                        <button type="button" onclick="cambiarVista('vista-menu')" class="px-6 py-3 rounded-lg font-bold text-gray-600 bg-gray-200 hover:bg-gray-300">Cancelar</button>
+                        <button id="btn-submit-ingreso" type="submit" class="px-8 py-3 rounded-lg font-bold text-white bg-emerald-500 hover:bg-emerald-600 shadow-lg flex items-center justify-center gap-2">
+                            <span>GUARDAR INGRESO</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ==========================================
+                 VISTA 3: FORMULARIO DE SALIDA
+                 ========================================== -->
+            <div id="vista-salida" class="vista fade-in">
+                <div class="flex items-center mb-6 border-b pb-4">
+                    <button onclick="cambiarVista('vista-menu')" class="text-slate-500 hover:text-slate-800 mr-4">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    </button>
+                    <h2 class="text-2xl font-bold text-rose-600">Registrar Salida</h2>
+                </div>
+
+                <form id="form-salida" onsubmit="guardarSalida(event)">
+                    <div class="max-w-md mx-auto bg-rose-50 p-6 rounded-xl border border-rose-100">
+                        <div class="space-y-5">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Código *</label>
+                                <input type="text" id="sal-codigo" list="datalist-codigos" required class="w-full p-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none bg-white" placeholder="Escriba o seleccione..." autocomplete="off">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Lote *</label>
+                                <input type="text" id="sal-lote" list="datalist-lotes" required placeholder="Ej: L-2023-A o seleccione..." class="w-full p-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none bg-white" autocomplete="off">
+                                <datalist id="datalist-lotes"></datalist>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Cantidad a retirar *</label>
+                                <input type="number" step="0.01" id="sal-cantidad" required placeholder="0.00" class="w-full p-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-rose-600 font-bold text-lg">
+                            </div>
+                        </div>
+
+                        <div class="mt-8 flex flex-col gap-3">
+                            <button id="btn-submit-salida" type="submit" class="w-full py-4 rounded-lg font-bold text-white bg-rose-500 hover:bg-rose-600 shadow-lg text-lg flex items-center justify-center gap-2">
+                                <span>REGISTRAR SALIDA</span>
+                            </button>
+                            <button type="button" onclick="cambiarVista('vista-menu')" class="w-full py-3 rounded-lg font-bold text-gray-600 bg-white border border-gray-300 hover:bg-gray-50">Cancelar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ==========================================
+                 VISTA 4: REPORTE DE SALDOS (NUEVO)
+                 ========================================== -->
+            <div id="vista-saldos" class="vista fade-in">
+                <div class="flex items-center justify-between mb-6 border-b pb-4">
+                    <div class="flex items-center">
+                        <button onclick="cambiarVista('vista-menu')" class="text-slate-500 hover:text-slate-800 mr-4">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        </button>
+                        <h2 class="text-2xl font-bold text-blue-700">Stock Actual (Saldos)</h2>
+                    </div>
+                </div>
+
+                <!-- Buscador para saldos -->
+                <div class="mb-4 flex gap-4 bg-blue-50 p-4 rounded-lg border border-blue-100">
+                    <div class="flex-1">
+                        <label class="block text-xs font-bold text-blue-800 uppercase mb-1">Buscar por Código o Artículo:</label>
+                        <input type="text" id="filtro-saldo-general" onkeyup="filtrarSaldos()" placeholder="Ej. ALGODON o COD-001" class="w-full p-2 border rounded shadow-sm focus:ring-2 focus:ring-blue-400 outline-none">
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border rounded-xl shadow-sm">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-blue-800 text-white">
+                            <tr>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Código</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Artículo</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Lote</th>
+                                <th class="px-4 py-3 text-right font-semibold uppercase tracking-wider whitespace-nowrap text-emerald-300">T. Ingresos</th>
+                                <th class="px-4 py-3 text-right font-semibold uppercase tracking-wider whitespace-nowrap text-rose-300">T. Salidas</th>
+                                <th class="px-4 py-3 text-right font-black uppercase tracking-wider whitespace-nowrap text-xl bg-blue-900">SALDO ACTUAL</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cuerpo-tabla-saldos" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="6" class="px-6 py-8 text-center text-gray-500 italic">Cargando saldos...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 VISTA 5: HISTÓRICO GENERAL
+                 ========================================== -->
+            <div id="vista-historico" class="vista fade-in">
+                <div class="flex items-center justify-between mb-6 border-b pb-4">
+                    <div class="flex items-center">
+                        <button onclick="cambiarVista('vista-menu')" class="text-slate-500 hover:text-slate-800 mr-4">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        </button>
+                        <h2 class="text-2xl font-bold text-slate-800">Histórico General (Auditoría)</h2>
+                    </div>
+                    <div class="text-sm bg-slate-100 px-4 py-2 rounded-full font-semibold text-slate-600 shadow-inner border border-slate-200">
+                        Total Registros: <span id="contador-registros" class="text-emerald-600 font-bold ml-1">0</span>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border rounded-xl shadow-sm">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm" id="tabla-historico">
+                        <thead class="bg-slate-800 text-white">
+                            <tr>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Fecha Mov.</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Código</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Lote</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap text-amber-300">Características</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Artículo</th>
+                                <th class="px-4 py-3 text-center font-semibold uppercase tracking-wider whitespace-nowrap">Tipo</th>
+                                <th class="px-4 py-3 text-right font-semibold uppercase tracking-wider whitespace-nowrap">Cantidad</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Proveedor</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Origen</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">F. Llegada</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Andamio</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">N° Caja</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Presentación</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Certificado</th>
+                            </tr>
+                            <!-- FILA DE FILTROS TIPO EXCEL -->
+                            <tr class="bg-slate-700">
+                                <td class="p-1"><input type="text" id="fh-fecha" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-xs text-black px-2 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400"></td>
+                                <td class="p-1"><input type="text" id="fh-codigo" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-xs text-black px-2 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400"></td>
+                                <td class="p-1"><input type="text" id="fh-lote" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-xs text-black px-2 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400"></td>
+                                <td class="p-1"><input type="text" id="fh-caracteristicas" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-xs text-black px-2 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400"></td>
+                                <td class="p-1"><input type="text" id="fh-articulo" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-xs text-black px-2 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400"></td>
+                                <td class="p-1"><select id="fh-tipo" onchange="filtrarHistorico()" class="w-full text-xs text-black px-1 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400"><option value="">Todos</option><option value="INGRESO">INGRESO</option><option value="SALIDA">SALIDA</option></select></td>
+                                <td colspan="8" class="p-1 text-center text-xs text-slate-300 italic">Otras columnas no filtrables</td>
+                            </tr>
+                        </thead>
+                        <tbody id="cuerpo-tabla" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="14" class="px-6 py-8 text-center text-gray-500 italic">Cargando información desde la base de datos... <div class="loader ml-2 mb-[-6px]"></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- 1. CONFIGURACIÓN DEL BACKEND ---
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwbObDTZ36mkBXSR-ay3AGRi07deg_Lomh-t6CSV8S2c7qQyghQ1tBVSs3E7OY5tF6O/exec";
+        
+        // Variables globales
+        let registrosKardex = [];
+        let catalogoCodigos = [];
+
+        // Inicializar al cargar la página
+        document.addEventListener("DOMContentLoaded", () => {
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('ing-fecha').value = hoy;
+            
+            // Iniciar la descarga de datos
+            cargarDashboard();
+        });
+
+        // Función para cambiar entre pantallas
+        function cambiarVista(idVista) {
+            document.querySelectorAll('.vista').forEach(el => el.classList.remove('activa'));
+            document.getElementById(idVista).classList.add('activa');
+        }
+
+        // --- 2. LECTURA DE DATOS (GET) ---
+        async function cargarDashboard() {
+            try {
+                const response = await fetch(WEB_APP_URL);
+                const data = await response.json();
+                
+                // Extraemos ambas tablas
+                registrosKardex = data.historico || [];
+                catalogoCodigos = data.catalogo || [];
+
+                // Actualizar las interfaces
+                actualizarTabla();
+                actualizarTablaSaldos(); // Novedad: Generar tabla de saldos
+                poblarSelectoresCodigo();
+                poblarSelectoresLote();
+                
+                // Indicador visual
+                const indicador = document.getElementById('estado-conexion');
+                indicador.classList.replace('bg-slate-700', 'bg-emerald-600');
+                indicador.innerHTML = '¡Conectado! ✅';
+
+            } catch (error) {
+                console.error("Error al cargar datos:", error);
+                document.getElementById('cuerpo-tabla').innerHTML = `<tr><td colspan="14" class="px-6 py-8 text-center text-rose-500 font-bold">Error de conexión con la Base de Datos.</td></tr>`;
+                
+                const indicador = document.getElementById('estado-conexion');
+                indicador.classList.replace('bg-slate-700', 'bg-rose-600');
+                indicador.innerHTML = 'Error de Conexión ❌';
+            }
+        }
+
+        // Funciones de Listas Desplegables
+        function poblarSelectoresCodigo() {
+            const datalist = document.getElementById('datalist-codigos');
+            let opcionesHTML = ``;
+            catalogoCodigos.forEach(item => {
+                opcionesHTML += `<option value="${item.codigo}">${item.articulo}</option>`;
+            });
+            if(datalist) datalist.innerHTML = opcionesHTML;
+        }
+
+        function poblarSelectoresLote() {
+            const datalist = document.getElementById('datalist-lotes');
+            if (!datalist) return;
+            const lotes = registrosKardex.map(item => item.lote).filter(lote => lote && String(lote).trim() !== "-" && String(lote).trim() !== "");
+            const lotesUnicos = [...new Set(lotes)];
+            let opcionesHTML = ``;
+            lotesUnicos.forEach(lote => { opcionesHTML += `<option value="${lote}"></option>`; });
+            datalist.innerHTML = opcionesHTML;
+        }
+
+        // --- LÓGICA PARA AUTOCOMPLETAR EL ARTÍCULO ---
+        document.getElementById('ing-codigo').addEventListener('input', function(e) {
+            const codigoIngresado = e.target.value.trim();
+            const inputArticulo = document.getElementById('ing-articulo');
+            const itemEncontrado = catalogoCodigos.find(c => String(c.codigo) === String(codigoIngresado));
+            inputArticulo.value = itemEncontrado ? itemEncontrado.articulo : "";
+        });
+
+        // --- 3. ESCRITURA DE INGRESO (POST) ---
+        async function guardarIngreso(e) {
+            e.preventDefault(); 
+            const btn = document.getElementById('btn-submit-ingreso');
+            const textoOriginal = btn.innerHTML;
+            btn.innerHTML = `<div class="loader mr-2"></div> ENVIANDO...`;
+            btn.disabled = true;
+            
+            const nuevoRegistro = {
+                fechaMovimiento: document.getElementById('ing-fecha').value,
+                codigo: document.getElementById('ing-codigo').value,
+                lote: document.getElementById('ing-lote').value,
+                caracteristicas: document.getElementById('ing-caracteristicas').value || "-",
+                articulo: document.getElementById('ing-articulo').value || "-", 
+                tipo: 'INGRESO',
+                cantidad: parseFloat(document.getElementById('ing-cantidad').value),
+                proveedor: document.getElementById('ing-proveedor').value || "-",
+                origen: document.getElementById('ing-origen').value || "-",
+                fLlegada: document.getElementById('ing-fllegada').value || "-",
+                andamio: document.getElementById('ing-andamio').value || "-",
+                nCaja: document.getElementById('ing-ncaja').value || "-",
+                presentacion: document.getElementById('ing-presentacion').value || "-",
+                certificado: document.getElementById('ing-certificado').value || "-"
+            };
+
+            try {
+                await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(nuevoRegistro) });
+                alert('¡Ingreso registrado exitosamente!');
+                document.getElementById('form-ingreso').reset();
+                document.getElementById('ing-fecha').value = new Date().toISOString().split('T')[0];
+                cambiarVista('vista-menu');
+                cargarDashboard(); 
+            } catch (error) {
+                alert('Hubo un error de conexión: ' + error.message);
+            } finally {
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            }
+        }
+
+        // --- 4. ESCRITURA DE SALIDA (POST) ---
+        async function guardarSalida(e) {
+            e.preventDefault(); 
+            const btn = document.getElementById('btn-submit-salida');
+            const textoOriginal = btn.innerHTML;
+            btn.innerHTML = `<div class="loader mr-2"></div> REGISTRANDO...`;
+            btn.disabled = true;
+            
+            const hoy = new Date().toISOString().split('T')[0];
+            const nuevoRegistro = {
+                fechaMovimiento: hoy,
+                codigo: document.getElementById('sal-codigo').value,
+                lote: document.getElementById('sal-lote').value,
+                caracteristicas: "-",
+                articulo: "", 
+                tipo: 'SALIDA',
+                cantidad: -Math.abs(parseFloat(document.getElementById('sal-cantidad').value)),
+                proveedor: "-", origen: "-", fLlegada: "-", andamio: "-", nCaja: "-", presentacion: "-", certificado: "-"
+            };
+
+            try {
+                await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(nuevoRegistro) });
+                alert('¡Salida registrada exitosamente!');
+                document.getElementById('form-salida').reset();
+                cambiarVista('vista-menu');
+                cargarDashboard(); 
+            } catch(error) {
+                alert('Error al procesar la salida: ' + error.message);
+            } finally {
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            }
+        }
+
+        // --- 5A. ACTUALIZAR TABLA DE SALDOS (NUEVO REPORTE) ---
+        function actualizarTablaSaldos() {
+            const tbody = document.getElementById('cuerpo-tabla-saldos');
+            const saldos = {}; // Diccionario para agrupar
+
+            // Agrupar y sumar
+            registrosKardex.forEach(reg => {
+                // Evitar filas vacías corruptas
+                if(!reg.codigo) return; 
+
+                const key = `${reg.codigo}__|__${reg.lote}`;
+                if (!saldos[key]) {
+                    // Si no existe, crear la base
+                    saldos[key] = {
+                        codigo: reg.codigo,
+                        articulo: reg.articulo || "",
+                        lote: reg.lote,
+                        ingresos: 0,
+                        salidas: 0,
+                        saldo: 0
+                    };
+                }
+
+                const cant = parseFloat(reg.cantidad) || 0;
+                if (String(reg.tipo).toUpperCase() === 'INGRESO') {
+                    saldos[key].ingresos += cant;
+                } else {
+                    // Las salidas vienen en negativo desde la BD, sacamos el valor absoluto para mostrar
+                    saldos[key].salidas += Math.abs(cant);
+                }
+                
+                // El saldo general (Suma directa porque la salida ya es negativa en BD, 
+                // pero por precaución sumamos Ingresos - Abs(Salidas))
+                saldos[key].saldo = saldos[key].ingresos - saldos[key].salidas;
+            });
+
+            // Dibujar la tabla
+            tbody.innerHTML = '';
+            
+            const saldosArray = Object.values(saldos);
+            if(saldosArray.length === 0){
+                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500 italic">No hay stock registrado.</td></tr>`;
+                return;
+            }
+
+            saldosArray.forEach(item => {
+                const colorSaldo = item.saldo > 0 ? 'text-blue-700 bg-blue-50' : (item.saldo < 0 ? 'text-rose-600' : 'text-gray-500');
+                
+                const tr = document.createElement('tr');
+                tr.classList.add('hover:bg-blue-50', 'transition-colors', 'fila-saldo'); // 'fila-saldo' para el buscador
+                tr.innerHTML = `
+                    <td class="px-4 py-3 font-semibold text-slate-800 whitespace-nowrap celda-codigo">${item.codigo}</td>
+                    <td class="px-4 py-3 font-medium text-slate-700 whitespace-nowrap celda-articulo">${item.articulo}</td>
+                    <td class="px-4 py-3 text-slate-600 whitespace-nowrap">${item.lote}</td>
+                    <td class="px-4 py-3 text-right text-emerald-600 whitespace-nowrap">${item.ingresos.toFixed(2)}</td>
+                    <td class="px-4 py-3 text-right text-rose-600 whitespace-nowrap">${item.salidas.toFixed(2)}</td>
+                    <td class="px-4 py-3 text-right font-bold text-lg ${colorSaldo} whitespace-nowrap">${item.saldo.toFixed(2)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Buscador interno para la tabla de Saldos
+        function filtrarSaldos() {
+            const input = document.getElementById('filtro-saldo-general').value.toLowerCase();
+            const filas = document.getElementsByClassName('fila-saldo');
+            
+            for (let i = 0; i < filas.length; i++) {
+                const txtCodigo = filas[i].querySelector('.celda-codigo').textContent.toLowerCase();
+                const txtArticulo = filas[i].querySelector('.celda-articulo').textContent.toLowerCase();
+                
+                if (txtCodigo.includes(input) || txtArticulo.includes(input)) {
+                    filas[i].style.display = "";
+                } else {
+                    filas[i].style.display = "none";
+                }
+            }
+        }
+
+        // --- 5B. ACTUALIZAR TABLA HISTÓRICA ---
+        function actualizarTabla() {
+            const tbody = document.getElementById('cuerpo-tabla');
+            document.getElementById('contador-registros').innerText = registrosKardex.length;
+            
+            if (registrosKardex.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="14" class="px-6 py-8 text-center text-gray-500 italic">No hay movimientos registrados todavía.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            const registrosInvertidos = [...registrosKardex].reverse();
+            
+            registrosInvertidos.forEach(reg => {
+                const isIngreso = reg.tipo.toUpperCase() === 'INGRESO';
+                const colorTipo = isIngreso 
+                    ? '<span class="bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full text-xs font-bold shadow-sm">INGRESO</span>' 
+                    : '<span class="bg-rose-100 text-rose-800 px-2 py-1 rounded-full text-xs font-bold shadow-sm">SALIDA</span>';
+                
+                const colorCantidad = isIngreso ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold';
+
+                const tr = document.createElement('tr');
+                tr.classList.add('hover:bg-slate-50', 'transition-colors', 'fila-historico'); // Añadimos clase para el filtro
+                tr.innerHTML = `
+                    <td class="px-4 py-3 whitespace-nowrap">${reg.fechaMovimiento}</td>
+                    <td class="px-4 py-3 font-semibold text-slate-800 whitespace-nowrap">${reg.codigo}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">${reg.lote}</td>
+                    <td class="px-4 py-3 text-slate-600 whitespace-nowrap">${reg.caracteristicas || '-'}</td>
+                    <td class="px-4 py-3 font-medium text-slate-700 whitespace-nowrap">${reg.articulo}</td>
+                    <td class="px-4 py-3 text-center whitespace-nowrap">${colorTipo}</td>
+                    <td class="px-4 py-3 text-right ${colorCantidad} whitespace-nowrap">${reg.cantidad}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">${reg.proveedor}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">${reg.origen}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">${reg.fLlegada}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">${reg.andamio}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">${reg.nCaja}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">${reg.presentacion}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">${reg.certificado}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- FILTROS TIPO EXCEL PARA EL HISTÓRICO ---
+        function filtrarHistorico() {
+            // Recoger los valores escritos en las cajas de la cabecera
+            const fFecha = document.getElementById('fh-fecha').value.toLowerCase();
+            const fCodigo = document.getElementById('fh-codigo').value.toLowerCase();
+            const fLote = document.getElementById('fh-lote').value.toLowerCase();
+            const fCaracteristicas = document.getElementById('fh-caracteristicas').value.toLowerCase();
+            const fArticulo = document.getElementById('fh-articulo').value.toLowerCase();
+            const fTipo = document.getElementById('fh-tipo').value.toLowerCase(); // Select dropdown
+
+            const filas = document.getElementsByClassName('fila-historico');
+
+            for (let i = 0; i < filas.length; i++) {
+                // Celdas de la fila actual correspondientes a cada columna
+                const txtFecha = filas[i].cells[0].textContent.toLowerCase();
+                const txtCodigo = filas[i].cells[1].textContent.toLowerCase();
+                const txtLote = filas[i].cells[2].textContent.toLowerCase();
+                const txtCarac = filas[i].cells[3].textContent.toLowerCase();
+                const txtArticulo = filas[i].cells[4].textContent.toLowerCase();
+                const txtTipo = filas[i].cells[5].textContent.toLowerCase(); // El span interno del tipo
+
+                // Lógica de coincidencia (tiene que coincidir con TODOS los filtros escritos)
+                const matchFecha = txtFecha.includes(fFecha);
+                const matchCodigo = txtCodigo.includes(fCodigo);
+                const matchLote = txtLote.includes(fLote);
+                const matchCarac = txtCarac.includes(fCaracteristicas);
+                const matchArticulo = txtArticulo.includes(fArticulo);
+                const matchTipo = fTipo === "" || txtTipo.includes(fTipo);
+
+                if (matchFecha && matchCodigo && matchLote && matchCarac && matchArticulo && matchTipo) {
+                    filas[i].style.display = ""; // Mostrar
+                } else {
+                    filas[i].style.display = "none"; // Ocultar
+                }
+            }
+        }
+    </script>
+</body>
+</html>
