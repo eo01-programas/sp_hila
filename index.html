@@ -31,6 +31,22 @@
             display: inline-block;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- ESTILOS PARA IMPRESIÓN --- */
+        @media print {
+            body { background-color: white !important; padding: 0 !important; color: black !important; }
+            .max-w-7xl { max-width: 100% !important; box-shadow: none !important; margin: 0 !important; }
+            .no-print { display: none !important; }
+            .bg-slate-800 { background-color: transparent !important; color: black !important; padding: 10px 0 !important; border-bottom: 2px solid #333; }
+            .bg-slate-800 p { color: #555 !important; }
+            table { width: 100% !important; border-collapse: collapse !important; font-size: 11px !important; }
+            th { background-color: #f1f5f9 !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            th, td { border: 1px solid #cbd5e1 !important; padding: 4px !important; }
+            .shadow-sm, .rounded-xl { box-shadow: none !important; border-radius: 0 !important; }
+            /* Evitar que se corten las filas al cambiar de página */
+            table { page-break-inside: auto; }
+            tr { page-break-inside: avoid; page-break-after: auto; }
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen p-4 md:p-8">
@@ -179,17 +195,27 @@
                  VISTA 4: REPORTE DE SALDOS (NUEVO)
                  ========================================== -->
             <div id="vista-saldos" class="vista fade-in">
-                <div class="flex items-center justify-between mb-6 border-b pb-4">
+                <div class="flex flex-wrap items-center justify-between mb-6 border-b pb-4 gap-4">
                     <div class="flex items-center">
-                        <button onclick="cambiarVista('vista-menu')" class="text-slate-500 hover:text-slate-800 mr-4">
+                        <button onclick="cambiarVista('vista-menu')" class="text-slate-500 hover:text-slate-800 mr-4 no-print">
                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                         </button>
                         <h2 class="text-2xl font-bold text-blue-700">Stock Actual (Saldos)</h2>
                     </div>
+                    
+                    <!-- BOTONES DE EXPORTACIÓN -->
+                    <div class="flex gap-2 no-print">
+                        <button onclick="window.print()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-bold text-sm transition-colors flex items-center gap-2">
+                            🖨️ Imprimir
+                        </button>
+                        <button onclick="exportarExcel('tabla-saldos', 'Reporte_Stock_Actual')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold text-sm transition-colors flex items-center gap-2">
+                            📊 Exportar Excel
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Buscador para saldos -->
-                <div class="mb-4 flex gap-4 bg-blue-50 p-4 rounded-lg border border-blue-100">
+                <div class="mb-4 flex gap-4 bg-blue-50 p-4 rounded-lg border border-blue-100 no-print">
                     <div class="flex-1">
                         <label class="block text-xs font-bold text-blue-800 uppercase mb-1">Buscar por Código o Artículo:</label>
                         <input type="text" id="filtro-saldo-general" onkeyup="filtrarSaldos()" placeholder="Ej. ALGODON o COD-001" class="w-full p-2 border rounded shadow-sm focus:ring-2 focus:ring-blue-400 outline-none">
@@ -197,7 +223,7 @@
                 </div>
 
                 <div class="overflow-x-auto border rounded-xl shadow-sm">
-                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                    <table id="tabla-saldos" class="min-w-full divide-y divide-gray-200 text-sm">
                         <thead class="bg-blue-800 text-white">
                             <tr>
                                 <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Código</th>
@@ -219,15 +245,27 @@
                  VISTA 5: HISTÓRICO GENERAL
                  ========================================== -->
             <div id="vista-historico" class="vista fade-in">
-                <div class="flex items-center justify-between mb-6 border-b pb-4">
+                <div class="flex flex-wrap items-center justify-between mb-6 border-b pb-4 gap-4">
                     <div class="flex items-center">
-                        <button onclick="cambiarVista('vista-menu')" class="text-slate-500 hover:text-slate-800 mr-4">
+                        <button onclick="cambiarVista('vista-menu')" class="text-slate-500 hover:text-slate-800 mr-4 no-print">
                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                         </button>
                         <h2 class="text-2xl font-bold text-slate-800">Histórico General (Auditoría)</h2>
                     </div>
-                    <div class="text-sm bg-slate-100 px-4 py-2 rounded-full font-semibold text-slate-600 shadow-inner border border-slate-200">
-                        Total Registros: <span id="contador-registros" class="text-emerald-600 font-bold ml-1">0</span>
+                    
+                    <!-- BOTONES DE EXPORTACIÓN E INFO -->
+                    <div class="flex items-center gap-4">
+                        <div class="text-sm bg-slate-100 px-4 py-2 rounded-full font-semibold text-slate-600 shadow-inner border border-slate-200 no-print">
+                            Total Registros: <span id="contador-registros" class="text-emerald-600 font-bold ml-1">0</span>
+                        </div>
+                        <div class="flex gap-2 no-print">
+                            <button onclick="window.print()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-bold text-sm transition-colors flex items-center gap-2">
+                                🖨️ Imprimir
+                            </button>
+                            <button onclick="exportarExcel('tabla-historico', 'Histórico_Auditoría')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold text-sm transition-colors flex items-center gap-2">
+                                📊 Exportar Excel
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -251,7 +289,7 @@
                                 <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Certificado</th>
                             </tr>
                             <!-- FILA DE FILTROS TIPO EXCEL -->
-                            <tr class="bg-slate-700">
+                            <tr class="bg-slate-700 no-print">
                                 <td class="p-1"><input type="text" id="fh-fecha" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-xs text-black px-2 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400"></td>
                                 <td class="p-1"><input type="text" id="fh-codigo" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-xs text-black px-2 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400"></td>
                                 <td class="p-1"><input type="text" id="fh-lote" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-xs text-black px-2 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400"></td>
@@ -272,6 +310,43 @@
     </div>
 
     <script>
+        // --- FUNCIÓN PARA EXPORTAR TABLA A EXCEL ---
+        function exportarExcel(tablaId, nombreArchivo) {
+            let tabla = document.getElementById(tablaId);
+            // Clonamos la tabla para no modificar la visual original
+            let tablaClon = tabla.cloneNode(true);
+            
+            // Eliminar fila de filtros y columnas ocultas del clon
+            let elementosNoPrint = tablaClon.querySelectorAll('.no-print');
+            elementosNoPrint.forEach(el => el.remove());
+            
+            let inputs = tablaClon.querySelectorAll('input, select');
+            inputs.forEach(input => input.remove());
+            
+            let filasOcultas = tablaClon.querySelectorAll('tr[style*="display: none"]');
+            filasOcultas.forEach(fila => fila.remove());
+
+            // Agregar un estilo en línea básico para Excel
+            let html = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                <head><meta charset="UTF-8"></head>
+                <body>
+                    ${tablaClon.outerHTML}
+                </body>
+                </html>`;
+
+            // Crear Blob para descargar
+            let blob = new Blob(['\ufeff', html], { type: 'application/vnd.ms-excel' });
+            let url = URL.createObjectURL(blob);
+            
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = nombreArchivo + '_' + new Date().toISOString().split('T')[0] + '.xls';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
         // --- FUNCIÓN DE FORMATO DE NÚMEROS (SEPARADOR DE MILES) ---
         function formatearNumero(num) {
             return Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -602,10 +677,14 @@
 
                 const key = `${reg.codigo}__|__${reg.lote}`;
                 if (!saldos[key]) {
+                    // Buscar en el catálogo para asegurar que tengamos el nombre
+                    const itemCat = catalogoCodigos.find(c => String(c.codigo) === String(reg.codigo));
+                    const nombreArt = itemCat ? itemCat.articulo : (reg.articulo && String(reg.articulo).trim() !== "-" && String(reg.articulo).trim() !== "" ? reg.articulo : "-");
+
                     // Si no existe, crear la base
                     saldos[key] = {
                         codigo: reg.codigo,
-                        articulo: reg.articulo || "",
+                        articulo: nombreArt,
                         lote: reg.lote,
                         ingresos: 0,
                         salidas: 0,
@@ -696,6 +775,10 @@
                 const valorPeso = reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad);
                 const valorPesoFormateado = valorPeso !== undefined ? formatearNumero(valorPeso) : formatearNumero(0);
 
+                // Recuperar el artículo real del catálogo si está vacío o es un guión (muy común en Salidas)
+                const itemCat = catalogoCodigos.find(c => String(c.codigo) === String(reg.codigo));
+                const nombreArticulo = itemCat ? itemCat.articulo : (reg.articulo && String(reg.articulo).trim() !== "-" && String(reg.articulo).trim() !== "" ? reg.articulo : "-");
+
                 const tr = document.createElement('tr');
                 tr.classList.add('hover:bg-slate-50', 'transition-colors', 'fila-historico'); // Añadimos clase para el filtro
                 tr.innerHTML = `
@@ -703,7 +786,7 @@
                     <td class="px-4 py-3 font-semibold text-slate-800 whitespace-nowrap">${reg.codigo}</td>
                     <td class="px-4 py-3 whitespace-nowrap">${reg.lote}</td>
                     <td class="px-4 py-3 text-slate-600 whitespace-nowrap">${reg.caracteristicas || '-'}</td>
-                    <td class="px-4 py-3 font-medium text-slate-700 whitespace-nowrap">${reg.articulo}</td>
+                    <td class="px-4 py-3 font-medium text-slate-700 whitespace-nowrap">${nombreArticulo}</td>
                     <td class="px-4 py-3 text-center whitespace-nowrap">${colorTipo}</td>
                     <td class="px-4 py-3 text-right ${colorCantidad} whitespace-nowrap">${valorPesoFormateado}</td>
                     <td class="px-4 py-3 whitespace-nowrap">${reg.proveedor}</td>
