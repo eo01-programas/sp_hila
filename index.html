@@ -591,8 +591,8 @@
                     <table id="tabla-saldos" class="min-w-[700px] sm:min-w-full divide-y divide-gray-200 text-xs sm:text-sm">
                         <thead class="bg-blue-800 text-white">
                             <tr>
-                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider w-[8%]">Código</th>
                                 <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider w-[32%]">Artículo</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider w-[8%]">Código</th>
                                 <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider w-[10%]">Lote</th>
                                 <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider w-[10%]">Certificado</th>
                                 <th class="px-4 py-3 text-right font-semibold uppercase tracking-wider text-emerald-300 w-[10%]">T. Ingresos (KG)</th>
@@ -601,13 +601,13 @@
                             </tr>
                             <tr class="bg-blue-700 no-print">
                                 <td class="p-1">
-                                    <input type="text" id="fs-codigo" onkeyup="filtrarSaldos()"
-                                        placeholder="Código..."
+                                    <input type="text" id="fs-articulo" onkeyup="filtrarSaldos()"
+                                        placeholder="Artículo..."
                                         class="w-full text-xs text-black px-2 py-1.5 rounded outline-none focus:ring-2 focus:ring-emerald-400 border-none">
                                 </td>
                                 <td class="p-1">
-                                    <input type="text" id="fs-articulo" onkeyup="filtrarSaldos()"
-                                        placeholder="Artículo..."
+                                    <input type="text" id="fs-codigo" onkeyup="filtrarSaldos()"
+                                        placeholder="Código..."
                                         class="w-full text-xs text-black px-2 py-1.5 rounded outline-none focus:ring-2 focus:ring-emerald-400 border-none">
                                 </td>
                                 <td class="p-1">
@@ -621,7 +621,7 @@
                                         <option value="">TODOS</option>
                                     </select>
                                 </td>
-                                <td colspan="2" class="p-1">
+                                <td colspan="3" class="p-1">
                                     <select id="fs-categoria" onchange="filtrarSaldos()"
                                         class="w-full text-xs text-black px-4 py-1.5 rounded outline-none focus:ring-2 focus:ring-emerald-400 border-none bg-blue-50 font-bold">
                                         <option value="">TODAS LAS CATEGORÍAS</option>
@@ -640,7 +640,7 @@
                         <tfoot id="pie-tabla-saldos"
                             class="bg-blue-100 font-bold text-slate-800 border-t-4 border-blue-300 hidden text-xs sm:text-sm">
                             <tr>
-                                <td colspan="3"
+                                <td colspan="4"
                                     class="px-2 sm:px-4 py-2 sm:py-3 text-right uppercase tracking-wider text-[10px] sm:text-sm text-blue-900">Subtotal
                                     Filtrado (NETO):</td>
                                 <td class="px-2 sm:px-4 py-2 sm:py-3 text-right text-emerald-700" id="subtotal-ingresos-saldos">0.00
@@ -1457,9 +1457,6 @@
                     return;
                 }
 
-                // Paleta de colores
-                const bgColors = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#84cc16'];
-
                 // 1. Gráfico de Barras Horizontal (Top 20 ordenado)
                 const sortedArtEntries = Object.entries(dataArticulos)
                     .sort((a, b) => b[1] - a[1])
@@ -1512,6 +1509,20 @@
                     }
                 });
 
+                // Paleta de colores para certificados (Mapeo personalizado)
+                const mappingColores = {
+                    'RWS': '#94a3b8',           // Plomo
+                    'GRS': '#38bdf8',           // Celeste
+                    'RCS': '#38bdf8',           // Celeste
+                    'GOTS': '#10b981',          // Verde
+                    'OCS': '#10b981',           // Verde
+                    'FSC': '#92400e',           // Marrón
+                    'SIN CERTIFICADO': '#ef4444' // Rojo
+                };
+
+                const labelsCert = Object.keys(dataCertificados);
+                const colorsCert = labelsCert.map(label => mappingColores[label.toUpperCase()] || '#cbd5e1');
+
                 // 2. Gráfico de Donas con Datalabels Plugin
                 const ctxDona = document.getElementById('chartLotes').getContext('2d');
                 if (chartLotesInstance) chartLotesInstance.destroy();
@@ -1519,10 +1530,10 @@
                     type: 'doughnut',
                     plugins: [ChartDataLabels],
                     data: {
-                        labels: Object.keys(dataCertificados),
+                        labels: labelsCert,
                         datasets: [{
                             data: Object.values(dataCertificados),
-                            backgroundColor: bgColors,
+                            backgroundColor: colorsCert,
                             borderWidth: 2,
                             borderColor: '#ffffff'
                         }]
@@ -1643,8 +1654,8 @@
                             tr.setAttribute('data-categoria', item.categoria); 
                             
                             tr.innerHTML = `
-                                <td class="px-4 py-3 font-semibold text-slate-800 whitespace-nowrap celda-codigo">${item.codigo}</td>
                                 <td class="px-4 py-3 font-medium text-slate-700 celda-articulo">${item.articulo}</td>
+                                <td class="px-4 py-3 font-semibold text-slate-800 whitespace-nowrap celda-codigo">${item.codigo}</td>
                                 <td class="px-4 py-3 text-slate-600 whitespace-nowrap">${item.lote}</td>
                                 <td class="px-4 py-3 text-slate-500 text-xs font-bold celda-certificado">${item.certificado}</td>
                             <td class="px-4 py-3 text-right text-emerald-600 whitespace-nowrap">${formatearNumero(item.ingresos)}</td>
