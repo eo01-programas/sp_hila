@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,20 +9,34 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- NUEVO: Librería Chart.js para los gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <style>
         /* Ocultar vistas que no están activas */
-        .vista { display: none; }
-        .vista.activa { display: block; }
-        
+        .vista {
+            display: none;
+        }
+
+        .vista.activa {
+            display: block;
+        }
+
         /* Animación suave al cambiar de vista */
         .fade-in {
             animation: fadeIn 0.3s ease-in-out;
         }
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
+
         /* Loader de espera */
         .loader {
             border: 4px solid #f3f3f3;
@@ -32,34 +47,101 @@
             animation: spin 1s linear infinite;
             display: inline-block;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
 
         /* --- ESTILOS PARA IMPRESIÓN --- */
         @media print {
-            @page { size: landscape; margin: 1cm; } /* Forzar orientación horizontal */
-            body { background-color: white !important; padding: 0 !important; color: black !important; }
-            .max-w-[98%] { max-width: 100% !important; box-shadow: none !important; margin: 0 !important; }
-            .no-print { display: none !important; }
-            .bg-slate-800 { background-color: transparent !important; color: black !important; padding: 10px 0 !important; border-bottom: 2px solid #333; }
-            .bg-slate-800 p { color: #555 !important; }
-            table { width: 100% !important; border-collapse: collapse !important; font-size: 11px !important; }
-            th { background-color: #f1f5f9 !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            th, td { border: 1px solid #cbd5e1 !important; padding: 4px !important; }
-            .shadow-sm, .rounded-xl { box-shadow: none !important; border-radius: 0 !important; }
+            @page {
+                size: landscape;
+                margin: 1cm;
+            }
+
+            /* Forzar orientación horizontal */
+            body {
+                background-color: white !important;
+                padding: 0 !important;
+                color: black !important;
+            }
+
+            #contenedor-principal {
+                max-width: 100% !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            #cabecera-principal {
+                background: transparent !important;
+                color: black !important;
+                padding: 10px 0 !important;
+                border-bottom: 2px solid #333 !important;
+            }
+
+            #cabecera-principal p {
+                color: #555 !important;
+            }
+
+            table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                font-size: 11px !important;
+            }
+
+            th {
+                background-color: #f1f5f9 !important;
+                color: black !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            th,
+            td {
+                border: 1px solid #cbd5e1 !important;
+                padding: 4px !important;
+            }
+
+            .shadow-sm,
+            .rounded-xl,
+            .rounded-2xl,
+            .rounded-3xl {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+            }
+
             /* Evitar que se corten las filas al cambiar de página */
-            table { page-break-inside: auto; }
-            tr { page-break-inside: avoid; page-break-after: auto; }
+            table {
+                page-break-inside: auto;
+            }
+
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
         }
     </style>
 </head>
+
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen p-2 md:p-4">
 
-    <div class="w-full max-w-[98%] mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
-        
-        <div class="bg-slate-800 text-white p-6 text-center relative">
+    <div id="contenedor-principal" class="w-full max-w-[98%] mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+
+        <div id="cabecera-principal" class="bg-slate-800 text-white p-6 text-center relative">
             <h1 class="text-3xl font-bold tracking-tight">Kardex de Control</h1>
-            <p class="text-slate-300 mt-2">Gestión de Ingresos y Salidas</p>
-            <div id="estado-conexion" class="absolute top-4 right-4 text-xs font-bold px-3 py-1 rounded-full bg-slate-700 text-slate-300 flex items-center gap-2">
+            <p class="text-slate-300 mt-2">Gestión Inteligente de Inventario • Hilandería</p>
+            <div id="estado-conexion"
+                class="absolute top-4 right-4 text-xs font-bold px-3 py-1 rounded-full bg-slate-700 text-slate-300 flex items-center gap-2">
                 Conectando... <div class="loader" style="width: 12px; height: 12px; border-width: 2px;"></div>
             </div>
         </div>
@@ -71,31 +153,44 @@
                  ========================================== -->
             <div id="vista-menu" class="vista activa fade-in">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <button onclick="iniciarFlujo('INGRESO')" 
-                            class="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl p-12 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg flex flex-col items-center justify-center">
-                        <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path></svg>
+                    <button onclick="iniciarFlujo('INGRESO')"
+                        class="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl p-12 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg flex flex-col items-center justify-center">
+                        <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
+                        </svg>
                         <span class="text-4xl font-black tracking-wider">INGRESO</span>
                     </button>
 
-                    <button onclick="iniciarFlujo('SALIDA')" 
-                            class="bg-rose-500 hover:bg-rose-600 text-white rounded-xl p-12 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg flex flex-col items-center justify-center">
-                        <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13l-3 3m0 0l-3-3m3 3V8m0 13a9 9 0 110-18 9 9 0 010 18z"></path></svg>
+                    <button onclick="iniciarFlujo('SALIDA')"
+                        class="bg-rose-500 hover:bg-rose-600 text-white rounded-xl p-12 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg flex flex-col items-center justify-center">
+                        <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 13l-3 3m0 0l-3-3m3 3V8m0 13a9 9 0 110-18 9 9 0 010 18z"></path>
+                        </svg>
                         <span class="text-4xl font-black tracking-wider">SALIDA</span>
                     </button>
                 </div>
 
                 <!-- Botón de STOCK -->
-                <button onclick="cambiarVista('vista-saldos')" 
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xl py-6 rounded-xl transition-colors flex items-center justify-center gap-3 mb-4 shadow-md transform hover:-translate-y-1">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <button onclick="cambiarVista('vista-saldos')"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xl py-6 rounded-xl transition-colors flex items-center justify-center gap-3 mb-4 shadow-md transform hover:-translate-y-1">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                    </svg>
                     VER STOCK ACTUAL (SALDOS)
                 </button>
 
                 <!-- Botón Histórico General -->
-                <button onclick="cambiarVista('vista-historico')" 
-                        class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xl py-4 rounded-xl transition-colors flex items-center justify-center gap-3">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
-                    Auditoría / Histórico Completo
+                <button onclick="cambiarVista('vista-historico')"
+                    class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xl py-4 rounded-xl transition-colors flex items-center justify-center gap-3">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                    </svg>
+                    HISTÓRICO
                 </button>
             </div>
 
@@ -105,17 +200,23 @@
             <div id="vista-categoria" class="vista fade-in max-w-4xl mx-auto">
                 <div class="flex items-center mb-6 border-b pb-4">
                     <button onclick="cambiarVista('vista-menu')" class="text-slate-500 hover:text-slate-800 mr-4">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
                     </button>
-                    <h2 id="titulo-categoria" class="text-2xl font-bold text-slate-700">¿Qué tipo de fibra registrará?</h2>
+                    <h2 id="titulo-categoria" class="text-2xl font-bold text-slate-700">¿Qué tipo de fibra registrará?
+                    </h2>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
-                    <button onclick="seleccionarCategoria('FIBRAS ESPECIALES')" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl p-10 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg border-b-4 border-indigo-800">
+                    <button onclick="seleccionarCategoria('FIBRAS ESPECIALES')"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl p-10 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg border-b-4 border-indigo-800">
                         <span class="text-2xl font-black block">FIBRAS ESPECIALES</span>
                     </button>
 
-                    <button onclick="seleccionarCategoria('FIBRAS DE PRODUCCIÓN')" class="bg-teal-600 hover:bg-teal-700 text-white rounded-xl p-10 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg border-b-4 border-teal-800">
+                    <button onclick="seleccionarCategoria('FIBRAS DE PRODUCCIÓN')"
+                        class="bg-teal-600 hover:bg-teal-700 text-white rounded-xl p-10 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg border-b-4 border-teal-800">
                         <span class="text-2xl font-black block">FIBRAS DE PRODUCCIÓN</span>
                     </button>
                 </div>
@@ -127,45 +228,109 @@
             <div id="vista-ingreso" class="vista fade-in max-w-5xl mx-auto">
                 <div class="flex items-center mb-6 border-b pb-4">
                     <button onclick="cambiarVista('vista-categoria')" class="text-slate-500 hover:text-slate-800 mr-4">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
                     </button>
                     <h2 class="text-2xl font-bold text-emerald-600 flex flex-col sm:flex-row sm:items-center gap-2">
                         <span>Registrar Ingreso</span>
                         <span class="hidden sm:inline text-slate-300">|</span>
-                        <span id="lbl-categoria-ingreso" class="text-indigo-600 bg-indigo-50 px-3 py-1 rounded-lg text-lg"></span>
+                        <span id="lbl-categoria-ingreso"
+                            class="text-indigo-600 bg-indigo-50 px-3 py-1 rounded-lg text-lg"></span>
                     </h2>
+                    <div class="ml-auto flex items-center gap-3 bg-slate-50 px-4 py-1.5 rounded-lg border border-slate-200 shadow-sm no-print">
+                        <span class="text-xs font-bold text-slate-600 uppercase tracking-tight">Carga Masiva</span>
+                        <label class="relative inline-flex items-center cursor-pointer scale-75">
+                            <input type="checkbox" id="ing-carga-masiva" class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                        </label>
+                    </div>
                 </div>
 
                 <form id="form-ingreso" onsubmit="guardarIngreso(event)">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Fecha Movimiento *</label><input type="date" id="ing-fecha" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Fecha Movimiento
+                                *</label><input type="date" id="ing-fecha" required
+                                class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
                         <div class="relative">
                             <label class="block text-sm font-semibold text-gray-600 mb-1">Código *</label>
-                            <input type="text" id="ing-codigo" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white" placeholder="Escriba o seleccione..." autocomplete="off">
-                            <div id="dropdown-ing-codigo" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden"></div>
+                            <input type="text" id="ing-codigo" required
+                                class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white"
+                                placeholder="Escriba o seleccione..." autocomplete="off">
+                            <div id="dropdown-ing-codigo"
+                                class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden">
+                            </div>
                         </div>
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Lote *</label><input type="text" id="ing-lote" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
-                        
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Características</label><input type="text" id="ing-caracteristicas" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
-                        
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Artículo (Automático)</label><input type="text" id="ing-articulo" placeholder="Esperando código..." readonly class="w-full p-2 border rounded-lg bg-gray-100 text-gray-800 font-medium outline-none"></div>
-                        
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">PESO (KG) *</label><input type="number" step="0.01" id="ing-cantidad" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
-                        
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Proveedor</label><input type="text" id="ing-proveedor" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Origen</label><input type="text" id="ing-origen" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">F. Llegada Fibra</label><input type="date" id="ing-fllegada" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
-                        
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Andamio</label><input type="text" id="ing-andamio" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">N° de Caja</label><input type="text" id="ing-ncaja" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
-                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Presentación</label><input type="text" id="ing-presentacion" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
-                        
-                        <div class="md:col-span-2 lg:col-span-3"><label class="block text-sm font-semibold text-gray-600 mb-1">Certificado</label><input type="text" id="ing-certificado" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Lote *</label><input
+                                type="text" id="ing-lote" required list="lista-lotes-ingreso"
+                                class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                            <datalist id="lista-lotes-ingreso"></datalist>
+                        </div>
+
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Características</label><input
+                                type="text" id="ing-caracteristicas"
+                                class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
+
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Artículo
+                                (Automático)</label><input type="text" id="ing-articulo"
+                                placeholder="Esperando código..." readonly
+                                class="w-full p-2 border rounded-lg bg-gray-100 text-gray-800 font-medium outline-none">
+                        </div>
+
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">PESO (KG) *</label><input
+                                type="number" step="0.01" id="ing-cantidad" required
+                                class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
+
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Proveedor</label><input
+                                type="text" id="ing-proveedor" list="lista-proveedores-ingreso"
+                                class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                            <datalist id="lista-proveedores-ingreso"></datalist>
+                        </div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Origen</label><input
+                                type="text" id="ing-origen" list="lista-origen-ingreso"
+                                class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                            <datalist id="lista-origen-ingreso"></datalist>
+                        </div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">F. Llegada
+                                Fibra</label><input type="date" id="ing-fllegada"
+                                class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
+
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Andamio</label><input
+                                type="text" id="ing-andamio"
+                                class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">N° de Caja</label><input
+                                type="text" id="ing-ncaja"
+                                class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
+                        <div><label class="block text-sm font-semibold text-gray-600 mb-1">Presentación</label><input
+                                type="text" id="ing-presentacion"
+                                class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
+
+                        <div class="md:col-span-2 lg:col-span-3"><label
+                                class="block text-sm font-semibold text-gray-600 mb-1">Certificado</label>
+                            <select id="ing-certificado"
+                                class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                                <option value="SIN CERTIFICADO" selected>SIN CERTIFICADO</option>
+                                <option value="RWS">RWS</option>
+                                <option value="GRS">GRS</option>
+                                <option value="GOTS">GOTS</option>
+                                <option value="FSC">FSC</option>
+                            </select>
+                        </div>
                     </div>
-                    
+
                     <div class="mt-8 flex justify-end gap-4">
-                        <button type="button" onclick="cambiarVista('vista-categoria')" class="px-6 py-3 rounded-lg font-bold text-gray-600 bg-gray-200 hover:bg-gray-300">Cancelar</button>
-                        <button id="btn-submit-ingreso" type="submit" class="px-8 py-3 rounded-lg font-bold text-white bg-emerald-500 hover:bg-emerald-600 shadow-lg flex items-center justify-center gap-2">
+                        <button type="button" onclick="cambiarVista('vista-categoria')"
+                            class="px-6 py-3 rounded-lg font-bold text-gray-600 bg-gray-200 hover:bg-gray-300 transition-colors">Cancelar</button>
+                        <button id="btn-submit-ingreso" type="submit"
+                            class="px-8 py-3 rounded-lg font-bold text-white bg-emerald-500 hover:bg-emerald-600 shadow-lg flex items-center justify-center gap-2 transition-all">
                             <span>GUARDAR INGRESO</span>
                         </button>
                     </div>
@@ -178,13 +343,24 @@
             <div id="vista-salida" class="vista fade-in">
                 <div class="flex items-center mb-6 border-b pb-4">
                     <button onclick="cambiarVista('vista-categoria')" class="text-slate-500 hover:text-slate-800 mr-4">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
                     </button>
                     <h2 class="text-2xl font-bold text-rose-600 flex flex-col sm:flex-row sm:items-center gap-2">
                         <span>Registrar Salida</span>
                         <span class="hidden sm:inline text-slate-300">|</span>
-                        <span id="lbl-categoria-salida" class="text-indigo-600 bg-indigo-50 px-3 py-1 rounded-lg text-lg"></span>
+                        <span id="lbl-categoria-salida"
+                            class="text-indigo-600 bg-indigo-50 px-3 py-1 rounded-lg text-lg"></span>
                     </h2>
+                    <div class="ml-auto flex items-center gap-3 bg-slate-50 px-4 py-1.5 rounded-lg border border-slate-200 shadow-sm no-print">
+                        <span class="text-xs font-bold text-slate-600 uppercase tracking-tight">Carga Masiva</span>
+                        <label class="relative inline-flex items-center cursor-pointer scale-75">
+                            <input type="checkbox" id="sal-carga-masiva" class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-500"></div>
+                        </label>
+                    </div>
                 </div>
 
                 <form id="form-salida" onsubmit="guardarSalida(event)">
@@ -192,29 +368,39 @@
                         <div class="space-y-5">
                             <div class="relative">
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Código *</label>
-                                <input type="text" id="sal-codigo" required class="w-full p-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none bg-white" placeholder="Escriba o seleccione..." autocomplete="off">
-                                <div id="dropdown-sal-codigo" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden"></div>
+                                <input type="text" id="sal-codigo" required
+                                    class="w-full p-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none bg-white"
+                                    placeholder="Escriba o seleccione..." autocomplete="off">
+                                <div id="dropdown-sal-codigo"
+                                    class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden">
+                                </div>
                             </div>
-                            
+
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Lote *</label>
-                                <select id="sal-lote" required class="w-full p-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none bg-white">
+                                <select id="sal-lote" required
+                                    class="w-full p-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none bg-white text-gray-700">
                                     <option value="">Primero seleccione un código...</option>
                                 </select>
                             </div>
-                            
+
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">PESO (KG) a retirar *</label>
-                                <input type="number" step="0.01" id="sal-cantidad" required placeholder="0.00" class="w-full p-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-rose-600 font-bold text-lg">
-                                <p id="sal-stock-disponible" class="text-sm font-semibold mt-2 text-blue-600 hidden">Stock disponible: <span>0</span> KG</p>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">PESO (KG) a retirar
+                                    *</label>
+                                <input type="number" step="0.01" id="sal-cantidad" required placeholder="0.00"
+                                    class="w-full p-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none text-rose-600 font-bold text-lg">
+                                <p id="sal-stock-disponible" class="text-sm font-semibold mt-2 text-blue-600 hidden">
+                                    Stock disponible: <span>0</span> KG</p>
                             </div>
                         </div>
 
                         <div class="mt-8 flex flex-col gap-3">
-                            <button id="btn-submit-salida" type="submit" class="w-full py-4 rounded-lg font-bold text-white bg-rose-500 hover:bg-rose-600 shadow-lg text-lg flex items-center justify-center gap-2">
+                            <button id="btn-submit-salida" type="submit"
+                                class="w-full py-4 rounded-lg font-bold text-white bg-rose-500 hover:bg-rose-600 shadow-lg text-lg flex items-center justify-center gap-2 transition-all">
                                 <span>REGISTRAR SALIDA</span>
                             </button>
-                            <button type="button" onclick="cambiarVista('vista-categoria')" class="w-full py-3 rounded-lg font-bold text-gray-600 bg-white border border-gray-300 hover:bg-gray-50">Cancelar</button>
+                            <button type="button" onclick="cambiarVista('vista-categoria')"
+                                class="w-full py-3 rounded-lg font-bold text-gray-600 bg-white border border-gray-300 hover:bg-gray-50 transition-colors">Cancelar</button>
                         </div>
                     </div>
                 </form>
@@ -224,35 +410,45 @@
                  VISTA 4: REPORTE DE SALDOS Y GRÁFICOS
                  ========================================== -->
             <div id="vista-saldos" class="vista fade-in">
-                <div class="flex flex-wrap items-center justify-between mb-6 border-b pb-4 gap-4">
+                <div class="flex flex-wrap items-center justify-between mb-8 pb-4 gap-4">
                     <div class="flex items-center">
-                        <button onclick="cambiarVista('vista-menu')" class="text-slate-500 hover:text-slate-800 mr-4 no-print">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        <button onclick="cambiarVista('vista-menu')"
+                            class="bg-slate-100 p-2 rounded-xl text-slate-500 hover:text-slate-800 mr-5 transition-all hover:bg-slate-200 no-print">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
                         </button>
-                        <h2 class="text-2xl font-bold text-blue-700">Stock Actual (Saldos)</h2>
+                        <h2 class="text-3xl font-extrabold text-slate-800 tracking-tight">Stock Actual <span
+                                class="text-indigo-600">Saldos</span></h2>
                     </div>
-                    
-                    <div class="flex gap-2 no-print">
-                        <button onclick="window.print()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-bold text-sm transition-colors flex items-center gap-2">
+
+                    <div class="flex gap-3 no-print">
+                        <button onclick="toggleGraficos()" id="btn-toggle-graficos"
+                            class="bg-indigo-50 border-2 border-indigo-100 hover:border-indigo-300 text-indigo-700 px-5 py-2.5 rounded-2xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm">
+                            📈 Ver Gráficos
+                        </button>
+                        <button onclick="window.print()"
+                            class="bg-white border-2 border-slate-100 hover:border-slate-300 text-slate-600 px-5 py-2.5 rounded-2xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm">
                             🖨️ Imprimir
                         </button>
-                        <button onclick="exportarExcel('tabla-saldos', 'Reporte_Stock_Actual')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold text-sm transition-colors flex items-center gap-2">
+                        <button onclick="exportarExcel('tabla-saldos', 'Reporte_Stock_Actual')"
+                            class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-2xl font-bold text-sm transition-all flex items-center gap-2 shadow-lg shadow-emerald-200">
                             📊 Exportar Excel
                         </button>
                     </div>
                 </div>
 
-                <!-- NUEVO: Contenedor de Gráficos Dinámicos -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 no-print" id="contenedor-graficos" style="display: none;">
-                    <div class="bg-white p-4 rounded-xl border border-blue-100 shadow-sm flex flex-col items-center">
-                        <h3 class="text-sm font-bold text-blue-800 mb-2 uppercase">Stock por Artículo (KG)</h3>
-                        <div class="w-full relative h-64">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10 no-print hidden" id="contenedor-graficos">
+                    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl flex flex-col items-center">
+                        <h3 class="text-xs font-black text-slate-400 mb-4 uppercase tracking-widest text-center">Stock por Artículo (KG) - Top 20</h3>
+                        <div class="w-full relative h-[500px] overflow-y-auto pr-2">
                             <canvas id="chartArticulos"></canvas>
                         </div>
                     </div>
-                    <div class="bg-white p-4 rounded-xl border border-blue-100 shadow-sm flex flex-col items-center">
-                        <h3 class="text-sm font-bold text-blue-800 mb-2 uppercase">Stock por Lote (KG)</h3>
-                        <div class="w-full relative h-64">
+                    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl flex flex-col items-center">
+                        <h3 class="text-xs font-black text-slate-400 mb-4 uppercase tracking-widest text-center">Participación por Certificado (KG)</h3>
+                        <div class="w-full relative h-[500px] flex items-center justify-center">
                             <canvas id="chartLotes"></canvas>
                         </div>
                     </div>
@@ -262,38 +458,63 @@
                     <table id="tabla-saldos" class="min-w-full divide-y divide-gray-200 text-sm">
                         <thead class="bg-blue-800 text-white">
                             <tr>
-                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap w-[15%]">Categoría</th>
-                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap w-[10%]">Código</th>
-                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap w-[30%]">Artículo</th>
-                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider whitespace-nowrap w-[10%]">Lote</th>
-                                <th class="px-4 py-3 text-right font-semibold uppercase tracking-wider whitespace-nowrap text-emerald-300 w-[10%]">T. Ingresos (KG)</th>
-                                <th class="px-4 py-3 text-right font-semibold uppercase tracking-wider whitespace-nowrap text-rose-300 w-[10%]">T. Salidas (KG)</th>
-                                <th class="px-4 py-3 text-right font-black uppercase tracking-wider whitespace-nowrap text-xl bg-blue-900 w-[15%]">SALDO ACTUAL (KG)</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider w-[8%]">Código</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider w-[32%]">Artículo</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider w-[10%]">Lote</th>
+                                <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider w-[10%]">Certificado</th>
+                                <th class="px-4 py-3 text-right font-semibold uppercase tracking-wider text-emerald-300 w-[10%]">T. Ingresos (KG)</th>
+                                <th class="px-4 py-3 text-right font-semibold uppercase tracking-wider text-rose-300 w-[10%]">T. Salidas (KG)</th>
+                                <th class="px-4 py-3 text-right font-black uppercase tracking-wider text-xs bg-indigo-900 w-[15%]">SALDO ACTUAL (KG)</th>
                             </tr>
                             <tr class="bg-blue-700 no-print">
-                                <!-- DROPDOWN CATEGORÍA PARA SALDOS -->
                                 <td class="p-1">
-                                    <select id="fs-categoria" onchange="filtrarSaldos()" class="w-full text-xs text-black px-2 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400">
-                                        <option value="">Todas</option>
+                                    <input type="text" id="fs-codigo" onkeyup="filtrarSaldos()"
+                                        placeholder="Código..."
+                                        class="w-full text-xs text-black px-2 py-1.5 rounded outline-none focus:ring-2 focus:ring-emerald-400 border-none">
+                                </td>
+                                <td class="p-1">
+                                    <input type="text" id="fs-articulo" onkeyup="filtrarSaldos()"
+                                        placeholder="Artículo..."
+                                        class="w-full text-xs text-black px-2 py-1.5 rounded outline-none focus:ring-2 focus:ring-emerald-400 border-none">
+                                </td>
+                                <td class="p-1">
+                                    <input type="text" id="fs-lote" onkeyup="filtrarSaldos()"
+                                        placeholder="Lote..."
+                                        class="w-full text-xs text-black px-2 py-1.5 rounded outline-none focus:ring-2 focus:ring-emerald-400 border-none">
+                                </td>
+                                <td class="p-1">
+                                    <select id="fs-certificado" onchange="filtrarSaldos()"
+                                        class="w-full text-xs text-black px-2 py-1.5 rounded outline-none focus:ring-2 focus:ring-emerald-400 border-none bg-white">
+                                        <option value="">TODOS</option>
+                                    </select>
+                                </td>
+                                <td colspan="2" class="p-1">
+                                    <select id="fs-categoria" onchange="filtrarSaldos()"
+                                        class="w-full text-xs text-black px-4 py-1.5 rounded outline-none focus:ring-2 focus:ring-emerald-400 border-none bg-blue-50 font-bold">
+                                        <option value="">TODAS LAS CATEGORÍAS</option>
                                         <option value="FIBRAS ESPECIALES">FIBRAS ESPECIALES</option>
                                         <option value="FIBRAS DE PRODUCCIÓN">FIBRAS DE PRODUCCIÓN</option>
                                     </select>
                                 </td>
-                                <td class="p-1"><input type="text" id="fs-codigo" onkeyup="filtrarSaldos()" placeholder="Filtrar código..." class="w-full text-xs text-black px-2 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400"></td>
-                                <td class="p-1"><input type="text" id="fs-articulo" onkeyup="filtrarSaldos()" placeholder="Filtrar artículo..." class="w-full text-xs text-black px-2 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400"></td>
-                                <td class="p-1"><input type="text" id="fs-lote" onkeyup="filtrarSaldos()" placeholder="Filtrar lote..." class="w-full text-xs text-black px-2 py-1 rounded outline-none focus:ring-2 focus:ring-emerald-400"></td>
-                                <td colspan="3" class="p-1 text-center text-xs text-blue-200 italic">Los subtotales se calculan al final 👇</td>
                             </tr>
                         </thead>
                         <tbody id="cuerpo-tabla-saldos" class="bg-white divide-y divide-gray-200">
-                            <tr><td colspan="7" class="px-6 py-8 text-center text-gray-500 italic">Cargando saldos...</td></tr>
-                        </tbody>
-                        <tfoot id="pie-tabla-saldos" class="bg-blue-100 font-bold text-slate-800 border-t-4 border-blue-300 hidden">
                             <tr>
-                                <td colspan="4" class="px-4 py-3 text-right uppercase tracking-wider text-sm text-blue-900">Subtotal Filtrado (NETO):</td>
-                                <td class="px-4 py-3 text-right text-emerald-700" id="subtotal-ingresos-saldos">0.00</td>
+                                <td colspan="7" class="px-6 py-8 text-center text-gray-500 italic">Cargando saldos...
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot id="pie-tabla-saldos"
+                            class="bg-blue-100 font-bold text-slate-800 border-t-4 border-blue-300 hidden">
+                            <tr>
+                                <td colspan="3"
+                                    class="px-4 py-3 text-right uppercase tracking-wider text-sm text-blue-900">Subtotal
+                                    Filtrado (NETO):</td>
+                                <td class="px-4 py-3 text-right text-emerald-700" id="subtotal-ingresos-saldos">0.00
+                                </td>
                                 <td class="px-4 py-3 text-right text-rose-700" id="subtotal-salidas-saldos">0.00</td>
-                                <td class="px-4 py-3 text-right text-lg text-blue-800" id="subtotal-neto-saldos">0.00</td>
+                                <td class="px-4 py-3 text-right text-lg text-blue-800" id="subtotal-neto-saldos">0.00
+                                </td>
                             </tr>
                         </tfoot>
                     </table>
@@ -304,23 +525,32 @@
                  VISTA 5: HISTÓRICO GENERAL
                  ========================================== -->
             <div id="vista-historico" class="vista fade-in">
-                <div class="flex flex-wrap items-center justify-between mb-4 border-b pb-4 gap-4">
+                <div class="flex flex-wrap items-center justify-between mb-8 pb-4 gap-4">
                     <div class="flex items-center">
-                        <button onclick="cambiarVista('vista-menu')" class="text-slate-500 hover:text-slate-800 mr-4 no-print">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        <button onclick="cambiarVista('vista-menu')"
+                            class="bg-slate-100 p-2 rounded-xl text-slate-500 hover:text-slate-800 mr-5 transition-all hover:bg-slate-200 no-print">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
                         </button>
-                        <h2 class="text-2xl font-bold text-slate-800">Histórico General (Auditoría)</h2>
+                        <h2 class="text-3xl font-extrabold text-slate-800 tracking-tight">HISTÓRICO</h2>
                     </div>
-                    
-                    <div class="flex items-center gap-4">
-                        <div class="text-sm bg-slate-100 px-4 py-2 rounded-full font-semibold text-slate-600 shadow-inner border border-slate-200 no-print">
-                            Registros: <span id="contador-registros" class="text-emerald-600 font-bold ml-1">0</span>
+
+                    <div class="flex items-center gap-6">
+                        <div class="hidden md:flex flex-col items-end">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total
+                                Registros</span>
+                            <span id="contador-registros"
+                                class="text-2xl font-black text-emerald-600 leading-none">0</span>
                         </div>
                         <div class="flex gap-2 no-print">
-                            <button onclick="window.print()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-bold text-sm transition-colors flex items-center gap-2">
+                            <button onclick="window.print()"
+                                class="bg-white border-2 border-slate-100 hover:border-slate-300 text-slate-600 px-5 py-2.5 rounded-2xl font-bold text-sm transition-all flex items-center gap-2">
                                 🖨️ Imprimir
                             </button>
-                            <button onclick="exportarExcel('tabla-historico', 'Histórico_Auditoría')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold text-sm transition-colors flex items-center gap-2">
+                            <button onclick="exportarExcel('tabla-historico', 'Historico')"
+                                class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-2xl font-bold text-sm transition-all flex items-center gap-2 shadow-lg shadow-emerald-200">
                                 📊 Exportar Excel
                             </button>
                         </div>
@@ -331,802 +561,1133 @@
                     <table class="min-w-full divide-y divide-gray-200 text-[11px]" id="tabla-historico">
                         <thead class="bg-slate-800 text-white">
                             <tr>
-                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Fecha Mov.</th>
-                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Categoría</th>
-                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Código</th>
-                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Lote</th>
-                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap text-amber-300">Características</th>
-                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Artículo</th>
-                                <th class="px-2 py-1.5 text-center font-semibold uppercase tracking-wider whitespace-nowrap">Tipo Mov.</th>
-                                <th class="px-2 py-1.5 text-right font-semibold uppercase tracking-wider whitespace-nowrap">PESO (KG)</th>
-                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Proveedor</th>
-                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Origen</th>
-                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">F. Llegada</th>
-                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Andamio</th>
-                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">N° Caja</th>
-                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Presentación</th>
-                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Certificado</th>
-                                <th class="px-2 py-1.5 text-center font-semibold uppercase tracking-wider whitespace-nowrap no-print">Acciones</th>
+                                <th
+                                    class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">
+                                    Fecha Mov.</th>
+                                <th
+                                    class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">
+                                    Categoría</th>
+                                <th
+                                    class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">
+                                    Código</th>
+                                <th
+                                    class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">
+                                    Lote</th>
+                                <th
+                                    class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap text-amber-300">
+                                    Características</th>
+                                <th
+                                    class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">
+                                    Artículo</th>
+                                <th
+                                    class="px-2 py-1.5 text-center font-semibold uppercase tracking-wider whitespace-nowrap">
+                                    Tipo Mov.</th>
+                                <th
+                                    class="px-2 py-1.5 text-right font-semibold uppercase tracking-wider whitespace-nowrap">
+                                    PESO (KG)</th>
+                                <th
+                                    class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">
+                                    Proveedor</th>
+                                <th
+                                    class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">
+                                    Origen</th>
+                                <th
+                                    class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">
+                                    F. Llegada</th>
+                                <th
+                                    class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">
+                                    Andamio</th>
+                                <th
+                                    class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">
+                                    N° Caja</th>
+                                <th
+                                    class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">
+                                    Presentación</th>
+                                <th
+                                    class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">
+                                    Certificado</th>
+                                <th
+                                    class="px-2 py-1.5 text-center font-semibold uppercase tracking-wider whitespace-nowrap no-print">
+                                    Acciones</th>
                             </tr>
                             <tr class="bg-slate-700 no-print">
-                                <td class="p-1"><input type="text" id="fh-fecha" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-[10px] text-black px-1 py-1 rounded outline-none"></td>
-                                <!-- DROPDOWN CATEGORÍA PARA HISTÓRICO -->
+                                <td class="p-1"><input type="text" id="fh-fecha" onkeyup="filtrarHistorico()"
+                                        placeholder="Filtrar..."
+                                        class="w-full text-[10px] text-black px-1 py-1 rounded outline-none border-none border-gray-100">
+                                </td>
                                 <td class="p-1">
-                                    <select id="fh-categoria" onchange="filtrarHistorico()" class="w-full text-[10px] text-black px-1 py-1 rounded outline-none">
+                                    <select id="fh-categoria" onchange="filtrarHistorico()"
+                                        class="w-full text-[10px] text-black px-1 py-1 rounded outline-none border-none">
                                         <option value="">Todas</option>
                                         <option value="FIBRAS ESPECIALES">ESPECIALES</option>
                                         <option value="FIBRAS DE PRODUCCIÓN">PRODUCCIÓN</option>
                                     </select>
                                 </td>
-                                <td class="p-1"><input type="text" id="fh-codigo" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-[10px] text-black px-1 py-1 rounded outline-none"></td>
-                                <td class="p-1"><input type="text" id="fh-lote" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-[10px] text-black px-1 py-1 rounded outline-none"></td>
-                                <td class="p-1"><input type="text" id="fh-caracteristicas" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-[10px] text-black px-1 py-1 rounded outline-none"></td>
-                                <td class="p-1"><input type="text" id="fh-articulo" onkeyup="filtrarHistorico()" placeholder="Filtrar..." class="w-full text-[10px] text-black px-1 py-1 rounded outline-none"></td>
-                                <td class="p-1"><select id="fh-tipo" onchange="filtrarHistorico()" class="w-full text-[10px] text-black px-1 py-1 rounded outline-none"><option value="">Todos</option><option value="INGRESO">IN</option><option value="SALIDA">OUT</option></select></td>
-                                <td colspan="9" class="p-1 text-center text-[10px] text-slate-300 italic">Otras columnas sin filtro</td>
+                                <td class="p-1"><input type="text" id="fh-codigo" onkeyup="filtrarHistorico()"
+                                        placeholder="Filtrar..."
+                                        class="w-full text-[10px] text-black px-1 py-1 rounded outline-none border-none">
+                                </td>
+                                <td class="p-1"><input type="text" id="fh-lote" onkeyup="filtrarHistorico()"
+                                        placeholder="Filtrar..."
+                                        class="w-full text-[10px] text-black px-1 py-1 rounded outline-none border-none">
+                                </td>
+                                <td class="p-1"><input type="text" id="fh-caracteristicas" onkeyup="filtrarHistorico()"
+                                        placeholder="Filtrar..."
+                                        class="w-full text-[10px] text-black px-1 py-1 rounded outline-none border-none">
+                                </td>
+                                <td class="p-1"><input type="text" id="fh-articulo" onkeyup="filtrarHistorico()"
+                                        placeholder="Filtrar..."
+                                        class="w-full text-[10px] text-black px-1 py-1 rounded outline-none border-none">
+                                </td>
+                                <td class="p-1"><select id="fh-tipo" onchange="filtrarHistorico()"
+                                        class="w-full text-[10px] text-black px-1 py-1 rounded outline-none border-none">
+                                        <option value="">Todos</option>
+                                        <option value="INGRESO">IN</option>
+                                        <option value="SALIDA">OUT</option>
+                                    </select></td>
+                                <td colspan="9" class="p-1 text-center text-[10px] text-slate-300 italic">Otras
+                                    columnas sin filtro</td>
                             </tr>
                         </thead>
                         <tbody id="cuerpo-tabla" class="bg-white divide-y divide-gray-200">
-                            <tr><td colspan="16" class="px-6 py-8 text-center text-gray-500 italic">Cargando información desde la base de datos... <div class="loader ml-2 mb-[-6px]"></div></td></tr>
-                        </tbody>
-                        <tfoot id="pie-tabla-historico" class="bg-slate-200 font-bold text-slate-800 border-t-2 border-slate-400 hidden">
                             <tr>
-                                <td colspan="7" class="px-2 py-2 text-right uppercase tracking-wider text-xs">Subtotal Filtrado (NETO):</td>
+                                <td colspan="16" class="px-6 py-8 text-center text-gray-500 italic">Cargando
+                                    información desde la base de datos... <div class="loader ml-2 mb-[-6px]"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot id="pie-tabla-historico"
+                            class="bg-slate-200 font-bold text-slate-800 border-t-2 border-slate-400 hidden">
+                            <tr>
+                                <td colspan="7" class="px-2 py-2 text-right uppercase tracking-wider text-xs">Subtotal
+                                    Filtrado (NETO):</td>
                                 <td class="px-2 py-2 text-right text-xs" id="subtotal-peso-historico">0.00</td>
                                 <td colspan="8" class="px-2 py-2"></td>
                             </tr>
                         </tfoot>
                     </table>
                 </div>
+                </div>
+
             </div>
-
         </div>
-    </div>
 
-    <!-- ==========================================
+        <!-- ==========================================
          MODAL DE EDICIÓN
          ========================================== -->
-    <div id="modal-editar" class="fixed inset-0 bg-black bg-opacity-60 z-[100] hidden flex items-center justify-center p-4 fade-in no-print">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
-            <div class="bg-blue-700 text-white px-6 py-4 flex justify-between items-center">
-                <h3 class="text-xl font-bold">Editar Registro</h3>
-                <button onclick="cerrarModalEditar()" class="text-white hover:text-gray-200 text-2xl font-bold">&times;</button>
-            </div>
-            
-            <div class="p-6 overflow-y-auto flex-1">
-                <form id="form-editar" onsubmit="guardarEdicionLocal(event)">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Fecha Movimiento *</label><input type="date" id="ed-fecha" required class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
-                        
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Categoría (Tipo de Fibra)*</label>
-                            <select id="ed-categoria" required class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                                <option value="-">-</option>
-                                <option value="FIBRAS ESPECIALES">FIBRAS ESPECIALES</option>
-                                <option value="FIBRAS DE PRODUCCIÓN">FIBRAS DE PRODUCCIÓN</option>
-                            </select>
+        <div id="modal-editar"
+            class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4 fade-in no-print">
+            <div
+                class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-200">
+                <div class="bg-blue-700 text-white px-6 py-4 flex justify-between items-center">
+                    <div>
+                        <h3 class="text-xl font-bold">Editar Registro</h3>
+                        <p class="text-blue-100 text-xs">Modificación de Registro</p>
+                    </div>
+                    <button onclick="cerrarModalEditar()" class="text-white hover:text-blue-200 transition-colors">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-6 overflow-y-auto flex-1 bg-white">
+                    <form id="form-editar" onsubmit="guardarEdicionLocal(event)">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                            <div><label class="block text-sm font-semibold text-gray-600 mb-1">Fecha Movimiento
+                                    *</label><input type="date" id="ed-fecha" required
+                                    class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                            <div><label class="block text-sm font-semibold text-gray-600 mb-1">Categoría
+                                    *</label><select id="ed-categoria" required
+                                    class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <option value="FIBRAS ESPECIALES">FIBRAS ESPECIALES</option>
+                                    <option value="FIBRAS DE PRODUCCIÓN">FIBRAS DE PRODUCCIÓN</option>
+                                </select></div>
+                            <div><label class="block text-sm font-semibold text-gray-600 mb-1">Tipo Mov.
+                                    *</label><select id="ed-tipo" required
+                                    class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <option value="INGRESO">INGRESO</option>
+                                    <option value="SALIDA">SALIDA</option>
+                                </select></div>
+                            <div><label class="block text-sm font-semibold text-gray-600 mb-1">Código *</label><input
+                                    type="text" id="ed-codigo" required
+                                    class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+
+                            <div><label class="block text-sm font-semibold text-gray-600 mb-1">Lote *</label><input
+                                    type="text" id="ed-lote" required
+                                    class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                            <div class="md:col-span-2"><label
+                                    class="block text-sm font-semibold text-gray-600 mb-1">Características</label><input
+                                    type="text" id="ed-caracteristicas"
+                                    class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+
+                            <div class="md:col-span-2"><label
+                                    class="block text-sm font-semibold text-gray-600 mb-1">Artículo</label><input
+                                    type="text" id="ed-articulo" required
+                                    class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                            <div><label class="block text-sm font-semibold text-gray-600 mb-1 text-emerald-600">PESO
+                                    (KG) *</label><input type="number" step="0.01" id="ed-cantidad" required
+                                    class="w-full p-2 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none font-bold text-emerald-700">
+                            </div>
+
+                            <div><label class="block text-sm font-semibold text-gray-600 mb-1">Proveedor</label><input
+                                    type="text" id="ed-proveedor"
+                                    class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                            <div><label class="block text-sm font-semibold text-gray-600 mb-1">Origen</label><input
+                                    type="text" id="ed-origen"
+                                    class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                            <div><label class="block text-sm font-semibold text-gray-600 mb-1">F. Llegada</label><input
+                                    type="date" id="ed-fllegada"
+                                    class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+
+                            <div><label class="block text-sm font-semibold text-gray-600 mb-1">Andamio</label><input
+                                    type="text" id="ed-andamio"
+                                    class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                            <div><label class="block text-sm font-semibold text-gray-600 mb-1">N° de Caja</label><input
+                                    type="text" id="ed-ncaja"
+                                    class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                            <div><label
+                                    class="block text-sm font-semibold text-gray-600 mb-1">Presentación</label><input
+                                    type="text" id="ed-presentacion"
+                                    class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+
+                            <div class="md:col-span-3"><label
+                                    class="block text-sm font-semibold text-gray-600 mb-1">Certificado</label>
+                                <select id="ed-certificado"
+                                    class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <option value="SIN CERTIFICADO">SIN CERTIFICADO</option>
+                                    <option value="RWS">RWS</option>
+                                    <option value="GRS">GRS</option>
+                                    <option value="GOTS">GOTS</option>
+                                    <option value="FSC">FSC</option>
+                                </select>
+                            </div>
                         </div>
 
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Código *</label><input type="text" id="ed-codigo" required class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Lote *</label><input type="text" id="ed-lote" required class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
-                        
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Características</label><input type="text" id="ed-caracteristicas" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
-                        
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Tipo de Mov. *</label>
-                            <select id="ed-tipo" required class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                                <option value="INGRESO">INGRESO</option>
-                                <option value="SALIDA">SALIDA</option>
-                            </select>
+                        <div class="mt-8 flex justify-end gap-3">
+                            <button type="button" onclick="cerrarModalEditar()"
+                                class="px-6 py-2.5 rounded-lg font-bold text-gray-600 bg-gray-200 hover:bg-gray-300 transition-colors">Cancelar</button>
+                            <button type="submit"
+                                class="px-8 py-2.5 rounded-lg font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg flex items-center gap-2 transition-all">
+                                💾 GUARDAR CAMBIOS
+                            </button>
                         </div>
-                        
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1">PESO (KG) *</label><input type="number" step="0.01" id="ed-cantidad" required class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none font-bold"></div>
-                        
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Proveedor</label><input type="text" id="ed-proveedor" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Origen</label><input type="text" id="ed-origen" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1">F. Llegada Fibra</label><input type="date" id="ed-fllegada" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
-                        
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Andamio</label><input type="text" id="ed-andamio" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1">N° de Caja</label><input type="text" id="ed-ncaja" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1">Presentación</label><input type="text" id="ed-presentacion" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
-                        
-                        <div class="md:col-span-3"><label class="block text-xs font-bold text-gray-600 mb-1">Certificado</label><input type="text" id="ed-certificado" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
-                    </div>
-                </form>
-            </div>
-            <div class="bg-gray-50 px-6 py-4 border-t flex justify-end gap-3">
-                <button type="button" onclick="cerrarModalEditar()" class="px-4 py-2 rounded font-bold text-gray-600 bg-gray-200 hover:bg-gray-300">Cancelar</button>
-                <button type="submit" form="form-editar" class="px-6 py-2 rounded font-bold text-white bg-blue-600 hover:bg-blue-700">Guardar Cambios</button>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
 
 
-    <script>
-        // --- VARIABLES PARA GRÁFICOS ---
-        let chartArticulosInstance = null;
-        let chartLotesInstance = null;
+        <script>
+            // --- VARIABLES PARA GRÁFICOS ---
+            let chartArticulosInstance = null;
+            let chartLotesInstance = null;
 
-        // --- FUNCIÓN PARA EXPORTAR TABLA A EXCEL ---
-        function exportarExcel(tablaId, nombreArchivo) {
-            let tabla = document.getElementById(tablaId);
-            let tablaClon = tabla.cloneNode(true);
-            
-            let elementosNoPrint = tablaClon.querySelectorAll('.no-print');
-            elementosNoPrint.forEach(el => el.remove());
-            let inputs = tablaClon.querySelectorAll('input, select');
-            inputs.forEach(input => input.remove());
-            let filasOcultas = tablaClon.querySelectorAll('tr[style*="display: none"]');
-            filasOcultas.forEach(fila => fila.remove());
+            // --- FUNCIÓN PARA EXPORTAR TABLA A EXCEL ---
+            function exportarExcel(tablaId, nombreArchivo) {
+                let tabla = document.getElementById(tablaId);
+                let tablaClon = tabla.cloneNode(true);
 
-            let html = `
-                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-                <head>
-                    <meta charset="UTF-8">
-                    <style>
+                let elementosNoPrint = tablaClon.querySelectorAll('.no-print');
+                elementosNoPrint.forEach(el => el.remove());
+                let inputs = tablaClon.querySelectorAll('input, select');
+                inputs.forEach(input => input.remove());
+                let filasOcultas = tablaClon.querySelectorAll('tr[style*="display: none"]');
+                filasOcultas.forEach(fila => fila.remove());
+
+                let html = `
+                \x3Chtml xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                \x3Chead>
+                    \x3Cmeta charset="UTF-8">
+                    \x3Cstyle>
                         table { border-collapse: collapse; width: 100%; }
                         th, td { border: 1px solid black !important; padding: 5px; text-align: left; }
                         th { background-color: #f1f5f9; font-weight: bold; }
-                    </style>
-                </head>
-                <body>${tablaClon.outerHTML}</body>
-                </html>`;
+                    \x3C/style>
+                \x3C/head>
+                \x3Cbody>${tablaClon.outerHTML}\x3C/body>
+                \x3C/html>`;
 
-            let blob = new Blob(['\ufeff', html], { type: 'application/vnd.ms-excel' });
-            let url = URL.createObjectURL(blob);
-            let a = document.createElement('a');
-            a.href = url;
-            a.download = nombreArchivo + '_' + new Date().toISOString().split('T')[0] + '.xls';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        // --- FORMATO DE NÚMEROS Y FECHAS ---
-        function formatearNumero(num) {
-            return Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
-
-        function formatearFechaCorto(fechaIso) {
-            if (!fechaIso || fechaIso === "-") return "";
-            if (String(fechaIso).length === 10 && String(fechaIso).includes("-")) return fechaIso;
-            try {
-                const d = new Date(fechaIso);
-                if (isNaN(d.getTime())) return fechaIso;
-                return d.toISOString().split('T')[0];
-            } catch(e) {
-                return fechaIso;
-            }
-        }
-
-        // --- 1. CONFIGURACIÓN DEL BACKEND ---
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz5MvWoG0Bs_ghicjJfuax6b3M3j8mJ7nrCBnvnY4_aZ6RRoIyNqxAqPgjXMV4dPyTh/exec";
-        
-        let registrosKardex = [];
-        let catalogoCodigos = [];
-        let indiceEdicionActual = -1;
-        let flujoActual = '';
-        let categoriaSeleccionada = ''; 
-
-        document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById('ing-fecha').value = new Date().toISOString().split('T')[0];
-            cargarDashboard();
-        });
-
-        function cambiarVista(idVista) {
-            document.querySelectorAll('.vista').forEach(el => el.classList.remove('activa'));
-            document.getElementById(idVista).classList.add('activa');
-        }
-
-        // CONTROL DEL FLUJO (Ingreso vs Salida)
-        function iniciarFlujo(flujo) {
-            flujoActual = flujo;
-            document.getElementById('titulo-categoria').innerText = flujo === 'INGRESO' ? '¿Qué tipo de fibra ingresará?' : '¿Qué tipo de fibra retirará?';
-            cambiarVista('vista-categoria');
-        }
-
-        function seleccionarCategoria(cat) {
-            categoriaSeleccionada = cat;
-            const colorClass = cat === "FIBRAS ESPECIALES" ? "text-indigo-700 bg-indigo-100 px-3 py-1 rounded-lg text-lg ml-2" : "text-teal-700 bg-teal-100 px-3 py-1 rounded-lg text-lg ml-2";
-            
-            if (flujoActual === 'INGRESO') {
-                document.getElementById('lbl-categoria-ingreso').innerText = cat;
-                document.getElementById('lbl-categoria-ingreso').className = colorClass;
-                cambiarVista('vista-ingreso');
-            } else if (flujoActual === 'SALIDA') {
-                document.getElementById('lbl-categoria-salida').innerText = cat;
-                document.getElementById('lbl-categoria-salida').className = colorClass;
-                
-                document.getElementById('sal-codigo').value = '';
-                document.getElementById('sal-lote').innerHTML = '<option value="">Primero seleccione un código...</option>';
-                document.getElementById('sal-cantidad').value = '';
-                document.getElementById('sal-stock-disponible').classList.add('hidden');
-                
-                cambiarVista('vista-salida');
-            }
-        }
-
-        // --- 2. LECTURA DE DATOS (GET) ---
-        async function cargarDashboard() {
-            try {
-                const response = await fetch(WEB_APP_URL);
-                if (!response.ok) throw new Error("Error HTTP: " + response.status);
-
-                const data = await response.json();
-                
-                registrosKardex = data.historico || [];
-                catalogoCodigos = data.catalogo || [];
-
-                actualizarTabla();
-                actualizarTablaSaldos();
-                configurarDropdownsCodigo(); 
-                
-                const indicador = document.getElementById('estado-conexion');
-                indicador.classList.replace('bg-slate-700', 'bg-emerald-600');
-                indicador.innerHTML = '¡Conectado! ✅';
-
-            } catch (error) {
-                console.error("Error al cargar:", error);
-                document.getElementById('cuerpo-tabla').innerHTML = `<tr><td colspan="16" class="px-6 py-8 text-center text-rose-500 font-bold">Asegúrate de que el acceso de tu Script en Google Sheets esté configurado como "Cualquier persona".<br><br>Detalle técnico: ${error.message}</td></tr>`;
-                document.getElementById('estado-conexion').classList.replace('bg-slate-700', 'bg-rose-600');
-                document.getElementById('estado-conexion').innerHTML = 'Error de Conexión ❌';
-            }
-        }
-
-        // --- SISTEMA DE AUTOCOMPLETADO VISUAL ---
-        function configurarDropdownsCodigo() {
-            const ingInput = document.getElementById('ing-codigo');
-            const ingDropdown = document.getElementById('dropdown-ing-codigo');
-            const salInput = document.getElementById('sal-codigo');
-            const salDropdown = document.getElementById('dropdown-sal-codigo');
-
-            function renderLista(input, dropdown) {
-                const query = input.value.toLowerCase();
-                dropdown.innerHTML = '';
-                
-                const filtrados = catalogoCodigos.filter(item => 
-                    String(item.codigo).toLowerCase().includes(query) || String(item.articulo).toLowerCase().includes(query)
-                );
-
-                if (filtrados.length === 0) {
-                    dropdown.innerHTML = '<div class="p-4 text-sm text-gray-500 italic text-center">Sin coincidencias</div>';
-                } else {
-                    filtrados.forEach(item => {
-                        const div = document.createElement('div');
-                        div.className = "px-4 py-2 border-b border-gray-100 hover:bg-slate-100 cursor-pointer flex flex-col";
-                        div.innerHTML = `<span class="font-bold text-slate-800 text-sm">${item.codigo}</span><span class="text-xs text-slate-500 truncate">${item.articulo}</span>`;
-                        div.onmousedown = (e) => {
-                            e.preventDefault(); 
-                            input.value = item.codigo;
-                            dropdown.classList.add('hidden');
-                            input.dispatchEvent(new Event('input'));
-                        };
-                        dropdown.appendChild(div);
-                    });
-                }
-                dropdown.classList.remove('hidden');
+                let blob = new Blob(['\ufeff', html], { type: 'application/vnd.ms-excel' });
+                let url = URL.createObjectURL(blob);
+                let a = document.createElement('a');
+                a.href = url;
+                a.download = nombreArchivo + '_' + new Date().toISOString().split('T')[0] + '.xls';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
             }
 
-            if(ingInput) {
-                ingInput.addEventListener('focus', () => renderLista(ingInput, ingDropdown));
-                ingInput.addEventListener('input', () => renderLista(ingInput, ingDropdown));
-                ingInput.addEventListener('blur', () => setTimeout(() => ingDropdown.classList.add('hidden'), 150));
+            // --- FORMATO DE NÚMEROS Y FECHAS ---
+            function formatearNumero(num) {
+                return Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
 
-            if(salInput) {
-                salInput.addEventListener('focus', () => renderLista(salInput, salDropdown));
-                salInput.addEventListener('input', () => renderLista(salInput, salDropdown));
-                salInput.addEventListener('blur', () => setTimeout(() => salDropdown.classList.add('hidden'), 150));
-            }
-        }
-
-        document.getElementById('ing-codigo').addEventListener('input', function(e) {
-            const codigoIngresado = e.target.value.trim();
-            const itemEncontrado = catalogoCodigos.find(c => String(c.codigo) === String(codigoIngresado));
-            document.getElementById('ing-articulo').value = itemEncontrado ? itemEncontrado.articulo : "";
-        });
-
-        function calcularSaldoStock(codigo, lote, categoria) {
-            let saldo = 0;
-            registrosKardex.forEach(reg => {
-                const catReg = reg.categoria || reg.CATEGORIA || "-";
-                if (String(reg.codigo) === String(codigo) && String(reg.lote) === String(lote) && (!categoria || catReg === categoria)) {
-                    const cant = parseFloat(reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad)) || 0;
-                    if (String(reg.tipo).toUpperCase() === 'INGRESO') saldo += cant;
-                    else saldo -= Math.abs(cant);
-                }
-            });
-            return saldo;
-        }
-
-        document.getElementById('sal-codigo').addEventListener('input', function(e) {
-            const codigoSeleccionado = e.target.value.trim();
-            const selectLoteSalida = document.getElementById('sal-lote');
-            const lblStock = document.getElementById('sal-stock-disponible');
-            
-            if (!selectLoteSalida) return;
-            selectLoteSalida.innerHTML = '<option value="">Seleccione un lote...</option>'; 
-            lblStock.classList.add('hidden');
-            document.getElementById('sal-cantidad').max = ""; 
-            document.getElementById('sal-cantidad').value = "";
-
-            if (!codigoSeleccionado) {
-                selectLoteSalida.innerHTML = '<option value="">Primero seleccione un código...</option>';
-                return;
-            }
-
-            const lotesDelCodigo = registrosKardex
-                .filter(reg => String(reg.codigo) === codigoSeleccionado && reg.lote && String(reg.lote).trim() !== "-" && String(reg.lote).trim() !== "" && (reg.categoria || reg.CATEGORIA || "-") === categoriaSeleccionada)
-                .map(reg => reg.lote);
-
-            const lotesUnicos = [...new Set(lotesDelCodigo)];
-            let opcionesHTML = `<option value="">Seleccione el lote a retirar...</option>`;
-            let lotesConStock = 0;
-
-            lotesUnicos.forEach(lote => { 
-                const saldoActual = calcularSaldoStock(codigoSeleccionado, lote, categoriaSeleccionada);
-                if (saldoActual > 0) {
-                    opcionesHTML += `<option value="${lote}">${lote} (Disp: ${formatearNumero(saldoActual)} KG)</option>`; 
-                    lotesConStock++;
-                }
-            });
-
-            if (lotesConStock === 0) opcionesHTML = `<option value="">Sin lotes con stock para este código en esta categoría</option>`;
-            selectLoteSalida.innerHTML = opcionesHTML;
-        });
-
-        document.getElementById('sal-lote').addEventListener('change', function(e) {
-            const codigoSeleccionado = document.getElementById('sal-codigo').value.trim();
-            const loteSeleccionado = e.target.value.trim();
-            const lblStock = document.getElementById('sal-stock-disponible');
-            const inputCantidad = document.getElementById('sal-cantidad');
-
-            if (codigoSeleccionado && loteSeleccionado) {
-                const saldo = calcularSaldoStock(codigoSeleccionado, loteSeleccionado, categoriaSeleccionada);
-                if (saldo > 0) {
-                    lblStock.innerHTML = `Stock disponible: <span>${formatearNumero(saldo)}</span> KG`;
-                    lblStock.className = "text-sm font-semibold mt-2 text-blue-600"; 
-                    inputCantidad.max = saldo; 
-                } else {
-                    lblStock.innerHTML = `⚠️ Sin stock disponible (0 KG)`;
-                    lblStock.className = "text-sm font-semibold mt-2 text-rose-600";
-                    inputCantidad.max = 0;
-                }
-            } else {
-                lblStock.classList.add('hidden');
-                inputCantidad.max = "";
-            }
-        });
-
-        // --- 3. ESCRITURA INGRESO ---
-        async function guardarIngreso(e) {
-            e.preventDefault(); 
-            const btn = document.getElementById('btn-submit-ingreso');
-            const textoOriginal = btn.innerHTML;
-            btn.innerHTML = `<div class="loader mr-2"></div> ENVIANDO...`;
-            btn.disabled = true;
-            
-            const cant = parseFloat(document.getElementById('ing-cantidad').value);
-            const nuevoRegistro = {
-                fechaMovimiento: document.getElementById('ing-fecha').value,
-                categoria: categoriaSeleccionada,
-                codigo: document.getElementById('ing-codigo').value,
-                lote: document.getElementById('ing-lote').value,
-                caracteristicas: document.getElementById('ing-caracteristicas').value || "-",
-                articulo: document.getElementById('ing-articulo').value || "-", 
-                tipo: 'INGRESO', peso: cant, cantidad: cant,
-                proveedor: document.getElementById('ing-proveedor').value || "-",
-                origen: document.getElementById('ing-origen').value || "-",
-                fLlegada: document.getElementById('ing-fllegada').value || "-",
-                andamio: document.getElementById('ing-andamio').value || "-",
-                nCaja: document.getElementById('ing-ncaja').value || "-",
-                presentacion: document.getElementById('ing-presentacion').value || "-",
-                certificado: document.getElementById('ing-certificado').value || "-"
-            };
-
-            try {
-                const response = await fetch(WEB_APP_URL, { 
-                    method: 'POST', 
-                    redirect: 'follow',
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify(nuevoRegistro) 
-                });
-                if(!response.ok) throw new Error("Error HTTP: " + response.status);
-
-                alert('¡Ingreso registrado exitosamente!');
-                document.getElementById('form-ingreso').reset();
-                document.getElementById('ing-fecha').value = new Date().toISOString().split('T')[0];
-                cambiarVista('vista-menu');
-                cargarDashboard(); 
-            } catch (error) {
-                alert('Hubo un error de conexión al enviar: ' + error.message);
-            } finally {
-                btn.innerHTML = textoOriginal;
-                btn.disabled = false;
-            }
-        }
-
-        // --- 4. ESCRITURA SALIDA ---
-        async function guardarSalida(e) {
-            e.preventDefault(); 
-            const btn = document.getElementById('btn-submit-salida');
-            const btnOriginal = btn.innerHTML;
-            btn.innerHTML = `<div class="loader mr-2"></div> REGISTRANDO...`;
-            btn.disabled = true;
-            
-            const codigo = document.getElementById('sal-codigo').value.trim();
-            const lote = document.getElementById('sal-lote').value.trim();
-            const cantRequerida = Math.abs(parseFloat(document.getElementById('sal-cantidad').value));
-            const saldoActual = calcularSaldoStock(codigo, lote, categoriaSeleccionada);
-
-            if (saldoActual <= 0 || cantRequerida > saldoActual) {
-                alert(`⚠️ Error de Stock:\nEstás intentando retirar ${formatearNumero(cantRequerida)} KG, pero el stock es de ${formatearNumero(saldoActual)} KG.`);
-                btn.innerHTML = btnOriginal;
-                btn.disabled = false;
-                return;
-            }
-
-            const cantSalida = -cantRequerida;
-            const nuevoRegistro = {
-                fechaMovimiento: new Date().toISOString().split('T')[0],
-                categoria: categoriaSeleccionada, 
-                codigo: codigo, lote: lote, caracteristicas: "-", articulo: "", tipo: 'SALIDA',
-                peso: cantSalida, cantidad: cantSalida,
-                proveedor: "-", origen: "-", fLlegada: "-", andamio: "-", nCaja: "-", presentacion: "-", certificado: "-"
-            };
-
-            try {
-                const response = await fetch(WEB_APP_URL, { 
-                    method: 'POST',
-                    redirect: 'follow',
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify(nuevoRegistro) 
-                });
-                if(!response.ok) throw new Error("Error HTTP: " + response.status);
-
-                alert('¡Salida registrada exitosamente!');
-                document.getElementById('form-salida').reset();
-                cambiarVista('vista-menu');
-                cargarDashboard(); 
-            } catch(error) {
-                alert('Error al procesar la salida: ' + error.message);
-            } finally {
-                btn.innerHTML = btnOriginal;
-                btn.disabled = false;
-            }
-        }
-
-        // --- EDICIÓN Y ELIMINACIÓN CONECTADA A GOOGLE SHEETS (Backend) ---
-        function abrirModalEditar(indexReal) {
-            indiceEdicionActual = indexReal;
-            const reg = registrosKardex[indexReal];
-            
-            document.getElementById('ed-fecha').value = formatearFechaCorto(reg.fechaMovimiento);
-            document.getElementById('ed-categoria').value = reg.categoria || reg.CATEGORIA || "-";
-            document.getElementById('ed-codigo').value = reg.codigo;
-            document.getElementById('ed-lote').value = reg.lote;
-            document.getElementById('ed-caracteristicas').value = reg.caracteristicas || "";
-            document.getElementById('ed-tipo').value = String(reg.tipo).toUpperCase() === 'INGRESO' ? 'INGRESO' : 'SALIDA';
-            
-            const valorPeso = reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad);
-            document.getElementById('ed-cantidad').value = Math.abs(parseFloat(valorPeso) || 0); 
-
-            document.getElementById('ed-proveedor').value = reg.proveedor || "";
-            document.getElementById('ed-origen').value = reg.origen || "";
-            document.getElementById('ed-fllegada').value = formatearFechaCorto(reg.fLlegada);
-            document.getElementById('ed-andamio').value = reg.andamio || "";
-            document.getElementById('ed-ncaja').value = reg.nCaja || "";
-            document.getElementById('ed-presentacion').value = reg.presentacion || "";
-            document.getElementById('ed-certificado').value = reg.certificado || "";
-
-            document.getElementById('modal-editar').classList.remove('hidden');
-        }
-
-        function cerrarModalEditar() {
-            document.getElementById('modal-editar').classList.add('hidden');
-            indiceEdicionActual = -1;
-        }
-
-        async function guardarEdicionLocal(e) {
-            e.preventDefault();
-            if (indiceEdicionActual === -1) return;
-            
-            const btn = e.target.querySelector('button[type="submit"]');
-            const textoOriginal = btn.innerHTML;
-            btn.innerHTML = `<div class="loader mr-2"></div> Guardando...`;
-            btn.disabled = true;
-
-            let cant = parseFloat(document.getElementById('ed-cantidad').value);
-            const tipo = document.getElementById('ed-tipo').value;
-            if(tipo === 'SALIDA') cant = -Math.abs(cant); 
-
-            const filaEnExcel = indiceEdicionActual + 2; 
-
-            const registroEditado = {
-                ...registrosKardex[indiceEdicionActual], 
-                fechaMovimiento: document.getElementById('ed-fecha').value,
-                categoria: document.getElementById('ed-categoria').value,
-                codigo: document.getElementById('ed-codigo').value,
-                lote: document.getElementById('ed-lote').value,
-                caracteristicas: document.getElementById('ed-caracteristicas').value || "-",
-                tipo: tipo,
-                peso: cant,
-                cantidad: cant,
-                proveedor: document.getElementById('ed-proveedor').value || "-",
-                origen: document.getElementById('ed-origen').value || "-",
-                fLlegada: document.getElementById('ed-fllegada').value || "-",
-                andamio: document.getElementById('ed-andamio').value || "-",
-                nCaja: document.getElementById('ed-ncaja').value || "-",
-                presentacion: document.getElementById('ed-presentacion').value || "-",
-                certificado: document.getElementById('ed-certificado').value || "-"
-            };
-
-            const payload = {
-                ...registroEditado,
-                accion_bd: 'EDITAR',
-                fila_excel: filaEnExcel
-            };
-
-            try {
-                const response = await fetch(WEB_APP_URL, { 
-                    method: 'POST',
-                    redirect: 'follow',
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify(payload) 
-                });
-                if(!response.ok) throw new Error("Error HTTP: " + response.status);
-
-                registrosKardex[indiceEdicionActual] = registroEditado;
-                cerrarModalEditar();
-                actualizarTabla();
-                actualizarTablaSaldos();
-                alert("Registro actualizado en la base de datos.");
-            } catch (error) {
-                alert('No se pudo guardar en la nube: ' + error.message);
-            } finally {
-                btn.innerHTML = textoOriginal;
-                btn.disabled = false;
-            }
-        }
-
-        async function eliminarRegistro(indexReal) {
-            if (confirm("¿Estás seguro de eliminar este registro permanentemente de la base de datos?")) {
-                const filaEnExcel = indexReal + 2; 
-                const registroRespaldo = registrosKardex[indexReal];
-                
-                registrosKardex.splice(indexReal, 1);
-                actualizarTabla();
-                actualizarTablaSaldos();
-
+            // Formato para inputs type="date" (YYYY-MM-DD)
+            function formatearFechaInput(fechaIso) {
+                if (!fechaIso || fechaIso === "-" || fechaIso === "") return "";
                 try {
-                    const payload = { accion_bd: 'ELIMINAR', fila_excel: filaEnExcel };
-                    const response = await fetch(WEB_APP_URL, { 
-                        method: 'POST',
-                        redirect: 'follow',
-                        headers: { "Content-Type": "text/plain;charset=utf-8" },
-                        body: JSON.stringify(payload) 
-                    });
-                    if(!response.ok) throw new Error("Error HTTP: " + response.status);
-                    
-                } catch (error) {
-                    alert("Error de conexión al intentar eliminar en la nube. Se restaurará el registro en pantalla.\nDetalle: " + error.message);
-                    registrosKardex.splice(indexReal, 0, registroRespaldo); 
+                    let dateStr = String(fechaIso);
+                    if (dateStr.includes("T")) dateStr = dateStr.split("T")[0];
+                    const parts = dateStr.split("-");
+                    if (parts.length === 3 && parts[0].length === 4) return dateStr;
+                    const d = new Date(fechaIso);
+                    if (isNaN(d.getTime())) return "";
+                    return d.toISOString().split('T')[0];
+                } catch (e) { return ""; }
+            }
+
+            // Formato para visualización (DD/MM/YYYY)
+            function formatearFechaDisplay(fechaIso) {
+                if (!fechaIso || fechaIso === "-" || fechaIso === "") return "";
+                try {
+                    let dateStr = String(fechaIso);
+                    if (dateStr.includes("T")) dateStr = dateStr.split("T")[0];
+                    const parts = dateStr.split("-");
+                    if (parts.length === 3 && parts[0].length === 4) {
+                        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+                    }
+                    const d = new Date(fechaIso);
+                    if (isNaN(d.getTime())) return fechaIso;
+                    const day = String(d.getUTCDate()).padStart(2, '0');
+                    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+                    const year = d.getUTCFullYear();
+                    return `${day}/${month}/${year}`;
+                } catch (e) { return fechaIso; }
+            }
+
+            // --- 1. CONFIGURACIÓN DEL BACKEND ---
+            const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz5MvWoG0Bs_ghicjJfuax6b3M3j8mJ7nrCBnvnY4_aZ6RRoIyNqxAqPgjXMV4dPyTh/exec";
+
+            let registrosKardex = [];
+            let catalogoCodigos = [];
+            let indiceEdicionActual = -1;
+            let flujoActual = '';
+            let categoriaSeleccionada = '';
+
+            document.addEventListener("DOMContentLoaded", () => {
+                const hoy = new Date().toLocaleDateString('en-CA');
+                document.getElementById('ing-fecha').value = hoy;
+                cargarDashboard();
+            });
+
+            function cambiarVista(idVista) {
+                document.querySelectorAll('.vista').forEach(el => el.classList.remove('activa'));
+                document.getElementById(idVista).classList.add('activa');
+            }
+
+            // CONTROL DEL FLUJO (Ingreso vs Salida)
+            function iniciarFlujo(flujo) {
+                flujoActual = flujo;
+                document.getElementById('titulo-categoria').innerText = flujo === 'INGRESO' ? '¿Qué tipo de fibra ingresará?' : '¿Qué tipo de fibra retirará?';
+                cambiarVista('vista-categoria');
+            }
+
+            function seleccionarCategoria(cat) {
+                categoriaSeleccionada = cat;
+                const colorClass = cat === "FIBRAS ESPECIALES" ? "text-indigo-700 bg-indigo-100 px-3 py-1 rounded-lg text-lg ml-2" : "text-teal-700 bg-teal-100 px-3 py-1 rounded-lg text-lg ml-2";
+
+                if (flujoActual === 'INGRESO') {
+                    document.getElementById('lbl-categoria-ingreso').innerText = cat;
+                    document.getElementById('lbl-categoria-ingreso').className = colorClass;
+                    cambiarVista('vista-ingreso');
+                } else if (flujoActual === 'SALIDA') {
+                    document.getElementById('lbl-categoria-salida').innerText = cat;
+                    document.getElementById('lbl-categoria-salida').className = colorClass;
+
+                    document.getElementById('sal-codigo').value = '';
+                    document.getElementById('sal-lote').innerHTML = '<option value="">Primero seleccione un código...</option>';
+                    document.getElementById('sal-cantidad').value = '';
+                    document.getElementById('sal-stock-disponible').classList.add('hidden');
+
+                    cambiarVista('vista-salida');
+                }
+            }
+
+            // --- 2. LECTURA DE DATOS (GET) ---
+            async function cargarDashboard() {
+                try {
+                    const response = await fetch(WEB_APP_URL);
+                    if (!response.ok) throw new Error("Error HTTP: " + response.status);
+
+                    const data = await response.json();
+
+                    registrosKardex = data.historico || [];
+                    catalogoCodigos = data.catalogo || [];
+
                     actualizarTabla();
                     actualizarTablaSaldos();
+                    configurarDropdownsCodigo();
+                    configurarDropdownsProveedor();
+                    configurarDropdownsOrigen();
+
+                    const indicador = document.getElementById('estado-conexion');
+                    indicador.classList.replace('bg-slate-700', 'bg-emerald-600');
+                    indicador.innerHTML = '¡Conectado! ✅';
+
+                } catch (error) {
+                    console.error("Error al cargar:", error);
+                    document.getElementById('cuerpo-tabla').innerHTML = `<tr><td colspan="16" class="px-6 py-8 text-center text-rose-500 font-bold">Asegúrate de que el acceso de tu Script en Google Sheets esté configurado como "Cualquier persona".<br><br>Detalle técnico: ${error.message}</td></tr>`;
+                    document.getElementById('estado-conexion').classList.replace('bg-slate-700', 'bg-rose-600');
+                    document.getElementById('estado-conexion').innerHTML = 'Error de Conexión ❌';
                 }
             }
-        }
 
-        // --- ACTUALIZACIÓN DE TABLAS Y GRÁFICOS ---
-        function actualizarGraficosSaldos() {
-            const filas = document.getElementsByClassName('fila-saldo');
-            const dataArticulos = {};
-            const dataLotes = {};
-            let hasData = false;
+            // --- SISTEMA DE AUTOCOMPLETADO VISUAL ---
+            function configurarDropdownsCodigo() {
+                const ingInput = document.getElementById('ing-codigo');
+                const ingDropdown = document.getElementById('dropdown-ing-codigo');
+                const salInput = document.getElementById('sal-codigo');
+                const salDropdown = document.getElementById('dropdown-sal-codigo');
 
-            for (let i = 0; i < filas.length; i++) {
-                if (filas[i].style.display !== "none") {
-                    const articulo = filas[i].querySelector('.celda-articulo').textContent.trim() || "Sin Artículo";
-                    const lote = filas[i].cells[3].textContent.trim();
-                    const saldo = parseFloat(filas[i].cells[6].textContent.replace(/,/g, '')) || 0;
+                function renderLista(input, dropdown) {
+                    const query = input.value.toLowerCase();
+                    dropdown.innerHTML = '';
 
-                    if (saldo > 0) { // Solo consideramos saldos positivos para las gráficas
-                        // Acumular por Artículo para gráfico de barras
-                        dataArticulos[articulo] = (dataArticulos[articulo] || 0) + saldo;
-                        
-                        // Acumular por Lote para gráfico de donas
-                        // Se agrega una versión corta del artículo para el tooltip/leyenda
-                        const articuloCorto = articulo !== "Sin Artículo" ? articulo.substring(0, 12) + "..." : "";
-                        const labelLote = `${lote} (${articuloCorto})`;
-                        dataLotes[labelLote] = (dataLotes[labelLote] || 0) + saldo;
-                        
-                        hasData = true;
+                    const filtrados = catalogoCodigos.filter(item =>
+                        String(item.codigo).toLowerCase().includes(query) || String(item.articulo).toLowerCase().includes(query)
+                    );
+
+                    if (filtrados.length === 0) {
+                        dropdown.innerHTML = '<div class="p-4 text-sm text-gray-500 italic text-center">Sin coincidencias</div>';
+                    } else {
+                        filtrados.forEach(item => {
+                            const div = document.createElement('div');
+                            div.className = "px-4 py-2 border-b border-gray-100 hover:bg-slate-100 cursor-pointer flex flex-col";
+                            div.innerHTML = `<span class="font-bold text-slate-800 text-sm">${item.codigo}</span><span class="text-xs text-slate-500 truncate">${item.articulo}</span>`;
+                            div.onmousedown = (e) => {
+                                e.preventDefault();
+                                input.value = item.codigo;
+                                dropdown.classList.add('hidden');
+                                input.dispatchEvent(new Event('input'));
+                            };
+                            dropdown.appendChild(div);
+                        });
+                    }
+                    dropdown.classList.remove('hidden');
+                }
+
+                if (ingInput) {
+                    ingInput.addEventListener('focus', () => renderLista(ingInput, ingDropdown));
+                    ingInput.addEventListener('input', () => renderLista(ingInput, ingDropdown));
+                    ingInput.addEventListener('blur', () => setTimeout(() => ingDropdown.classList.add('hidden'), 150));
+                }
+
+                if (salInput) {
+                    salInput.addEventListener('focus', () => renderLista(salInput, salDropdown));
+                    salInput.addEventListener('input', () => renderLista(salInput, salDropdown));
+                    salInput.addEventListener('blur', () => setTimeout(() => salDropdown.classList.add('hidden'), 150));
+                }
+            }
+
+            document.getElementById('ing-codigo').addEventListener('input', function (e) {
+                const codigoIngresado = e.target.value.trim();
+                const itemEncontrado = catalogoCodigos.find(c => String(c.codigo) === String(codigoIngresado));
+                document.getElementById('ing-articulo').value = itemEncontrado ? itemEncontrado.articulo : "";
+
+                // Sugerencias de Lote para Ingreso
+                const dlLotes = document.getElementById('lista-lotes-ingreso');
+                if (dlLotes) {
+                    dlLotes.innerHTML = '';
+                    if (codigoIngresado) {
+                        const lotesExistentes = registrosKardex
+                            .filter(reg => String(reg.codigo) === codigoIngresado && reg.lote && String(reg.lote).trim() !== "-")
+                            .map(reg => reg.lote);
+                        const lotesUnicos = [...new Set(lotesExistentes)];
+                        lotesUnicos.forEach(lote => {
+                            const opt = document.createElement('option');
+                            opt.value = lote;
+                            dlLotes.appendChild(opt);
+                        });
                     }
                 }
-            }
-
-            const contenedorGraficos = document.getElementById('contenedor-graficos');
-            if (!hasData) {
-                contenedorGraficos.style.display = 'none';
-                return;
-            }
-            contenedorGraficos.style.display = 'grid'; // Mostrar grid lg:grid-cols-2
-
-            // Paleta de colores extensa y moderna
-            const bgColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#84cc16'];
-
-            // 1. Gráfico de Barras (Stock por Artículo)
-            const ctxArt = document.getElementById('chartArticulos').getContext('2d');
-            if (chartArticulosInstance) chartArticulosInstance.destroy();
-            chartArticulosInstance = new Chart(ctxArt, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(dataArticulos),
-                    datasets: [{
-                        label: 'Stock Actual (KG)',
-                        data: Object.values(dataArticulos),
-                        backgroundColor: '#3b82f6',
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
-                }
             });
 
-            // 2. Gráfico de Donas (Stock por Lote)
-            const ctxLotes = document.getElementById('chartLotes').getContext('2d');
-            if (chartLotesInstance) chartLotesInstance.destroy();
-            chartLotesInstance = new Chart(ctxLotes, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(dataLotes),
-                    datasets: [{
-                        data: Object.values(dataLotes),
-                        backgroundColor: bgColors,
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { position: 'right', labels: { boxWidth: 12, font: {size: 10} } } 
+            function configurarDropdownsProveedor() {
+                const dlProv = document.getElementById('lista-proveedores-ingreso');
+                if (dlProv && registrosKardex.length > 0) {
+                    dlProv.innerHTML = '';
+                    const provs = registrosKardex
+                        .map(reg => reg.proveedor || reg.PROVEEDOR)
+                        .filter(p => p && p !== "-");
+                    const provsUnicos = [...new Set(provs)].sort();
+                    provsUnicos.forEach(p => {
+                        const opt = document.createElement('option');
+                        opt.value = p;
+                        dlProv.appendChild(opt);
+                    });
+                }
+            }
+
+            function configurarDropdownsOrigen() {
+                const dlOri = document.getElementById('lista-origen-ingreso');
+                if (dlOri && registrosKardex.length > 0) {
+                    dlOri.innerHTML = '';
+                    const oris = registrosKardex
+                        .map(reg => reg.origen || reg.ORIGEN)
+                        .filter(o => o && o !== "-");
+                    const orisUnicos = [...new Set(oris)].sort();
+                    orisUnicos.forEach(o => {
+                        const opt = document.createElement('option');
+                        opt.value = o;
+                        dlOri.appendChild(opt);
+                    });
+                }
+            }
+
+            function calcularSaldoStock(codigo, lote, categoria) {
+                let saldo = 0;
+                registrosKardex.forEach(reg => {
+                    const catReg = reg.categoria || reg.CATEGORIA || "-";
+                    if (String(reg.codigo) === String(codigo) && String(reg.lote) === String(lote) && (!categoria || catReg === categoria)) {
+                        const cant = parseFloat(reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad)) || 0;
+                        if (String(reg.tipo).toUpperCase() === 'INGRESO') saldo += cant;
+                        else saldo -= Math.abs(cant);
                     }
-                }
-            });
-        }
-
-        function actualizarTablaSaldos() {
-            const tbody = document.getElementById('cuerpo-tabla-saldos');
-            const saldos = {}; 
-            registrosKardex.forEach(reg => {
-                if(!reg.codigo) return; 
-                const key = `${reg.codigo}__|__${reg.lote}`;
-                if (!saldos[key]) {
-                    const itemCat = catalogoCodigos.find(c => String(c.codigo) === String(reg.codigo));
-                    const nombreArt = itemCat ? itemCat.articulo : (reg.articulo && String(reg.articulo).trim() !== "-" && String(reg.articulo).trim() !== "" ? reg.articulo : "-");
-                    const catFibra = reg.categoria || reg.CATEGORIA || "-";
-
-                    saldos[key] = { categoria: catFibra, codigo: reg.codigo, articulo: nombreArt, lote: reg.lote, ingresos: 0, salidas: 0, saldo: 0 };
-                }
-                const valorPeso = reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad);
-                const cant = parseFloat(valorPeso) || 0;
-                if (String(reg.tipo).toUpperCase() === 'INGRESO') saldos[key].ingresos += cant;
-                else saldos[key].salidas += Math.abs(cant);
-                
-                saldos[key].saldo = saldos[key].ingresos - saldos[key].salidas;
-            });
-
-            tbody.innerHTML = '';
-            const saldosArray = Object.values(saldos);
-            if(saldosArray.length === 0){
-                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500 italic">No hay stock registrado.</td></tr>`;
-                document.getElementById('pie-tabla-saldos').classList.add('hidden');
-                document.getElementById('contenedor-graficos').style.display = 'none';
-                return;
+                });
+                return saldo;
             }
 
-            saldosArray.forEach(item => {
-                const colorSaldo = item.saldo > 0 ? 'text-blue-700 bg-blue-50' : (item.saldo < 0 ? 'text-rose-600' : 'text-gray-500');
-                const tr = document.createElement('tr');
-                tr.classList.add('hover:bg-blue-50', 'transition-colors', 'fila-saldo'); 
-                tr.innerHTML = `
-                    <td class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap celda-cat">${item.categoria}</td>
-                    <td class="px-4 py-3 font-semibold text-slate-800 whitespace-nowrap celda-codigo">${item.codigo}</td>
-                    <td class="px-4 py-3 font-medium text-slate-700 whitespace-nowrap celda-articulo">${item.articulo}</td>
-                    <td class="px-4 py-3 text-slate-600 whitespace-nowrap">${item.lote}</td>
-                    <td class="px-4 py-3 text-right text-emerald-600 whitespace-nowrap">${formatearNumero(item.ingresos)}</td>
-                    <td class="px-4 py-3 text-right text-rose-600 whitespace-nowrap">${formatearNumero(item.salidas)}</td>
-                    <td class="px-4 py-3 text-right font-bold text-lg ${colorSaldo} whitespace-nowrap">${formatearNumero(item.saldo)}</td>
-                `;
-                tbody.appendChild(tr);
+            document.getElementById('sal-codigo').addEventListener('input', function (e) {
+                const codigoSeleccionado = e.target.value.trim();
+                const selectLoteSalida = document.getElementById('sal-lote');
+                const lblStock = document.getElementById('sal-stock-disponible');
+
+                if (!selectLoteSalida) return;
+                selectLoteSalida.innerHTML = '<option value="">Seleccione un lote...</option>';
+                lblStock.classList.add('hidden');
+                document.getElementById('sal-cantidad').max = "";
+                document.getElementById('sal-cantidad').value = "";
+
+                if (!codigoSeleccionado) {
+                    selectLoteSalida.innerHTML = '<option value="">Primero seleccione un código...</option>';
+                    return;
+                }
+
+                const lotesDelCodigo = registrosKardex
+                    .filter(reg => String(reg.codigo) === codigoSeleccionado && reg.lote && String(reg.lote).trim() !== "-" && String(reg.lote).trim() !== "" && (reg.categoria || reg.CATEGORIA || "-") === categoriaSeleccionada)
+                    .map(reg => reg.lote);
+
+                const lotesUnicos = [...new Set(lotesDelCodigo)];
+                let opcionesHTML = `<option value="">Seleccione el lote a retirar...</option>`;
+                let lotesConStock = 0;
+
+                lotesUnicos.forEach(lote => {
+                    const saldoActual = calcularSaldoStock(codigoSeleccionado, lote, categoriaSeleccionada);
+                    if (saldoActual > 0) {
+                        opcionesHTML += `<option value="${lote}">${lote} (Disp: ${formatearNumero(saldoActual)} KG)</option>`;
+                        lotesConStock++;
+                    }
+                });
+
+                if (lotesConStock === 0) opcionesHTML = `<option value="">Sin lotes con stock para este código en esta categoría</option>`;
+                selectLoteSalida.innerHTML = opcionesHTML;
             });
-            
-            document.getElementById('pie-tabla-saldos').classList.remove('hidden');
-            calcularSubtotalSaldos();
-        }
 
-        function filtrarSaldos() {
-            const fCat = document.getElementById('fs-categoria').value.toLowerCase();
-            const fCodigo = document.getElementById('fs-codigo').value.toLowerCase();
-            const fArticulo = document.getElementById('fs-articulo').value.toLowerCase();
-            const fLote = document.getElementById('fs-lote').value.toLowerCase();
+            document.getElementById('sal-lote').addEventListener('change', function (e) {
+                const codigoSeleccionado = document.getElementById('sal-codigo').value.trim();
+                const loteSeleccionado = e.target.value.trim();
+                const lblStock = document.getElementById('sal-stock-disponible');
+                const inputCantidad = document.getElementById('sal-cantidad');
 
-            const filas = document.getElementsByClassName('fila-saldo');
-            for (let i = 0; i < filas.length; i++) {
-                const txtCat = filas[i].querySelector('.celda-cat').textContent.toLowerCase();
-                const txtC = filas[i].querySelector('.celda-codigo').textContent.toLowerCase();
-                const txtA = filas[i].querySelector('.celda-articulo').textContent.toLowerCase();
-                const txtL = filas[i].cells[3].textContent.toLowerCase();
-
-                if ((fCat === "" || txtCat.includes(fCat)) && txtC.includes(fCodigo) && txtA.includes(fArticulo) && txtL.includes(fLote)) {
-                    filas[i].style.display = "";
+                if (codigoSeleccionado && loteSeleccionado) {
+                    const saldo = calcularSaldoStock(codigoSeleccionado, loteSeleccionado, categoriaSeleccionada);
+                    if (saldo > 0) {
+                        lblStock.innerHTML = `Stock disponible: <span>${formatearNumero(saldo)}</span> KG`;
+                        lblStock.className = "text-sm font-semibold mt-2 text-blue-600";
+                        inputCantidad.max = saldo;
+                    } else {
+                        lblStock.innerHTML = `⚠️ Sin stock disponible (0 KG)`;
+                        lblStock.className = "text-sm font-semibold mt-2 text-rose-600";
+                        inputCantidad.max = 0;
+                    }
                 } else {
-                    filas[i].style.display = "none";
+                    lblStock.classList.add('hidden');
+                    inputCantidad.max = "";
+                }
+            });
+
+            // --- 3. ESCRITURA INGRESO ---
+            async function guardarIngreso(e) {
+                e.preventDefault();
+                const btn = document.getElementById('btn-submit-ingreso');
+                const textoOriginal = btn.innerHTML;
+                btn.innerHTML = `<div class="loader mr-2"></div> ENVIANDO...`;
+                btn.disabled = true;
+
+                const cant = parseFloat(document.getElementById('ing-cantidad').value);
+                const nuevoRegistro = {
+                    fechaMovimiento: document.getElementById('ing-fecha').value,
+                    categoria: categoriaSeleccionada,
+                    codigo: document.getElementById('ing-codigo').value,
+                    lote: document.getElementById('ing-lote').value,
+                    caracteristicas: document.getElementById('ing-caracteristicas').value || "-",
+                    articulo: document.getElementById('ing-articulo').value || "-",
+                    tipo: 'INGRESO', peso: cant, cantidad: cant,
+                    proveedor: document.getElementById('ing-proveedor').value || "-",
+                    origen: document.getElementById('ing-origen').value || "-",
+                    fLlegada: document.getElementById('ing-fllegada').value || "-",
+                    andamio: document.getElementById('ing-andamio').value || "-",
+                    nCaja: document.getElementById('ing-ncaja').value || "-",
+                    presentacion: document.getElementById('ing-presentacion').value || "-",
+                    certificado: document.getElementById('ing-certificado').value || "-"
+                };
+
+                try {
+                    const response = await fetch(WEB_APP_URL, {
+                        method: 'POST',
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify(nuevoRegistro)
+                    });
+                    if (!response.ok) throw new Error("Error HTTP: " + response.status);
+
+                    alert('¡Ingreso registrado exitosamente!');
+                    document.getElementById('form-ingreso').reset();
+                    document.getElementById('ing-fecha').value = new Date().toLocaleDateString('en-CA');
+                    
+                    // Si NO es Carga Masiva, regresamos al menú. 
+                    // Si SÍ ES, nos quedamos y el reset ya limpió los campos.
+                    if (!document.getElementById('ing-carga-masiva').checked) {
+                        cambiarVista('vista-menu');
+                    }
+                    cargarDashboard();
+                } catch (error) {
+                    alert('Hubo un error de conexión al enviar: ' + error.message);
+                } finally {
+                    btn.innerHTML = textoOriginal;
+                    btn.disabled = false;
                 }
             }
-            calcularSubtotalSaldos();
-        }
 
-        function calcularSubtotalSaldos() {
-            const filas = document.getElementsByClassName('fila-saldo');
-            let subIngresos = 0, subSalidas = 0, subNeto = 0;
-            
-            for (let i = 0; i < filas.length; i++) {
-                if (filas[i].style.display !== "none") {
-                    subIngresos += parseFloat(filas[i].cells[4].textContent.replace(/,/g, '')) || 0;
-                    subSalidas += parseFloat(filas[i].cells[5].textContent.replace(/,/g, '')) || 0;
-                    subNeto += parseFloat(filas[i].cells[6].textContent.replace(/,/g, '')) || 0;
+            // --- 4. ESCRITURA SALIDA ---
+            async function guardarSalida(e) {
+                e.preventDefault();
+                const btn = document.getElementById('btn-submit-salida');
+                const btnOriginal = btn.innerHTML;
+                btn.innerHTML = `<div class="loader mr-2"></div> REGISTRANDO...`;
+                btn.disabled = true;
+
+                const codigo = document.getElementById('sal-codigo').value.trim();
+                const lote = document.getElementById('sal-lote').value.trim();
+                const cantRequerida = Math.abs(parseFloat(document.getElementById('sal-cantidad').value));
+                const saldoActual = calcularSaldoStock(codigo, lote, categoriaSeleccionada);
+
+                if (saldoActual <= 0 || cantRequerida > saldoActual) {
+                    alert(`⚠️ Error de Stock:\nEstás intentando retirar ${formatearNumero(cantRequerida)} KG, pero el stock es de ${formatearNumero(saldoActual)} KG.`);
+                    btn.innerHTML = btnOriginal;
+                    btn.disabled = false;
+                    return;
+                }
+
+                const cantSalida = -cantRequerida;
+                const nuevoRegistro = {
+                    fechaMovimiento: new Date().toISOString().split('T')[0],
+                    categoria: categoriaSeleccionada,
+                    codigo: codigo, lote: lote, caracteristicas: "-", articulo: "", tipo: 'SALIDA',
+                    peso: cantSalida, cantidad: cantSalida,
+                    proveedor: "-", origen: "-", fLlegada: "-", andamio: "-", nCaja: "-", presentacion: "-", certificado: "-"
+                };
+
+                try {
+                    const response = await fetch(WEB_APP_URL, {
+                        method: 'POST',
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify(nuevoRegistro)
+                    });
+                    if (!response.ok) throw new Error("Error HTTP: " + response.status);
+
+                    alert('¡Salida registrada exitosamente!');
+                    document.getElementById('form-salida').reset();
+                    
+                    // Si NO es Carga Masiva, regresamos al menú.
+                    if (!document.getElementById('sal-carga-masiva').checked) {
+                        cambiarVista('vista-menu');
+                    }
+                    cargarDashboard();
+                } catch (error) {
+                    alert('Error al procesar la salida: ' + error.message);
+                } finally {
+                    btn.innerHTML = btnOriginal;
+                    btn.disabled = false;
                 }
             }
 
-            document.getElementById('subtotal-ingresos-saldos').textContent = formatearNumero(subIngresos);
-            document.getElementById('subtotal-salidas-saldos').textContent = formatearNumero(subSalidas);
-            
-            const elNeto = document.getElementById('subtotal-neto-saldos');
-            elNeto.textContent = formatearNumero(subNeto);
-            
-            if (subNeto > 0) {
-                elNeto.className = "px-4 py-3 text-right text-lg font-bold text-blue-800";
-            } else if (subNeto < 0) {
-                elNeto.className = "px-4 py-3 text-right text-lg font-bold text-rose-700";
-            } else {
-                elNeto.className = "px-4 py-3 text-right text-lg font-bold text-slate-800";
-            }
+            // --- EDICIÓN Y ELIMINACIÓN CONECTADA A GOOGLE SHEETS (Backend) ---
+            function abrirModalEditar(indexReal) {
+                indiceEdicionActual = indexReal;
+                const reg = registrosKardex[indexReal];
 
-            // Actualizar Gráficos cada vez que se calcula un subtotal (incluso en filtros)
-            actualizarGraficosSaldos();
-        }
+                document.getElementById('ed-fecha').value = formatearFechaInput(reg.fechaMovimiento);
+                document.getElementById('ed-categoria').value = reg.categoria || reg.CATEGORIA || "-";
+                document.getElementById('ed-codigo').value = reg.codigo;
+                document.getElementById('ed-lote').value = reg.lote;
+                document.getElementById('ed-caracteristicas').value = reg.caracteristicas || "";
+                document.getElementById('ed-tipo').value = String(reg.tipo).toUpperCase() === 'INGRESO' ? 'INGRESO' : 'SALIDA';
 
-        function actualizarTabla() {
-            const tbody = document.getElementById('cuerpo-tabla');
-            document.getElementById('contador-registros').innerText = registrosKardex.length;
-            
-            if (registrosKardex.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="16" class="px-6 py-8 text-center text-gray-500 italic">No hay movimientos registrados.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = '';
-            
-            for(let i = registrosKardex.length - 1; i >= 0; i--) {
-                const reg = registrosKardex[i];
-                const isIngreso = String(reg.tipo).toUpperCase() === 'INGRESO';
-                const colorTipo = isIngreso ? '<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold">IN</span>' : '<span class="bg-rose-100 text-rose-800 px-2 py-0.5 rounded text-[10px] font-bold">OUT</span>';
-                const colorCantidad = isIngreso ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold';
-                
-                const valorPeso = reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad);
-                const catFibra = reg.categoria || reg.CATEGORIA || "-";
                 const itemCat = catalogoCodigos.find(c => String(c.codigo) === String(reg.codigo));
-                const nombreArticulo = itemCat ? itemCat.articulo : (reg.articulo && String(reg.articulo).trim() !== "-" && String(reg.articulo).trim() !== "" ? reg.articulo : "-");
+                const nombreArt = itemCat ? itemCat.articulo : (reg.articulo || reg.ARTICULO || "-");
+                document.getElementById('ed-articulo').value = nombreArt;
 
-                const tr = document.createElement('tr');
-                tr.classList.add('hover:bg-slate-50', 'transition-colors', 'fila-historico');
+                const valorPeso = reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad);
+                document.getElementById('ed-cantidad').value = Math.abs(parseFloat(valorPeso) || 0);
+
+                document.getElementById('ed-proveedor').value = reg.proveedor || "";
+                document.getElementById('ed-origen').value = reg.origen || "";
+                document.getElementById('ed-fllegada').value = formatearFechaInput(reg.fLlegada);
+                document.getElementById('ed-andamio').value = reg.andamio || "";
+                document.getElementById('ed-ncaja').value = reg.nCaja || "";
+                document.getElementById('ed-presentacion').value = reg.presentacion || "";
+                document.getElementById('ed-certificado').value = reg.certificado || "";
+
+                document.getElementById('modal-editar').classList.remove('hidden');
+            }
+
+            function cerrarModalEditar() {
+                document.getElementById('modal-editar').classList.add('hidden');
+                indiceEdicionActual = -1;
+            }
+
+            async function guardarEdicionLocal(e) {
+                e.preventDefault();
+                if (indiceEdicionActual === -1) return;
+
+                const btn = e.target.querySelector('button[type="submit"]');
+                const textoOriginal = btn.innerHTML;
+                btn.innerHTML = `<div class="loader mr-2"></div> Guardando...`;
+                btn.disabled = true;
+
+                let cant = parseFloat(document.getElementById('ed-cantidad').value);
+                const tipo = document.getElementById('ed-tipo').value;
+                if (tipo === 'SALIDA') cant = -Math.abs(cant);
+
+                const filaEnExcel = indiceEdicionActual + 2;
+
+                const registroEditado = {
+                    ...registrosKardex[indiceEdicionActual],
+                    fechaMovimiento: document.getElementById('ed-fecha').value,
+                    categoria: document.getElementById('ed-categoria').value,
+                    codigo: document.getElementById('ed-codigo').value,
+                    lote: document.getElementById('ed-lote').value,
+                    caracteristicas: document.getElementById('ed-caracteristicas').value || "-",
+                    articulo: document.getElementById('ed-articulo').value || "-",
+                    tipo: tipo,
+                    peso: cant,
+                    cantidad: cant,
+                    proveedor: document.getElementById('ed-proveedor').value || "-",
+                    origen: document.getElementById('ed-origen').value || "-",
+                    fLlegada: document.getElementById('ed-fllegada').value || "-",
+                    andamio: document.getElementById('ed-andamio').value || "-",
+                    nCaja: document.getElementById('ed-ncaja').value || "-",
+                    presentacion: document.getElementById('ed-presentacion').value || "-",
+                    certificado: document.getElementById('ed-certificado').value || "-"
+                };
+
+                const payload = {
+                    ...registroEditado,
+                    accion_bd: 'EDITAR',
+                    fila_excel: filaEnExcel
+                };
+
+                try {
+                    const response = await fetch(WEB_APP_URL, {
+                        method: 'POST',
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error("Error HTTP: " + response.status);
+
+                    registrosKardex[indiceEdicionActual] = registroEditado;
+                    cerrarModalEditar();
+                    actualizarTabla();
+                    actualizarTablaSaldos();
+                    alert("Registro actualizado en la base de datos.");
+                } catch (error) {
+                    alert('No se pudo guardar en la nube: ' + error.message);
+                } finally {
+                    btn.innerHTML = textoOriginal;
+                    btn.disabled = false;
+                }
+            }
+
+            async function eliminarRegistro(indexReal) {
+                if (confirm("¿Estás seguro de eliminar este registro permanentemente de la base de datos?")) {
+                    const filaEnExcel = indexReal + 2;
+                    const registroRespaldo = registrosKardex[indexReal];
+
+                    registrosKardex.splice(indexReal, 1);
+                    actualizarTabla();
+                    actualizarTablaSaldos();
+
+                    try {
+                        const payload = { accion_bd: 'ELIMINAR', fila_excel: filaEnExcel };
+                        const response = await fetch(WEB_APP_URL, {
+                            method: 'POST',
+                            headers: { "Content-Type": "text/plain;charset=utf-8" },
+                            body: JSON.stringify(payload)
+                        });
+                        if (!response.ok) throw new Error("Error HTTP: " + response.status);
+
+                    } catch (error) {
+                        alert("Error de conexión al intentar eliminar en la nube. Se restaurará el registro en pantalla.\nDetalle: " + error.message);
+                        registrosKardex.splice(indexReal, 0, registroRespaldo);
+                        actualizarTabla();
+                        actualizarTablaSaldos();
+                    }
+                }
+            }
+
+            // --- ACTUALIZACIÓN DE TABLAS Y GRÁFICOS ---
+            function actualizarGraficosSaldos() {
+                const filas = document.getElementsByClassName('fila-saldo');
+                const dataArticulos = {};
+                const dataCertificados = {};
+                let hasData = false;
+
+                for (let i = 0; i < filas.length; i++) {
+                    if (filas[i].style.display !== "none") {
+                        const articulo = filas[i].querySelector('.celda-articulo').textContent.trim() || "Sin Artículo";
+                        const codigo = filas[i].querySelector('.celda-codigo').textContent.trim();
+                        const lote = filas[i].cells[2].textContent.trim();
+                        const saldo = parseFloat(filas[i].cells[6].textContent.replace(/,/g, '')) || 0;
+
+                        if (saldo > 0) { 
+                            // Acumular por Artículo para gráfico de barras
+                            dataArticulos[articulo] = (dataArticulos[articulo] || 0) + saldo;
+
+                            // Buscar el certificado en los registros originales para este código/lote
+                            const regOriginal = registrosKardex.find(r => String(r.codigo) === codigo && String(r.lote) === lote && r.tipo === 'INGRESO');
+                            const cert = regOriginal ? (regOriginal.certificado || regOriginal.CERTIFICADO || "SIN CERTIFICADO") : "SIN CERTIFICADO";
+                            
+                            dataCertificados[cert] = (dataCertificados[cert] || 0) + saldo;
+                            hasData = true;
+                        }
+                    }
+                }
+
+                const contenedorGraficos = document.getElementById('contenedor-graficos');
+                if (!hasData) {
+                    contenedorGraficos.classList.add('hidden');
+                    return;
+                }
+
+                // Paleta de colores
+                const bgColors = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#84cc16'];
+
+                // 1. Gráfico de Barras Horizontal (Top 20 ordenado)
+                const sortedArtEntries = Object.entries(dataArticulos)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 20); // Limitamos al Top 20 para legibilidad
                 
-                tr.innerHTML = `
-                    <td class="px-2 py-1.5 text-xs whitespace-nowrap">${formatearFechaCorto(reg.fechaMovimiento)}</td>
+                const sortedLabels = sortedArtEntries.map(e => e[0]);
+                const sortedValues = sortedArtEntries.map(e => e[1]);
+
+                const ctxArt = document.getElementById('chartArticulos').getContext('2d');
+                if (chartArticulosInstance) chartArticulosInstance.destroy();
+                chartArticulosInstance = new Chart(ctxArt, {
+                    type: 'bar',
+                    plugins: [ChartDataLabels],
+                    data: {
+                        labels: sortedLabels,
+                        datasets: [{
+                            label: 'Stock Actual (KG)',
+                            data: sortedValues,
+                            backgroundColor: '#6366f1',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y', 
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            datalabels: {
+                                anchor: 'end',
+                                align: 'right',
+                                color: '#4b5563',
+                                font: { weight: 'bold', size: 10 },
+                                formatter: (value) => formatearNumero(value)
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => `${formatearNumero(context.parsed.x)} KG`
+                                }
+                            }
+                        },
+                        scales: {
+                            x: { 
+                                beginAtZero: true, 
+                                grid: { display: false },
+                                ticks: { padding: 40 } // Espacio para que quepan los numeritos a la derecha
+                            },
+                            y: { grid: { display: false }, ticks: { font: { size: 9 } } }
+                        }
+                    }
+                });
+
+                // 2. Gráfico de Donas con Datalabels Plugin
+                const ctxDona = document.getElementById('chartLotes').getContext('2d');
+                if (chartLotesInstance) chartLotesInstance.destroy();
+                chartLotesInstance = new Chart(ctxDona, {
+                    type: 'doughnut',
+                    plugins: [ChartDataLabels],
+                    data: {
+                        labels: Object.keys(dataCertificados),
+                        datasets: [{
+                            data: Object.values(dataCertificados),
+                            backgroundColor: bgColors,
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { 
+                                position: 'right', 
+                                labels: { boxWidth: 12, font: { size: 10 } } 
+                            },
+                            datalabels: {
+                                color: '#fff',
+                                font: { weight: 'bold', size: 10 },
+                                formatter: (value, ctx) => {
+                                    const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(0);
+                                    return percentage > 5 ? `${formatearNumero(value)}` : '';
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const value = context.parsed || 0;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((value / total) * 100).toFixed(1) + '%';
+                                        return `${context.label}: ${formatearNumero(value)} KG (${percentage})`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            function toggleGraficos() {
+                const contenedor = document.getElementById('contenedor-graficos');
+                const btn = document.getElementById('btn-toggle-graficos');
+                
+                if (contenedor.classList.contains('hidden')) {
+                    contenedor.classList.remove('hidden');
+                    btn.innerHTML = '📈 Ocultar Gráficos';
+                    btn.classList.replace('bg-indigo-50', 'bg-slate-800');
+                    btn.classList.replace('text-indigo-700', 'text-white');
+                    actualizarGraficosSaldos();
+                } else {
+                    contenedor.classList.add('hidden');
+                    btn.innerHTML = '📈 Ver Gráficos';
+                    btn.classList.replace('bg-slate-800', 'bg-indigo-50');
+                    btn.classList.replace('text-white', 'text-indigo-700');
+                }
+            }
+
+            function actualizarTablaSaldos() {
+                const tbody = document.getElementById('cuerpo-tabla-saldos');
+                const saldos = {};
+                registrosKardex.forEach(reg => {
+                    if (!reg.codigo) return;
+                    const key = `${reg.codigo}__|__${reg.lote}`;
+                    if (!saldos[key]) {
+                        const itemCat = catalogoCodigos.find(c => String(c.codigo) === String(reg.codigo));
+                        const nombreArt = itemCat ? itemCat.articulo : (reg.articulo && String(reg.articulo).trim() !== "-" && String(reg.articulo).trim() !== "" ? reg.articulo : "-");
+                        const catFibra = (reg.categoria || reg.CATEGORIA || "SIN CATEGORÍA").toUpperCase();
+                        
+                        // Obtener Certificado (solo de registros de INGRESO para consistencia)
+                        const regIng = registrosKardex.find(r => r.codigo === reg.codigo && r.lote === reg.lote && r.tipo === 'INGRESO');
+                        const cert = regIng ? (regIng.certificado || regIng.CERTIFICADO || "SIN CERTIFICADO") : "SIN CERTIFICADO";
+
+                        saldos[key] = { categoria: catFibra, codigo: reg.codigo, articulo: nombreArt, lote: reg.lote, certificado: cert, ingresos: 0, salidas: 0, saldo: 0 };
+                    }
+                    const valorPeso = reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad);
+                    const cant = parseFloat(valorPeso) || 0;
+                    if (String(reg.tipo).toUpperCase() === 'INGRESO') saldos[key].ingresos += cant;
+                    else saldos[key].salidas += Math.abs(cant);
+
+                    saldos[key].saldo = saldos[key].ingresos - saldos[key].salidas;
+                });
+
+                tbody.innerHTML = '';
+                const saldosArray = Object.values(saldos);
+                if (saldosArray.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-8 text-center text-gray-500 italic">No hay stock registrado.</td></tr>`;
+                    document.getElementById('pie-tabla-saldos').classList.add('hidden');
+                    document.getElementById('contenedor-graficos').style.display = 'none';
+                    return;
+                }
+
+                // Poblar filtro de certificados dinámicamente si no hay selección actual
+                const selectCert = document.getElementById('fs-certificado');
+                const certActual = selectCert.value;
+                const uniqueCerts = [...new Set(saldosArray.map(i => i.certificado))].sort();
+                selectCert.innerHTML = '<option value="">TODOS LOS CERTIFICADOS</option>';
+                uniqueCerts.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c;
+                    opt.textContent = c;
+                    if (c === certActual) opt.selected = true;
+                    selectCert.appendChild(opt);
+                });
+
+                const categorias = ["FIBRAS ESPECIALES", "FIBRAS DE PRODUCCIÓN"];
+                
+                categorias.forEach(cat => {
+                    const itemsCat = saldosArray.filter(i => i.categoria === cat);
+                    if (itemsCat.length > 0) {
+                        // Fila de Encabezado de Grupo
+                        const trHeader = document.createElement('tr');
+                        trHeader.className = "bg-slate-100 group-header";
+                        trHeader.innerHTML = `<td colspan="7" class="px-4 py-2 font-black text-slate-800 border-y border-slate-200 text-center uppercase tracking-widest text-xs">${cat}</td>`;
+                        tbody.appendChild(trHeader);
+
+                        itemsCat.forEach(item => {
+                            const colorSaldo = item.saldo > 0 ? 'text-blue-700 bg-blue-50' : (item.saldo < 0 ? 'text-rose-600' : 'text-gray-500');
+                            const tr = document.createElement('tr');
+                            tr.classList.add('hover:bg-blue-50', 'transition-colors', 'fila-saldo');
+                            // Atributo personalizado para facilitar el filtrado por categoria
+                            tr.setAttribute('data-categoria', item.categoria); 
+                            
+                            tr.innerHTML = `
+                                <td class="px-4 py-3 font-semibold text-slate-800 whitespace-nowrap celda-codigo">${item.codigo}</td>
+                                <td class="px-4 py-3 font-medium text-slate-700 celda-articulo">${item.articulo}</td>
+                                <td class="px-4 py-3 text-slate-600 whitespace-nowrap">${item.lote}</td>
+                                <td class="px-4 py-3 text-slate-500 text-xs font-bold celda-certificado">${item.certificado}</td>
+                            <td class="px-4 py-3 text-right text-emerald-600 whitespace-nowrap">${formatearNumero(item.ingresos)}</td>
+                            <td class="px-4 py-3 text-right text-rose-600 whitespace-nowrap">${formatearNumero(item.salidas)}</td>
+                            <td class="px-4 py-3 text-right font-black text-sm ${colorSaldo} whitespace-nowrap">
+                                ${formatearNumero(item.saldo)}
+                            </td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                    }
+                });
+
+                document.getElementById('pie-tabla-saldos').classList.remove('hidden');
+                calcularSubtotalSaldos();
+            }
+
+            function filtrarSaldos() {
+                const fCat = document.getElementById('fs-categoria').value.toUpperCase();
+                const fCodigo = document.getElementById('fs-codigo').value.toLowerCase();
+                const fArticulo = document.getElementById('fs-articulo').value.toLowerCase();
+                const fLote = document.getElementById('fs-lote').value.toLowerCase();
+                const fCert = document.getElementById('fs-certificado').value.toLowerCase();
+
+                const filas = document.getElementsByClassName('fila-saldo');
+                for (let i = 0; i < filas.length; i++) {
+                    const txtCat = filas[i].getAttribute('data-categoria') || "";
+                    const txtC = filas[i].querySelector('.celda-codigo').textContent.toLowerCase();
+                    const txtA = filas[i].querySelector('.celda-articulo').textContent.toLowerCase();
+                    const txtL = filas[i].cells[2].textContent.toLowerCase();
+                    const txtCert = filas[i].querySelector('.celda-certificado').textContent.toLowerCase();
+
+                    const cumpleFiltros = (fCat === "" || txtCat === fCat) && 
+                                          txtC.includes(fCodigo) && 
+                                          txtA.includes(fArticulo) && 
+                                          txtL.includes(fLote) &&
+                                          (fCert === "" || txtCert === fCert);
+
+                    filas[i].style.display = cumpleFiltros ? "" : "none";
+                }
+                
+                // Ocultar/Mostrar encabezados de grupo según si tienen filas visibles
+                const headers = document.getElementsByClassName('group-header');
+                for (let h of headers) {
+                    let nextEl = h.nextElementSibling;
+                    let hasVisible = false;
+                    while (nextEl && nextEl.classList.contains('fila-saldo')) {
+                        if (nextEl.style.display !== "none") {
+                            hasVisible = true;
+                            break;
+                        }
+                        nextEl = nextEl.nextElementSibling;
+                    }
+                    h.style.display = hasVisible ? "" : "none";
+                }
+
+                calcularSubtotalSaldos();
+            }
+
+            function calcularSubtotalSaldos() {
+                const filas = document.getElementsByClassName('fila-saldo');
+                let subIngresos = 0, subSalidas = 0, subNeto = 0;
+
+                for (let i = 0; i < filas.length; i++) {
+                    if (filas[i].style.display !== "none") {
+                        subIngresos += parseFloat(filas[i].cells[4].textContent.replace(/,/g, '')) || 0;
+                        subSalidas += parseFloat(filas[i].cells[5].textContent.replace(/,/g, '')) || 0;
+                        subNeto += parseFloat(filas[i].cells[6].textContent.replace(/,/g, '')) || 0;
+                    }
+                }
+
+                document.getElementById('subtotal-ingresos-saldos').textContent = formatearNumero(subIngresos);
+                document.getElementById('subtotal-salidas-saldos').textContent = formatearNumero(subSalidas);
+
+                const elNeto = document.getElementById('subtotal-neto-saldos');
+                elNeto.textContent = formatearNumero(subNeto);
+
+                if (subNeto > 0) {
+                    elNeto.className = "px-4 py-3 text-right text-lg font-bold text-blue-800";
+                } else if (subNeto < 0) {
+                    elNeto.className = "px-4 py-3 text-right text-lg font-bold text-rose-700";
+                } else {
+                    elNeto.className = "px-4 py-3 text-right text-lg font-bold text-slate-800";
+                }
+
+                // No actualizar gráficos automáticamente si están ocultos
+                const contenedorGraficos = document.getElementById('contenedor-graficos');
+                if (contenedorGraficos && !contenedorGraficos.classList.contains('hidden')) {
+                    actualizarGraficosSaldos();
+                }
+            }
+
+            function actualizarTabla() {
+                const tbody = document.getElementById('cuerpo-tabla');
+                document.getElementById('contador-registros').innerText = registrosKardex.length;
+
+                if (registrosKardex.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="16" class="px-6 py-8 text-center text-gray-500 italic">No hay movimientos registrados.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = '';
+
+                for (let i = registrosKardex.length - 1; i >= 0; i--) {
+                    const reg = registrosKardex[i];
+                    const isIngreso = String(reg.tipo).toUpperCase() === 'INGRESO';
+                    const colorTipo = isIngreso ? '<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold">IN</span>' : '<span class="bg-rose-100 text-rose-800 px-2 py-0.5 rounded text-[10px] font-bold">OUT</span>';
+                    const colorCantidad = isIngreso ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold';
+
+                    const valorPeso = reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad);
+                    const catFibra = reg.categoria || reg.CATEGORIA || "-";
+                    const itemCat = catalogoCodigos.find(c => String(c.codigo) === String(reg.codigo));
+                    const nombreArticulo = itemCat ? itemCat.articulo : (reg.articulo && String(reg.articulo).trim() !== "-" && String(reg.articulo).trim() !== "" ? reg.articulo : "-");
+
+                    const tr = document.createElement('tr');
+                    tr.classList.add('hover:bg-slate-50', 'transition-colors', 'fila-historico');
+
+                    tr.innerHTML = `
+                    <td class="px-2 py-1.5 text-xs whitespace-nowrap">${formatearFechaDisplay(reg.fechaMovimiento)}</td>
                     <td class="px-2 py-1.5 text-xs font-medium whitespace-nowrap text-indigo-700 celda-cat">${catFibra}</td>
                     <td class="px-2 py-1.5 text-xs font-semibold text-slate-800 whitespace-nowrap">${reg.codigo}</td>
                     <td class="px-2 py-1.5 text-xs whitespace-nowrap">${reg.lote}</td>
@@ -1136,7 +1697,7 @@
                     <td class="px-2 py-1.5 text-xs text-right ${colorCantidad} whitespace-nowrap">${formatearNumero(valorPeso || 0)}</td>
                     <td class="px-2 py-1.5 text-xs whitespace-nowrap truncate max-w-[80px]">${reg.proveedor || '-'}</td>
                     <td class="px-2 py-1.5 text-xs whitespace-nowrap">${reg.origen || '-'}</td>
-                    <td class="px-2 py-1.5 text-xs whitespace-nowrap">${formatearFechaCorto(reg.fLlegada)}</td>
+                    <td class="px-2 py-1.5 text-xs whitespace-nowrap">${formatearFechaDisplay(reg.fLlegada)}</td>
                     <td class="px-2 py-1.5 text-xs whitespace-nowrap">${reg.andamio || '-'}</td>
                     <td class="px-2 py-1.5 text-xs whitespace-nowrap">${reg.nCaja || '-'}</td>
                     <td class="px-2 py-1.5 text-xs whitespace-nowrap">${reg.presentacion || '-'}</td>
@@ -1146,68 +1707,69 @@
                         <button onclick="eliminarRegistro(${i})" class="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition ml-1" title="Eliminar este registro">🗑️</button>
                     </td>
                 `;
-                tbody.appendChild(tr);
+                    tbody.appendChild(tr);
+                }
+
+                document.getElementById('pie-tabla-historico').classList.remove('hidden');
+                calcularSubtotalHistorico();
             }
 
-            document.getElementById('pie-tabla-historico').classList.remove('hidden');
-            calcularSubtotalHistorico();
-        }
+            function filtrarHistorico() {
+                const fFecha = document.getElementById('fh-fecha').value.toLowerCase();
+                const fCat = document.getElementById('fh-categoria').value.toLowerCase();
+                const fCodigo = document.getElementById('fh-codigo').value.toLowerCase();
+                const fLote = document.getElementById('fh-lote').value.toLowerCase();
+                const fCarac = document.getElementById('fh-caracteristicas').value.toLowerCase();
+                const fArticulo = document.getElementById('fh-articulo').value.toLowerCase();
+                const fTipo = document.getElementById('fh-tipo').value.toLowerCase();
 
-        function filtrarHistorico() {
-            const fFecha = document.getElementById('fh-fecha').value.toLowerCase();
-            const fCat = document.getElementById('fh-categoria').value.toLowerCase();
-            const fCodigo = document.getElementById('fh-codigo').value.toLowerCase();
-            const fLote = document.getElementById('fh-lote').value.toLowerCase();
-            const fCarac = document.getElementById('fh-caracteristicas').value.toLowerCase();
-            const fArticulo = document.getElementById('fh-articulo').value.toLowerCase();
-            const fTipo = document.getElementById('fh-tipo').value.toLowerCase();
+                const filas = document.getElementsByClassName('fila-historico');
 
-            const filas = document.getElementsByClassName('fila-historico');
+                for (let i = 0; i < filas.length; i++) {
+                    const txtFecha = filas[i].cells[0].textContent.toLowerCase();
+                    const txtCat = filas[i].querySelector('.celda-cat').textContent.toLowerCase();
+                    const txtCodigo = filas[i].cells[2].textContent.toLowerCase();
+                    const txtLote = filas[i].cells[3].textContent.toLowerCase();
+                    const txtCarac = filas[i].cells[4].textContent.toLowerCase();
+                    const txtArticulo = filas[i].cells[5].textContent.toLowerCase();
+                    const txtTipo = filas[i].cells[6].textContent.toLowerCase();
 
-            for (let i = 0; i < filas.length; i++) {
-                const txtFecha = filas[i].cells[0].textContent.toLowerCase();
-                const txtCat = filas[i].querySelector('.celda-cat').textContent.toLowerCase();
-                const txtCodigo = filas[i].cells[2].textContent.toLowerCase();
-                const txtLote = filas[i].cells[3].textContent.toLowerCase();
-                const txtCarac = filas[i].cells[4].textContent.toLowerCase();
-                const txtArticulo = filas[i].cells[5].textContent.toLowerCase();
-                const txtTipo = filas[i].cells[6].textContent.toLowerCase();
+                    const match = txtFecha.includes(fFecha) && (fCat === "" || txtCat.includes(fCat)) && txtCodigo.includes(fCodigo) &&
+                        txtLote.includes(fLote) && txtCarac.includes(fCarac) &&
+                        txtArticulo.includes(fArticulo) && (fTipo === "" || txtTipo.includes(fTipo));
 
-                const match = txtFecha.includes(fFecha) && (fCat === "" || txtCat.includes(fCat)) && txtCodigo.includes(fCodigo) && 
-                              txtLote.includes(fLote) && txtCarac.includes(fCarac) && 
-                              txtArticulo.includes(fArticulo) && (fTipo === "" || txtTipo.includes(fTipo));
+                    filas[i].style.display = match ? "" : "none";
+                }
 
-                filas[i].style.display = match ? "" : "none";
+                calcularSubtotalHistorico();
             }
-            
-            calcularSubtotalHistorico();
-        }
 
-        function calcularSubtotalHistorico() {
-            const filas = document.getElementsByClassName('fila-historico');
-            let subtotal = 0;
-            
-            for (let i = 0; i < filas.length; i++) {
-                if (filas[i].style.display !== "none") {
-                    const textoPeso = filas[i].cells[7].textContent.replace(/,/g, ''); 
-                    const peso = parseFloat(textoPeso) || 0;
-                    subtotal += peso;
+            function calcularSubtotalHistorico() {
+                const filas = document.getElementsByClassName('fila-historico');
+                let subtotal = 0;
+
+                for (let i = 0; i < filas.length; i++) {
+                    if (filas[i].style.display !== "none") {
+                        const textoPeso = filas[i].cells[7].textContent.replace(/,/g, '');
+                        const peso = parseFloat(textoPeso) || 0;
+                        subtotal += peso;
+                    }
+                }
+
+                const elSubtotal = document.getElementById('subtotal-peso-historico');
+                if (elSubtotal) {
+                    elSubtotal.textContent = formatearNumero(subtotal);
+
+                    if (subtotal > 0) {
+                        elSubtotal.className = "px-2 py-2 text-right text-xs text-emerald-700";
+                    } else if (subtotal < 0) {
+                        elSubtotal.className = "px-2 py-2 text-right text-xs text-rose-700";
+                    } else {
+                        elSubtotal.className = "px-2 py-2 text-right text-xs text-slate-800";
+                    }
                 }
             }
-
-            const elSubtotal = document.getElementById('subtotal-peso-historico');
-            if (elSubtotal) {
-                elSubtotal.textContent = formatearNumero(subtotal);
-                
-                if (subtotal > 0) {
-                    elSubtotal.className = "px-2 py-2 text-right text-xs text-emerald-700";
-                } else if (subtotal < 0) {
-                    elSubtotal.className = "px-2 py-2 text-right text-xs text-rose-700";
-                } else {
-                    elSubtotal.className = "px-2 py-2 text-right text-xs text-slate-800";
-                }
-            }
-        }
-    </script>
+        </script>
 </body>
+
 </html>
