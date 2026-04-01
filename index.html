@@ -944,7 +944,7 @@
             }
 
             // --- 1. CONFIGURACIÓN DEL BACKEND ---
-            const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz5MvWoG0Bs_ghicjJfuax6b3M3j8mJ7nrCBnvnY4_aZ6RRoIyNqxAqPgjXMV4dPyTh/exec";
+            const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzmJVJfEAAknL4mJ2_Au7qkYpEinC87QeBheg9CZ4WIQ4dN_i3U2vpfTiAZqRC0wQlu/exec";
 
             let registrosKardex = [];
             let catalogoCodigos = [];
@@ -991,33 +991,63 @@
                 }
             }
 
-            // --- 2. LECTURA DE DATOS (GET) ---
-            async function cargarDashboard() {
-                try {
-                    const response = await fetch(WEB_APP_URL);
-                    if (!response.ok) throw new Error("Error HTTP: " + response.status);
-
-                    const data = await response.json();
-
-                    registrosKardex = data.historico || [];
-                    catalogoCodigos = data.catalogo || [];
-
-                    actualizarTabla();
-                    actualizarTablaSaldos();
-                    configurarDropdownsCodigo();
-                    configurarDropdownsProveedor();
-                    configurarDropdownsOrigen();
-
+            // --- 2. LECTURA DE DATOS (JSONP para Velocidad Máxima) ---
+            function cargarDashboard() {
+                return new Promise((resolve, reject) => {
                     const indicador = document.getElementById('estado-conexion');
-                    indicador.classList.replace('bg-slate-700', 'bg-emerald-600');
-                    indicador.innerHTML = '¡Conectado! ✅';
+                    indicador.innerHTML = 'Conectando... <span class="animate-spin ml-2 inline-block">⏳</span>';
+                    indicador.classList.replace('bg-emerald-600', 'bg-slate-700');
+                    indicador.classList.replace('bg-rose-600', 'bg-slate-700');
 
-                } catch (error) {
-                    console.error("Error al cargar:", error);
-                    document.getElementById('cuerpo-tabla').innerHTML = `<tr><td colspan="16" class="px-6 py-8 text-center text-rose-500 font-bold">Asegúrate de que el acceso de tu Script en Google Sheets esté configurado como "Cualquier persona".<br><br>Detalle técnico: ${error.message}</td></tr>`;
-                    document.getElementById('estado-conexion').classList.replace('bg-slate-700', 'bg-rose-600');
-                    document.getElementById('estado-conexion').innerHTML = 'Error de Conexión ❌';
-                }
+                    const callbackName = 'jsonp_kardex_' + Math.floor(Math.random() * 1000000);
+                    
+                    window[callbackName] = function(responseData) {
+                        try {
+                            if (!responseData.success) {
+                                throw new Error(responseData.message || "Error en el servidor");
+                            }
+
+                            const data = responseData.data || {};
+                            registrosKardex = data.historico || [];
+                            catalogoCodigos = data.catalogo || [];
+
+                            actualizarTabla();
+                            actualizarTablaSaldos();
+                            configurarDropdownsCodigo();
+                            configurarDropdownsProveedor();
+                            configurarDropdownsOrigen();
+
+                            indicador.classList.replace('bg-slate-700', 'bg-emerald-600');
+                            indicador.innerHTML = '¡Conectado! ✅';
+
+                            // Limpieza
+                            delete window[callbackName];
+                            const scriptTag = document.getElementById('jsonp-script');
+                            if (scriptTag) scriptTag.remove();
+                            resolve(responseData);
+                        } catch (err) {
+                            manejarErrorCarga(err);
+                            reject(err);
+                        }
+                    };
+
+                    const script = document.createElement('script');
+                    script.id = 'jsonp-script';
+                    script.src = `${WEB_APP_URL}?action=dashboard&callback=${callbackName}&v=${Date.now()}`;
+                    script.onerror = () => {
+                        manejarErrorCarga(new Error("Error de red o URL inválida"));
+                        reject(new Error("Fallo al cargar script"));
+                    };
+                    document.body.appendChild(script);
+                });
+            }
+
+            function manejarErrorCarga(error) {
+                console.error("Error al cargar:", error);
+                document.getElementById('cuerpo-tabla').innerHTML = `<tr><td colspan="16" class="px-6 py-8 text-center text-rose-500 font-bold">Error de sincronización.<br><br>Detalle técnico: ${error.message}</td></tr>`;
+                const indicador = document.getElementById('estado-conexion');
+                indicador.classList.replace('bg-slate-700', 'bg-rose-600');
+                indicador.innerHTML = 'Error de Conexión ❌';
             }
 
             // --- SISTEMA DE AUTOCOMPLETADO VISUAL ---
@@ -1635,22 +1665,21 @@
                     selectCert.appendChild(opt);
                 });
 
+                const fragmentRoot = document.createDocumentFragment();
                 const categorias = ["FIBRAS ESPECIALES", "FIBRAS DE PRODUCCIÓN"];
                 
                 categorias.forEach(cat => {
                     const itemsCat = saldosArray.filter(i => i.categoria === cat);
                     if (itemsCat.length > 0) {
-                        // Fila de Encabezado de Grupo
                         const trHeader = document.createElement('tr');
                         trHeader.className = "bg-slate-100 group-header";
                         trHeader.innerHTML = `<td colspan="7" class="px-4 py-2 font-black text-slate-800 border-y border-slate-200 text-center uppercase tracking-widest text-xs">${cat}</td>`;
-                        tbody.appendChild(trHeader);
+                        fragmentRoot.appendChild(trHeader);
 
                         itemsCat.forEach(item => {
                             const colorSaldo = item.saldo > 0 ? 'text-blue-700 bg-blue-50' : (item.saldo < 0 ? 'text-rose-600' : 'text-gray-500');
                             const tr = document.createElement('tr');
                             tr.classList.add('hover:bg-blue-50', 'transition-colors', 'fila-saldo');
-                            // Atributo personalizado para facilitar el filtrado por categoria
                             tr.setAttribute('data-categoria', item.categoria); 
                             
                             tr.innerHTML = `
@@ -1664,10 +1693,11 @@
                                 ${formatearNumero(item.saldo)}
                             </td>
                             `;
-                            tbody.appendChild(tr);
+                            fragmentRoot.appendChild(tr);
                         });
                     }
                 });
+                tbody.appendChild(fragmentRoot);
 
                 document.getElementById('pie-tabla-saldos').classList.remove('hidden');
                 calcularSubtotalSaldos();
@@ -1758,22 +1788,26 @@
                 }
 
                 tbody.innerHTML = '';
-                
+                const fragmentHist = document.createDocumentFragment();
                 const categorias = ["FIBRAS ESPECIALES", "FIBRAS DE PRODUCCIÓN"];
                 
+                // Si hay demasiados registros, limitamos la visualización para proteger el rendimiento del navegador
+                const LIMITE_RECOPILACION = 800;
+
                 categorias.forEach(cat => {
-                    // Filtrar registros por categoría y mantener el orden descendente original
-                    const indicesYRegistros = registrosKardex
+                    const indicesYRegistrosFull = registrosKardex
                         .map((reg, originalIndex) => ({ reg, originalIndex }))
                         .filter(item => (item.reg.categoria || item.reg.CATEGORIA || "").toUpperCase() === cat)
                         .reverse();
+                    
+                    const indicesYRegistros = indicesYRegistrosFull.slice(0, LIMITE_RECOPILACION);
 
                     if (indicesYRegistros.length > 0) {
                         // Insertar fila de encabezado de grupo
                         const trHeader = document.createElement('tr');
                         trHeader.className = "bg-slate-100 group-header-hist no-print";
-                        trHeader.innerHTML = `<td colspan="15" class="px-3 py-1.5 font-black text-slate-600 border-y border-slate-200 text-center uppercase tracking-widest text-[9px]">${cat}</td>`;
-                        tbody.appendChild(trHeader);
+                        trHeader.innerHTML = `<td colspan="15" class="px-3 py-1.5 font-black text-slate-600 border-y border-slate-200 text-center uppercase tracking-widest text-[9px]">${cat} ${indicesYRegistrosFull.length > LIMITE_RECOPILACION ? '(Últimos 800)' : ''}</td>`;
+                        fragmentHist.appendChild(trHeader);
 
                         indicesYRegistros.forEach(({ reg, originalIndex }) => {
                             const isIngreso = String(reg.tipo).toUpperCase() === 'INGRESO';
@@ -1808,23 +1842,20 @@
                                 <div class="flex gap-2 justify-center">
                                     <button onclick="abrirModalEditar(${originalIndex})" 
                                             class="text-blue-600 hover:text-blue-800 transition-colors p-1" title="Editar">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                        </svg>
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                                     </button>
                                     <button onclick="eliminarRegistro(${originalIndex})" 
-                                            class="text-rose-600 hover:text-rose-800 transition-colors p-1" title="Eliminar">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                        </svg>
+                                            class="text-rose-500 hover:text-rose-700 transition-colors p-1" title="Eliminar">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                     </button>
                                 </div>
                             </td>
                             `;
-                            tbody.appendChild(tr);
+                            fragmentHist.appendChild(tr);
                         });
                     }
                 });
+                tbody.appendChild(fragmentHist);
 
                 document.getElementById('pie-tabla-historico').classList.remove('hidden');
                 calcularSubtotalHistorico();
