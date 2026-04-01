@@ -58,6 +58,138 @@
             }
         }
 
+        /* --- ESTILOS RESPONSIVE PARA MÓVIL --- */
+        @media (max-width: 640px) {
+            /* Mejorar interacción táctil */
+            button, a, input, select, textarea {
+                min-height: 44px;
+            }
+            
+            /* Header móvil */
+            #cabecera-principal {
+                padding: 12px 10px !important;
+            }
+            #cabecera-principal h1 {
+                font-size: 1.25rem !important;
+            }
+            #cabecera-principal p {
+                font-size: 0.7rem !important;
+                margin-top: 4px !important;
+            }
+            #estado-conexion {
+                position: static !important;
+                margin-top: 8px !important;
+                font-size: 0.65rem !important;
+                padding: 2px 8px !important;
+                justify-content: center !important;
+            }
+
+            /* Botones del menú principal */
+            .btn-menu-principal {
+                padding: 24px 12px !important;
+            }
+            .btn-menu-principal svg {
+                width: 40px !important;
+                height: 40px !important;
+                margin-bottom: 8px !important;
+            }
+            .btn-menu-principal span {
+                font-size: 1.5rem !important;
+            }
+            .btn-menu-stock {
+                font-size: 0.9rem !important;
+                padding: 14px 12px !important;
+            }
+            .btn-menu-stock svg {
+                width: 20px !important;
+                height: 20px !important;
+            }
+            .btn-menu-historico {
+                font-size: 0.9rem !important;
+                padding: 12px !important;
+            }
+            .btn-menu-historico svg {
+                width: 20px !important;
+                height: 20px !important;
+            }
+
+            /* Headers de secciones */
+            .seccion-header h2 {
+                font-size: 1.25rem !important;
+            }
+            .seccion-header .btn-back svg {
+                width: 24px !important;
+                height: 24px !important;
+            }
+
+            /* Botones de acción en tablas */
+            .acciones-tabla {
+                flex-direction: column !important;
+                gap: 6px !important;
+            }
+            .acciones-tabla button {
+                font-size: 0.75rem !important;
+                padding: 8px 12px !important;
+                width: 100% !important;
+                justify-content: center !important;
+            }
+
+            /* Toggle carga masiva */
+            .toggle-carga-masiva {
+                display: none !important;
+            }
+
+            /* Modal de edición */
+            #modal-editar .bg-white {
+                max-height: 95vh !important;
+                margin: 8px !important;
+            }
+            #modal-editar .p-6 {
+                padding: 12px !important;
+            }
+
+            /* Contenedor gráficos */
+            .chart-container-mobile {
+                height: 350px !important;
+            }
+
+            /* Botones de categoría */
+            .btn-categoria {
+                padding: 20px 12px !important;
+            }
+            .btn-categoria span {
+                font-size: 1.1rem !important;
+            }
+
+            /* Contador registros */
+            .contador-registros-wrap {
+                display: none !important;
+            }
+
+            /* Botones stock/historico header */
+            .acciones-header-vista {
+                flex-wrap: wrap !important;
+                gap: 6px !important;
+            }
+            .acciones-header-vista button {
+                font-size: 0.7rem !important;
+                padding: 6px 10px !important;
+            }
+
+            /* Formulario de salida */
+            .form-salida-container {
+                max-width: 100% !important;
+                padding: 12px !important;
+            }
+
+            /* Tablas: texto más compacto */
+            #tabla-saldos th,
+            #tabla-saldos td {
+                padding: 6px 4px !important;
+                font-size: 11px !important;
+            }
+        }
+
         /* --- ESTILOS PARA IMPRESIÓN --- */
         @media print {
             @page {
@@ -133,49 +265,49 @@
     </style>
 </head>
 
-<body class="bg-slate-100 text-slate-800 font-sans min-h-screen p-2 md:p-4">
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen p-1 sm:p-2 md:p-4">
 
-    <div id="contenedor-principal" class="w-full max-w-[98%] mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+    <div id="contenedor-principal" class="w-full max-w-[100%] sm:max-w-[98%] mx-auto bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden">
 
-        <div id="cabecera-principal" class="bg-slate-800 text-white p-6 text-center relative">
-            <h1 class="text-3xl font-bold tracking-tight">Kardex de Control</h1>
-            <p class="text-slate-300 mt-2">Gestión Inteligente de Inventario • Hilandería</p>
+        <div id="cabecera-principal" class="bg-slate-800 text-white p-4 sm:p-6 text-center relative">
+            <h1 class="text-xl sm:text-3xl font-bold tracking-tight">Kardex de Control</h1>
+            <p class="text-slate-300 mt-1 sm:mt-2 text-xs sm:text-base">Gestión Inteligente de Inventario • Hilandería</p>
             <div id="estado-conexion"
-                class="absolute top-4 right-4 text-xs font-bold px-3 py-1 rounded-full bg-slate-700 text-slate-300 flex items-center gap-2">
+                class="sm:absolute sm:top-4 sm:right-4 mx-auto sm:mx-0 mt-2 sm:mt-0 text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-1 rounded-full bg-slate-700 text-slate-300 flex items-center gap-2 w-fit">
                 Conectando... <div class="loader" style="width: 12px; height: 12px; border-width: 2px;"></div>
             </div>
         </div>
 
-        <div class="p-4 md:p-6">
+        <div class="p-3 sm:p-4 md:p-6">
 
             <!-- ==========================================
                  VISTA 1: MENÚ PRINCIPAL
                  ========================================== -->
             <div id="vista-menu" class="vista activa fade-in">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="grid grid-cols-2 md:grid-cols-2 gap-3 sm:gap-6 mb-4 sm:mb-6">
                     <button onclick="iniciarFlujo('INGRESO')"
-                        class="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl p-12 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg flex flex-col items-center justify-center">
-                        <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="btn-menu-principal bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl p-6 sm:p-12 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg flex flex-col items-center justify-center">
+                        <svg class="w-10 h-10 sm:w-16 sm:h-16 mb-2 sm:mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path>
                         </svg>
-                        <span class="text-4xl font-black tracking-wider">INGRESO</span>
+                        <span class="text-xl sm:text-4xl font-black tracking-wider">INGRESO</span>
                     </button>
 
                     <button onclick="iniciarFlujo('SALIDA')"
-                        class="bg-rose-500 hover:bg-rose-600 text-white rounded-xl p-12 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg flex flex-col items-center justify-center">
-                        <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="btn-menu-principal bg-rose-500 hover:bg-rose-600 text-white rounded-xl p-6 sm:p-12 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg flex flex-col items-center justify-center">
+                        <svg class="w-10 h-10 sm:w-16 sm:h-16 mb-2 sm:mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15 13l-3 3m0 0l-3-3m3 3V8m0 13a9 9 0 110-18 9 9 0 010 18z"></path>
                         </svg>
-                        <span class="text-4xl font-black tracking-wider">SALIDA</span>
+                        <span class="text-xl sm:text-4xl font-black tracking-wider">SALIDA</span>
                     </button>
                 </div>
 
                 <!-- Botón de STOCK -->
                 <button onclick="cambiarVista('vista-saldos')"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xl py-6 rounded-xl transition-colors flex items-center justify-center gap-3 mb-4 shadow-md transform hover:-translate-y-1">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="btn-menu-stock w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-base sm:text-xl py-4 sm:py-6 rounded-xl transition-colors flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4 shadow-md transform hover:-translate-y-1">
+                    <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                         </path>
@@ -185,8 +317,8 @@
 
                 <!-- Botón Histórico General -->
                 <button onclick="cambiarVista('vista-historico')"
-                    class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xl py-4 rounded-xl transition-colors flex items-center justify-center gap-3">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="btn-menu-historico w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-base sm:text-xl py-3 sm:py-4 rounded-xl transition-colors flex items-center justify-center gap-2 sm:gap-3">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
                     </svg>
@@ -198,26 +330,26 @@
                  VISTA 1.5: SELECCIÓN DE CATEGORÍA
                  ========================================== -->
             <div id="vista-categoria" class="vista fade-in max-w-4xl mx-auto">
-                <div class="flex items-center mb-6 border-b pb-4">
-                    <button onclick="cambiarVista('vista-menu')" class="text-slate-500 hover:text-slate-800 mr-4">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="seccion-header flex items-center mb-4 sm:mb-6 border-b pb-3 sm:pb-4">
+                    <button onclick="cambiarVista('vista-menu')" class="btn-back text-slate-500 hover:text-slate-800 mr-3 sm:mr-4">
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                         </svg>
                     </button>
-                    <h2 id="titulo-categoria" class="text-2xl font-bold text-slate-700">¿Qué tipo de fibra registrará?
+                    <h2 id="titulo-categoria" class="text-lg sm:text-2xl font-bold text-slate-700">¿Qué tipo de fibra registrará?
                     </h2>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-6 sm:mt-10">
                     <button onclick="seleccionarCategoria('FIBRAS ESPECIALES')"
-                        class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl p-10 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg border-b-4 border-indigo-800">
-                        <span class="text-2xl font-black block">FIBRAS ESPECIALES</span>
+                        class="btn-categoria bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl p-6 sm:p-10 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg border-b-4 border-indigo-800">
+                        <span class="text-lg sm:text-2xl font-black block">FIBRAS ESPECIALES</span>
                     </button>
 
                     <button onclick="seleccionarCategoria('FIBRAS DE PRODUCCIÓN')"
-                        class="bg-teal-600 hover:bg-teal-700 text-white rounded-xl p-10 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg border-b-4 border-teal-800">
-                        <span class="text-2xl font-black block">FIBRAS DE PRODUCCIÓN</span>
+                        class="btn-categoria bg-teal-600 hover:bg-teal-700 text-white rounded-xl p-6 sm:p-10 text-center transition-all transform hover:-translate-y-1 hover:shadow-lg border-b-4 border-teal-800">
+                        <span class="text-lg sm:text-2xl font-black block">FIBRAS DE PRODUCCIÓN</span>
                     </button>
                 </div>
             </div>
@@ -226,21 +358,21 @@
                  VISTA 2: FORMULARIO DE INGRESO
                  ========================================== -->
             <div id="vista-ingreso" class="vista fade-in max-w-5xl mx-auto">
-                <div class="flex items-center mb-6 border-b pb-4">
-                    <button onclick="cambiarVista('vista-categoria')" class="text-slate-500 hover:text-slate-800 mr-4">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="seccion-header flex flex-wrap items-center mb-4 sm:mb-6 border-b pb-3 sm:pb-4 gap-2">
+                    <button onclick="cambiarVista('vista-categoria')" class="btn-back text-slate-500 hover:text-slate-800 mr-2 sm:mr-4">
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                         </svg>
                     </button>
-                    <h2 class="text-2xl font-bold text-emerald-600 flex flex-col sm:flex-row sm:items-center gap-2">
+                    <h2 class="text-lg sm:text-2xl font-bold text-emerald-600 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                         <span>Registrar Ingreso</span>
                         <span class="hidden sm:inline text-slate-300">|</span>
                         <span id="lbl-categoria-ingreso"
-                            class="text-indigo-600 bg-indigo-50 px-3 py-1 rounded-lg text-lg"></span>
+                            class="text-indigo-600 bg-indigo-50 px-2 sm:px-3 py-1 rounded-lg text-sm sm:text-lg"></span>
                     </h2>
-                    <div class="ml-auto flex items-center gap-3 bg-slate-50 px-4 py-1.5 rounded-lg border border-slate-200 shadow-sm no-print">
-                        <span class="text-xs font-bold text-slate-600 uppercase tracking-tight">Carga Masiva</span>
+                    <div class="toggle-carga-masiva ml-auto flex items-center gap-2 sm:gap-3 bg-slate-50 px-3 sm:px-4 py-1.5 rounded-lg border border-slate-200 shadow-sm no-print">
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-tight">Carga Masiva</span>
                         <label class="relative inline-flex items-center cursor-pointer scale-75">
                             <input type="checkbox" id="ing-carga-masiva" class="sr-only peer">
                             <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
@@ -326,11 +458,11 @@
                         </div>
                     </div>
 
-                    <div class="mt-8 flex justify-end gap-4">
+                    <div class="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
                         <button type="button" onclick="cambiarVista('vista-categoria')"
-                            class="px-6 py-3 rounded-lg font-bold text-gray-600 bg-gray-200 hover:bg-gray-300 transition-colors">Cancelar</button>
+                            class="px-6 py-2.5 sm:py-3 rounded-lg font-bold text-gray-600 bg-gray-200 hover:bg-gray-300 transition-colors text-sm sm:text-base">Cancelar</button>
                         <button id="btn-submit-ingreso" type="submit"
-                            class="px-8 py-3 rounded-lg font-bold text-white bg-emerald-500 hover:bg-emerald-600 shadow-lg flex items-center justify-center gap-2 transition-all">
+                            class="px-8 py-2.5 sm:py-3 rounded-lg font-bold text-white bg-emerald-500 hover:bg-emerald-600 shadow-lg flex items-center justify-center gap-2 transition-all text-sm sm:text-base">
                             <span>GUARDAR INGRESO</span>
                         </button>
                     </div>
@@ -341,21 +473,21 @@
                  VISTA 3: FORMULARIO DE SALIDA
                  ========================================== -->
             <div id="vista-salida" class="vista fade-in">
-                <div class="flex items-center mb-6 border-b pb-4">
-                    <button onclick="cambiarVista('vista-categoria')" class="text-slate-500 hover:text-slate-800 mr-4">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="seccion-header flex flex-wrap items-center mb-4 sm:mb-6 border-b pb-3 sm:pb-4 gap-2">
+                    <button onclick="cambiarVista('vista-categoria')" class="btn-back text-slate-500 hover:text-slate-800 mr-2 sm:mr-4">
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                         </svg>
                     </button>
-                    <h2 class="text-2xl font-bold text-rose-600 flex flex-col sm:flex-row sm:items-center gap-2">
+                    <h2 class="text-lg sm:text-2xl font-bold text-rose-600 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                         <span>Registrar Salida</span>
                         <span class="hidden sm:inline text-slate-300">|</span>
                         <span id="lbl-categoria-salida"
-                            class="text-indigo-600 bg-indigo-50 px-3 py-1 rounded-lg text-lg"></span>
+                            class="text-indigo-600 bg-indigo-50 px-2 sm:px-3 py-1 rounded-lg text-sm sm:text-lg"></span>
                     </h2>
-                    <div class="ml-auto flex items-center gap-3 bg-slate-50 px-4 py-1.5 rounded-lg border border-slate-200 shadow-sm no-print">
-                        <span class="text-xs font-bold text-slate-600 uppercase tracking-tight">Carga Masiva</span>
+                    <div class="toggle-carga-masiva ml-auto flex items-center gap-2 sm:gap-3 bg-slate-50 px-3 sm:px-4 py-1.5 rounded-lg border border-slate-200 shadow-sm no-print">
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-tight">Carga Masiva</span>
                         <label class="relative inline-flex items-center cursor-pointer scale-75">
                             <input type="checkbox" id="sal-carga-masiva" class="sr-only peer">
                             <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-500"></div>
@@ -364,7 +496,7 @@
                 </div>
 
                 <form id="form-salida" onsubmit="guardarSalida(event)">
-                    <div class="max-w-md mx-auto bg-rose-50 p-6 rounded-xl border border-rose-100">
+                    <div class="form-salida-container max-w-md mx-auto bg-rose-50 p-4 sm:p-6 rounded-xl border border-rose-100">
                         <div class="space-y-5">
                             <div class="relative">
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Código *</label>
@@ -394,13 +526,13 @@
                             </div>
                         </div>
 
-                        <div class="mt-8 flex flex-col gap-3">
+                        <div class="mt-6 sm:mt-8 flex flex-col gap-2 sm:gap-3">
                             <button id="btn-submit-salida" type="submit"
-                                class="w-full py-4 rounded-lg font-bold text-white bg-rose-500 hover:bg-rose-600 shadow-lg text-lg flex items-center justify-center gap-2 transition-all">
+                                class="w-full py-3 sm:py-4 rounded-lg font-bold text-white bg-rose-500 hover:bg-rose-600 shadow-lg text-base sm:text-lg flex items-center justify-center gap-2 transition-all">
                                 <span>REGISTRAR SALIDA</span>
                             </button>
                             <button type="button" onclick="cambiarVista('vista-categoria')"
-                                class="w-full py-3 rounded-lg font-bold text-gray-600 bg-white border border-gray-300 hover:bg-gray-50 transition-colors">Cancelar</button>
+                                class="w-full py-2.5 sm:py-3 rounded-lg font-bold text-gray-600 bg-white border border-gray-300 hover:bg-gray-50 transition-colors text-sm sm:text-base">Cancelar</button>
                         </div>
                     </div>
                 </form>
@@ -410,52 +542,53 @@
                  VISTA 4: REPORTE DE SALDOS Y GRÁFICOS
                  ========================================== -->
             <div id="vista-saldos" class="vista fade-in">
-                <div class="flex flex-wrap items-center justify-between mb-8 pb-4 gap-4">
+                <div class="seccion-header flex flex-wrap items-center justify-between mb-6 sm:mb-8 pb-3 sm:pb-4 gap-3 sm:gap-4">
                     <div class="flex items-center">
                         <button onclick="cambiarVista('vista-menu')"
-                            class="bg-slate-100 p-2 rounded-xl text-slate-500 hover:text-slate-800 mr-5 transition-all hover:bg-slate-200 no-print">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="btn-back bg-slate-100 p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-slate-800 mr-3 sm:mr-5 transition-all hover:bg-slate-200 no-print">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                             </svg>
                         </button>
-                        <h2 class="text-3xl font-extrabold text-slate-800 tracking-tight">Stock Actual <span
+                        <h2 class="text-xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Stock Actual <span
                                 class="text-indigo-600">Saldos</span></h2>
                     </div>
 
-                    <div class="flex gap-3 no-print">
+                    <div class="acciones-header-vista acciones-tabla flex gap-2 sm:gap-3 no-print">
                         <button onclick="toggleGraficos()" id="btn-toggle-graficos"
-                            class="bg-indigo-50 border-2 border-indigo-100 hover:border-indigo-300 text-indigo-700 px-5 py-2.5 rounded-2xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm">
-                            📈 Ver Gráficos
+                            class="bg-indigo-50 border-2 border-indigo-100 hover:border-indigo-300 text-indigo-700 px-3 sm:px-5 py-2 sm:py-2.5 rounded-2xl font-bold text-xs sm:text-sm transition-all flex items-center gap-1 sm:gap-2 shadow-sm">
+                            📈 <span class="hidden sm:inline">Ver </span>Gráficos
                         </button>
                         <button onclick="window.print()"
-                            class="bg-white border-2 border-slate-100 hover:border-slate-300 text-slate-600 px-5 py-2.5 rounded-2xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm">
+                            class="bg-white border-2 border-slate-100 hover:border-slate-300 text-slate-600 px-3 sm:px-5 py-2 sm:py-2.5 rounded-2xl font-bold text-xs sm:text-sm transition-all flex items-center gap-1 sm:gap-2 shadow-sm">
                             🖨️ Imprimir
                         </button>
                         <button onclick="exportarExcel('tabla-saldos', 'Reporte_Stock_Actual')"
-                            class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-2xl font-bold text-sm transition-all flex items-center gap-2 shadow-lg shadow-emerald-200">
-                            📊 Exportar Excel
+                            class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-2xl font-bold text-xs sm:text-sm transition-all flex items-center gap-1 sm:gap-2 shadow-lg shadow-emerald-200">
+                            📊 <span class="hidden sm:inline">Exportar </span>Excel
                         </button>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10 no-print hidden" id="contenedor-graficos">
-                    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl flex flex-col items-center">
-                        <h3 class="text-xs font-black text-slate-400 mb-4 uppercase tracking-widest text-center">Stock por Artículo (KG) - Top 20</h3>
-                        <div class="w-full relative h-[500px] overflow-y-auto pr-2">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 mb-6 sm:mb-10 no-print hidden" id="contenedor-graficos">
+                    <div class="bg-white p-3 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 shadow-xl flex flex-col items-center">
+                        <h3 class="text-[10px] sm:text-xs font-black text-slate-400 mb-3 sm:mb-4 uppercase tracking-widest text-center">Stock por Artículo (KG) - Top 20</h3>
+                        <div class="w-full relative h-[300px] sm:h-[500px] overflow-y-auto pr-2 chart-container-mobile">
                             <canvas id="chartArticulos"></canvas>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl flex flex-col items-center">
-                        <h3 class="text-xs font-black text-slate-400 mb-4 uppercase tracking-widest text-center">Participación por Certificado (KG)</h3>
-                        <div class="w-full relative h-[500px] flex items-center justify-center">
+                    <div class="bg-white p-3 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 shadow-xl flex flex-col items-center">
+                        <h3 class="text-[10px] sm:text-xs font-black text-slate-400 mb-3 sm:mb-4 uppercase tracking-widest text-center">Participación por Certificado (KG)</h3>
+                        <div class="w-full relative h-[300px] sm:h-[500px] flex items-center justify-center chart-container-mobile">
                             <canvas id="chartLotes"></canvas>
                         </div>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto border rounded-xl shadow-sm pb-6">
-                    <table id="tabla-saldos" class="min-w-full divide-y divide-gray-200 text-sm">
+                <div class="overflow-x-auto border rounded-xl shadow-sm pb-6 relative">
+                    <div class="sm:hidden text-center text-[10px] text-slate-400 pb-2 sticky left-0">← Desliza para ver más →</div>
+                    <table id="tabla-saldos" class="min-w-[700px] sm:min-w-full divide-y divide-gray-200 text-xs sm:text-sm">
                         <thead class="bg-blue-800 text-white">
                             <tr>
                                 <th class="px-4 py-3 text-left font-semibold uppercase tracking-wider w-[8%]">Código</th>
@@ -505,15 +638,15 @@
                             </tr>
                         </tbody>
                         <tfoot id="pie-tabla-saldos"
-                            class="bg-blue-100 font-bold text-slate-800 border-t-4 border-blue-300 hidden">
+                            class="bg-blue-100 font-bold text-slate-800 border-t-4 border-blue-300 hidden text-xs sm:text-sm">
                             <tr>
                                 <td colspan="3"
-                                    class="px-4 py-3 text-right uppercase tracking-wider text-sm text-blue-900">Subtotal
+                                    class="px-2 sm:px-4 py-2 sm:py-3 text-right uppercase tracking-wider text-[10px] sm:text-sm text-blue-900">Subtotal
                                     Filtrado (NETO):</td>
-                                <td class="px-4 py-3 text-right text-emerald-700" id="subtotal-ingresos-saldos">0.00
+                                <td class="px-2 sm:px-4 py-2 sm:py-3 text-right text-emerald-700" id="subtotal-ingresos-saldos">0.00
                                 </td>
-                                <td class="px-4 py-3 text-right text-rose-700" id="subtotal-salidas-saldos">0.00</td>
-                                <td class="px-4 py-3 text-right text-lg text-blue-800" id="subtotal-neto-saldos">0.00
+                                <td class="px-2 sm:px-4 py-2 sm:py-3 text-right text-rose-700" id="subtotal-salidas-saldos">0.00</td>
+                                <td class="px-2 sm:px-4 py-2 sm:py-3 text-right text-sm sm:text-lg text-blue-800" id="subtotal-neto-saldos">0.00
                                 </td>
                             </tr>
                         </tfoot>
@@ -525,48 +658,46 @@
                  VISTA 5: HISTÓRICO GENERAL
                  ========================================== -->
             <div id="vista-historico" class="vista fade-in">
-                <div class="flex flex-wrap items-center justify-between mb-8 pb-4 gap-4">
+                <div class="seccion-header flex flex-wrap items-center justify-between mb-6 sm:mb-8 pb-3 sm:pb-4 gap-3 sm:gap-4">
                     <div class="flex items-center">
                         <button onclick="cambiarVista('vista-menu')"
-                            class="bg-slate-100 p-2 rounded-xl text-slate-500 hover:text-slate-800 mr-5 transition-all hover:bg-slate-200 no-print">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="btn-back bg-slate-100 p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-slate-800 mr-3 sm:mr-5 transition-all hover:bg-slate-200 no-print">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                             </svg>
                         </button>
-                        <h2 class="text-3xl font-extrabold text-slate-800 tracking-tight">HISTÓRICO</h2>
+                        <h2 class="text-xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">HISTÓRICO</h2>
                     </div>
 
-                    <div class="flex items-center gap-6">
-                        <div class="hidden md:flex flex-col items-end">
+                    <div class="flex items-center gap-4 sm:gap-6">
+                        <div class="contador-registros-wrap hidden md:flex flex-col items-end">
                             <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total
                                 Registros</span>
                             <span id="contador-registros"
                                 class="text-2xl font-black text-emerald-600 leading-none">0</span>
                         </div>
-                        <div class="flex gap-2 no-print">
+                        <div class="acciones-header-vista acciones-tabla flex gap-2 no-print">
                             <button onclick="window.print()"
-                                class="bg-white border-2 border-slate-100 hover:border-slate-300 text-slate-600 px-5 py-2.5 rounded-2xl font-bold text-sm transition-all flex items-center gap-2">
+                                class="bg-white border-2 border-slate-100 hover:border-slate-300 text-slate-600 px-3 sm:px-5 py-2 sm:py-2.5 rounded-2xl font-bold text-xs sm:text-sm transition-all flex items-center gap-1 sm:gap-2">
                                 🖨️ Imprimir
                             </button>
                             <button onclick="exportarExcel('tabla-historico', 'Historico')"
-                                class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-2xl font-bold text-sm transition-all flex items-center gap-2 shadow-lg shadow-emerald-200">
-                                📊 Exportar Excel
+                                class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-2xl font-bold text-xs sm:text-sm transition-all flex items-center gap-1 sm:gap-2 shadow-lg shadow-emerald-200">
+                                📊 <span class="hidden sm:inline">Exportar </span>Excel
                             </button>
                         </div>
                     </div>
                 </div>
 
-<div class="overflow-x-auto border rounded-xl shadow-sm pb-10">
-                    <table class="min-w-full divide-y divide-gray-200 text-[11px]" id="tabla-historico">
+<div class="overflow-x-auto border rounded-xl shadow-sm pb-10 relative">
+                    <div class="sm:hidden text-center text-[10px] text-slate-400 pb-2 sticky left-0">← Desliza para ver más →</div>
+                    <table class="min-w-[900px] sm:min-w-full divide-y divide-gray-200 text-[10px] sm:text-[11px]" id="tabla-historico">
                         <thead class="bg-slate-800 text-white">
                             <tr>
                                 <th
                                     class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">
                                     Fecha Mov.</th>
-                                <th
-                                    class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">
-                                    Categoría</th>
                                 <th
                                     class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">
                                     Código</th>
@@ -599,32 +730,23 @@
                                     Andamio</th>
                                 <th
                                     class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">
-                                    N° Caja</th>
-                                <th
-                                    class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">
-                                    Presentación</th>
-                                <th
-                                    class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">
-                                    Certificado</th>
-                                <th
-                                    class="px-3 py-1.5 text-center font-bold uppercase tracking-wider bg-slate-800 sticky right-0 z-10 shadow-[-4px_0_6px_-4px_rgba(255,255,255,0.1)]">
-                                    ACCION</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Fecha Mov.</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Código</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Lote</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap text-amber-300">Características</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Artículo</th>
+                                <th class="px-2 py-1.5 text-center font-semibold uppercase tracking-wider whitespace-nowrap">Tipo Mov.</th>
+                                <th class="px-2 py-1.5 text-right font-semibold uppercase tracking-wider whitespace-nowrap">PESO (KG)</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Proveedor</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Origen</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">F. Llegada</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Andamio</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">N° Caja</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Presentación</th>
+                                <th class="px-2 py-1.5 text-left font-semibold uppercase tracking-wider whitespace-nowrap">Certificado</th>
+                                <th class="px-3 py-1.5 text-center font-bold uppercase tracking-wider bg-slate-800 sticky right-0 z-10 shadow-[-4px_0_6px_-4px_rgba(255,255,255,0.1)]">ACCION</th>
                             </tr>
                             <tr class="bg-slate-700 no-print">
-                                <td class="p-1"><input type="text" id="fh-fecha" onkeyup="filtrarHistorico()"
-                                        placeholder="Filtrar..."
-                                        class="w-full text-[10px] text-black px-1 py-1 rounded outline-none border-none border-gray-100">
-                                </td>
-                                <td class="p-1">
-                                    <select id="fh-categoria" onchange="filtrarHistorico()"
-                                        class="w-full text-[10px] text-black px-1 py-1 rounded outline-none border-none">
-                                        <option value="">Todas</option>
-                                        <option value="FIBRAS ESPECIALES">ESPECIALES</option>
-                                        <option value="FIBRAS DE PRODUCCIÓN">PRODUCCIÓN</option>
-                                    </select>
-                                </td>
-                                <td class="p-1"><input type="text" id="fh-codigo" onkeyup="filtrarHistorico()"
-                                        placeholder="Filtrar..."
                                         class="w-full text-[10px] text-black px-1 py-1 rounded outline-none border-none">
                                 </td>
                                 <td class="p-1"><input type="text" id="fh-lote" onkeyup="filtrarHistorico()"
@@ -676,24 +798,24 @@
          MODAL DE EDICIÓN
          ========================================== -->
         <div id="modal-editar"
-            class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4 fade-in no-print">
+            class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-2 sm:p-4 fade-in no-print">
             <div
-                class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-200">
-                <div class="bg-blue-700 text-white px-6 py-4 flex justify-between items-center">
+                class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] flex flex-col overflow-hidden border border-slate-200">
+                <div class="bg-blue-700 text-white px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
                     <div>
-                        <h3 class="text-xl font-bold">Editar Registro</h3>
-                        <p class="text-blue-100 text-xs">Modificación de Registro</p>
+                        <h3 class="text-lg sm:text-xl font-bold">Editar Registro</h3>
+                        <p class="text-blue-100 text-[10px] sm:text-xs">Modificación de Registro</p>
                     </div>
                     <button onclick="cerrarModalEditar()" class="text-white hover:text-blue-200 transition-colors">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-7 h-7 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
                 </div>
-                <div class="p-6 overflow-y-auto flex-1 bg-white">
+                <div class="p-3 sm:p-6 overflow-y-auto flex-1 bg-white">
                     <form id="form-editar" onsubmit="guardarEdicionLocal(event)">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5">
                             <div><label class="block text-sm font-semibold text-gray-600 mb-1">Fecha Movimiento
                                     *</label><input type="date" id="ed-fecha" required
                                     class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
@@ -775,11 +897,11 @@
                             </div>
                         </div>
 
-                        <div class="mt-8 flex justify-end gap-3">
+                        <div class="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
                             <button type="button" onclick="cerrarModalEditar()"
-                                class="px-6 py-2.5 rounded-lg font-bold text-gray-600 bg-gray-200 hover:bg-gray-300 transition-colors">Cancelar</button>
+                                class="px-6 py-2 sm:py-2.5 rounded-lg font-bold text-gray-600 bg-gray-200 hover:bg-gray-300 transition-colors text-sm sm:text-base">Cancelar</button>
                             <button type="submit"
-                                class="px-8 py-2.5 rounded-lg font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg flex items-center gap-2 transition-all">
+                                class="px-8 py-2 sm:py-2.5 rounded-lg font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg flex items-center justify-center gap-2 transition-all text-sm sm:text-base">
                                 💾 GUARDAR CAMBIOS
                             </button>
                         </div>
@@ -1666,60 +1788,76 @@
                 document.getElementById('contador-registros').innerText = registrosKardex.length;
 
                 if (registrosKardex.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="16" class="px-6 py-8 text-center text-gray-500 italic">No hay movimientos registrados.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="15" class="px-6 py-8 text-center text-gray-500 italic">No hay movimientos registrados.</td></tr>`;
                     return;
                 }
 
                 tbody.innerHTML = '';
+                
+                const categorias = ["FIBRAS ESPECIALES", "FIBRAS DE PRODUCCIÓN"];
+                
+                categorias.forEach(cat => {
+                    // Filtrar registros por categoría y mantener el orden descendente original
+                    const indicesYRegistros = registrosKardex
+                        .map((reg, originalIndex) => ({ reg, originalIndex }))
+                        .filter(item => (item.reg.categoria || item.reg.CATEGORIA || "").toUpperCase() === cat)
+                        .reverse();
 
-                for (let i = registrosKardex.length - 1; i >= 0; i--) {
-                    const reg = registrosKardex[i];
-                    const isIngreso = String(reg.tipo).toUpperCase() === 'INGRESO';
-                    const colorTipo = isIngreso ? '<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold">IN</span>' : '<span class="bg-rose-100 text-rose-800 px-2 py-0.5 rounded text-[10px] font-bold">OUT</span>';
-                    const colorCantidad = isIngreso ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold';
+                    if (indicesYRegistros.length > 0) {
+                        // Insertar fila de encabezado de grupo
+                        const trHeader = document.createElement('tr');
+                        trHeader.className = "bg-slate-100 group-header-hist no-print";
+                        trHeader.innerHTML = `<td colspan="16" class="px-3 py-1.5 font-black text-slate-600 border-y border-slate-200 text-center uppercase tracking-widest text-[9px]">${cat}</td>`;
+                        tbody.appendChild(trHeader);
 
-                    const valorPeso = reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad);
-                    const catFibra = reg.categoria || reg.CATEGORIA || "-";
-                    const itemCat = catalogoCodigos.find(c => String(c.codigo) === String(reg.codigo));
-                    const nombreArticulo = itemCat ? itemCat.articulo : (reg.articulo && String(reg.articulo).trim() !== "-" && String(reg.articulo).trim() !== "" ? reg.articulo : "-");
+                        indicesYRegistros.forEach(({ reg, originalIndex }) => {
+                            const isIngreso = String(reg.tipo).toUpperCase() === 'INGRESO';
+                            const colorTipo = isIngreso ? '<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold">IN</span>' : '<span class="bg-rose-100 text-rose-800 px-2 py-0.5 rounded text-[10px] font-bold">OUT</span>';
+                            const colorCantidad = isIngreso ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold';
 
-                    const tr = document.createElement('tr');
-                    tr.classList.add('hover:bg-slate-50', 'transition-colors', 'fila-historico');
+                            const valorPeso = reg.peso !== undefined ? reg.peso : (reg.PESO !== undefined ? reg.PESO : reg.cantidad);
+                            const itemCat = catalogoCodigos.find(c => String(c.codigo) === String(reg.codigo));
+                            const nombreArticulo = itemCat ? itemCat.articulo : (reg.articulo && String(reg.articulo).trim() !== "-" && String(reg.articulo).trim() !== "" ? reg.articulo : "-");
 
-                    tr.innerHTML = `
-                    <td class="px-2 py-1.5 text-[10px] whitespace-nowrap text-slate-500">${formatearFechaDisplay(reg.fechaMovimiento)}</td>
-                    <td class="px-2 py-1.5 text-[10px] font-bold text-indigo-700 max-w-[120px] truncate celda-cat">${catFibra}</td>
-                    <td class="px-2 py-1.5 text-[10px] font-bold text-slate-800 whitespace-nowrap">${reg.codigo}</td>
-                    <td class="px-2 py-1.5 text-[10px] whitespace-nowrap font-mono">${reg.lote}</td>
-                    <td class="px-2 py-1.5 text-[10px] min-w-[120px] whitespace-normal break-words text-slate-500">${reg.caracteristicas || '-'}</td>
-                    <td class="px-2 py-1.5 text-[10px] font-medium text-slate-700 min-w-[150px] whitespace-normal break-words">${nombreArticulo}</td>
-                    <td class="px-2 py-1.5 text-center whitespace-nowrap">${colorTipo}</td>
-                    <td class="px-2 py-1.5 text-[10px] text-right ${colorCantidad} whitespace-nowrap">${formatearNumero(valorPeso || 0)}</td>
-                    <td class="px-2 py-1.5 text-[10px] whitespace-nowrap truncate max-w-[90px] text-slate-500">${reg.proveedor || '-'}</td>
-                    <td class="px-2 py-1.5 text-[10px] whitespace-nowrap text-slate-500">${reg.origen || '-'}</td>
-                    <td class="px-2 py-1.5 text-[10px] whitespace-nowrap text-slate-500">${formatearFechaDisplay(reg.fLlegada)}</td>
-                    <td class="px-2 py-1.5 text-[10px] whitespace-nowrap text-slate-500">${reg.andamio || '-'}</td>
-                    <td class="px-2 py-1.5 text-[10px] whitespace-nowrap text-slate-500">${reg.nCaja || '-'}</td>
-                    <td class="px-2 py-1.5 text-[10px] whitespace-nowrap text-slate-500">${reg.presentacion || '-'}</td>
-                    <td class="px-2 py-1.5 text-[10px] whitespace-nowrap font-bold text-slate-500">${reg.certificado || '-'}</td>
-                    
-                    <td class="px-3 py-1.5 text-center whitespace-nowrap border-l border-slate-100 no-print sticky right-0 bg-white z-10 shadow-[-10px_0_15px_-10px_rgba(0,0,0,0.1)] flex gap-2 justify-center">
-                        <button onclick="abrirModalEditar(${i})" 
-                                class="text-blue-600 hover:text-blue-800 transition-colors p-1" title="Editar">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                            </svg>
-                        </button>
-                        <button onclick="eliminarRegistro(${i})" 
-                                class="text-rose-600 hover:text-rose-800 transition-colors p-1" title="Eliminar">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                            </svg>
-                        </button>
-                    </td>
-                `;
-                    tbody.appendChild(tr);
-                }
+                            const tr = document.createElement('tr');
+                            tr.classList.add('hover:bg-slate-50', 'transition-colors', 'fila-historico');
+                            tr.setAttribute('data-categoria', cat);
+
+                            tr.innerHTML = `
+                            <td class="px-2 py-1.5 text-[10px] whitespace-nowrap text-slate-500">${formatearFechaDisplay(reg.fechaMovimiento)}</td>
+                            <td class="px-2 py-1.5 text-[10px] font-bold text-slate-800 whitespace-nowrap">${reg.codigo}</td>
+                            <td class="px-2 py-1.5 text-[10px] whitespace-nowrap font-mono">${reg.lote}</td>
+                            <td class="px-2 py-1.5 text-[10px] min-w-[120px] whitespace-normal break-words text-slate-500">${reg.caracteristicas || '-'}</td>
+                            <td class="px-2 py-1.5 text-[10px] font-medium text-slate-700 min-w-[150px] whitespace-normal break-words">${nombreArticulo}</td>
+                            <td class="px-2 py-1.5 text-center whitespace-nowrap">${colorTipo}</td>
+                            <td class="px-2 py-1.5 text-[10px] text-right ${colorCantidad} whitespace-nowrap">${formatearNumero(valorPeso || 0)}</td>
+                            <td class="px-2 py-1.5 text-[10px] whitespace-nowrap truncate max-w-[90px] text-slate-500">${reg.proveedor || '-'}</td>
+                            <td class="px-2 py-1.5 text-[10px] whitespace-nowrap text-slate-500">${reg.origen || '-'}</td>
+                            <td class="px-2 py-1.5 text-[10px] whitespace-nowrap text-slate-500">${formatearFechaDisplay(reg.fLlegada)}</td>
+                            <td class="px-2 py-1.5 text-[10px] whitespace-nowrap text-slate-500">${reg.andamio || '-'}</td>
+                            <td class="px-2 py-1.5 text-[10px] whitespace-nowrap text-slate-500">${reg.nCaja || '-'}</td>
+                            <td class="px-2 py-1.5 text-[10px] whitespace-nowrap text-slate-500">${reg.presentacion || '-'}</td>
+                            <td class="px-2 py-1.5 text-[10px] whitespace-nowrap font-bold text-slate-500">${reg.certificado || '-'}</td>
+                            
+                            <td class="px-3 py-1.5 text-center whitespace-nowrap border-l border-slate-100 no-print sticky right-0 bg-white z-10 shadow-[-10px_0_15px_-10px_rgba(0,0,0,0.1)] flex gap-2 justify-center">
+                                <button onclick="abrirModalEditar(${originalIndex})" 
+                                        class="text-blue-600 hover:text-blue-800 transition-colors p-1" title="Editar">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                </button>
+                                <button onclick="eliminarRegistro(${originalIndex})" 
+                                        class="text-rose-600 hover:text-rose-800 transition-colors p-1" title="Eliminar">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                    }
+                });
 
                 document.getElementById('pie-tabla-historico').classList.remove('hidden');
                 calcularSubtotalHistorico();
@@ -1727,7 +1865,6 @@
 
             function filtrarHistorico() {
                 const fFecha = document.getElementById('fh-fecha').value.toLowerCase();
-                const fCat = document.getElementById('fh-categoria').value.toLowerCase();
                 const fCodigo = document.getElementById('fh-codigo').value.toLowerCase();
                 const fLote = document.getElementById('fh-lote').value.toLowerCase();
                 const fCarac = document.getElementById('fh-caracteristicas').value.toLowerCase();
@@ -1738,18 +1875,27 @@
 
                 for (let i = 0; i < filas.length; i++) {
                     const txtFecha = filas[i].cells[0].textContent.toLowerCase();
-                    const txtCat = filas[i].querySelector('.celda-cat').textContent.toLowerCase();
-                    const txtCodigo = filas[i].cells[2].textContent.toLowerCase();
-                    const txtLote = filas[i].cells[3].textContent.toLowerCase();
-                    const txtCarac = filas[i].cells[4].textContent.toLowerCase();
-                    const txtArticulo = filas[i].cells[5].textContent.toLowerCase();
-                    const txtTipo = filas[i].cells[6].textContent.toLowerCase();
+                    const txtCodigo = filas[i].cells[1].textContent.toLowerCase();
+                    const txtLote = filas[i].cells[2].textContent.toLowerCase();
+                    const txtCarac = filas[i].cells[3].textContent.toLowerCase();
+                    const txtArticulo = filas[i].cells[4].textContent.toLowerCase();
+                    const txtTipo = filas[i].cells[5].textContent.toLowerCase();
 
-                    const match = txtFecha.includes(fFecha) && (fCat === "" || txtCat.includes(fCat)) && txtCodigo.includes(fCodigo) &&
+                    const match = txtFecha.includes(fFecha) && txtCodigo.includes(fCodigo) &&
                         txtLote.includes(fLote) && txtCarac.includes(fCarac) &&
                         txtArticulo.includes(fArticulo) && (fTipo === "" || txtTipo.includes(fTipo));
 
                     filas[i].style.display = match ? "" : "none";
+                }
+
+                // Controlar visibilidad de encabezados de grupo
+                const headers = document.getElementsByClassName('group-header-hist');
+                for (let h = 0; h < headers.length; h++) {
+                    const cat = headers[h].textContent.trim();
+                    let groupVisible = false;
+                    const items = document.querySelectorAll(`.fila-historico[data-categoria="${cat}"]`);
+                    items.forEach(item => { if (item.style.display !== "none") groupVisible = true; });
+                    headers[h].style.display = groupVisible ? "" : "none";
                 }
 
                 calcularSubtotalHistorico();
@@ -1761,7 +1907,7 @@
 
                 for (let i = 0; i < filas.length; i++) {
                     if (filas[i].style.display !== "none") {
-                        const textoPeso = filas[i].cells[7].textContent.replace(/,/g, '');
+                        const textoPeso = filas[i].cells[6].textContent.replace(/,/g, '');
                         const peso = parseFloat(textoPeso) || 0;
                         subtotal += peso;
                     }
